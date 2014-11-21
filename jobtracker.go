@@ -86,10 +86,10 @@ var httpClientMutex sync.Mutex
 
 func init() {
 	httpClientMutex = sync.Mutex{}
-	NewHTTPClient()
+	generateNewHTTPClient()
 }
 
-func NewHTTPClient() {
+func generateNewHTTPClient() {
 	httpClientMutex.Lock()
 	httpClient = http.Client{
 		Transport: &http.Transport{
@@ -110,7 +110,7 @@ func getJSON(url string, data interface{}) error {
 	resp, err := httpClient.Get(url)
 	if err != nil {
 		if strings.Index(err.Error(), "use of closed network connection") != -1 {
-			NewHTTPClient()
+			generateNewHTTPClient()
 		}
 		return err
 	}
@@ -302,7 +302,7 @@ func (jt *jobTracker) cleanupLoop() {
 				job.complete = false
 				job.Tasks = nil
 				job.Counters = nil
-				counter += 1
+				counter++
 			}
 		}
 		log.Printf("Dropped full data for %d older jobs.\n", counter)
@@ -370,7 +370,7 @@ func (jt *jobTracker) UpdatePartialJob(job *job) error {
 	return nil
 }
 
-func Min(i, j int) int {
+func min(i, j int) int {
 	if i < j {
 		return i
 	}
@@ -385,13 +385,13 @@ func trimTasks(pairs [][]int64) [][]int64 {
 		return pairs
 	}
 
-	trimmed := make([][]int64, 0)
+	var trimmed [][]int64
 
 	sort.Sort(taskListByStartTime(pairs))
 
 	sampleSize := int(len(pairs) / taskLimit)
 	for i := 0; i < len(pairs)/sampleSize; i++ {
-		window := pairs[i*sampleSize : Min((i+1)*sampleSize, len(pairs))]
+		window := pairs[i*sampleSize : min((i+1)*sampleSize, len(pairs))]
 		sort.Sort(sort.Reverse(taskListByDuration(window)))
 		trimmed = append(trimmed, window[0])
 	}
