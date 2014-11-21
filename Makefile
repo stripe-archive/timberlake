@@ -4,17 +4,21 @@ RELEASE_NAME = timberlake-$(TIMBERLAKE_VERSION)
 
 all: build
 
-build: timberlake static
+build: bin/timberlake bin/slack static
 
 release: clean build
 	mkdir -p $(RELEASE_NAME)
-	cp -r timberlake static README.md LICENSE $(RELEASE_NAME)/
+	cp -r bin static README.md LICENSE $(RELEASE_NAME)/
 	tar -cvzf $(RELEASE_NAME).tar.gz $(RELEASE_NAME)
 
-timberlake:
+bin/timberlake:
 	go get -v github.com/zenazn/goji
 	go get -v github.com/colinmarc/hdfs
-	go build -v
+	go build -o bin/timberlake .
+
+bin/slack:
+	go build -o bin/slack bots/slack.go
+
 
 static: node_modules
 	node_modules/.bin/gulp build
@@ -24,7 +28,7 @@ node_modules:
 
 clean:
 	rm -f timberlake timberlake-*.tar.gz
-	rm -rf static
+	rm -rf static bin node_modules
 	rm -rf $(RELEASE_NAME)
 
 .PHONY: clean build release
