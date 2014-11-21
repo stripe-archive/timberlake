@@ -15,16 +15,12 @@ timberlake:
 	go get -v github.com/tools/godep
 	$(GOPATH)/bin/godep go build -v
 
-node_modules:
-	npm install
-
-static: node_modules
+static:
 	node_modules/.bin/gulp build
 
 clean:
 	rm -f timberlake timberlake-*.tar.gz
 	rm -rf static
-	rm -rf node_modules
 	rm -rf $(RELEASE_NAME)
 
 .PHONY: clean release
