@@ -62,6 +62,7 @@ func (sse *sse) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	go func() {
 		<-w.(http.CloseNotifier).CloseNotify()
 		sse.removeClient <- events
+		close(events)
 	}()
 
 	newline := []byte("\n")
