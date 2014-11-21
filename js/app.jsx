@@ -804,7 +804,7 @@ var ReduceSummary = React.createClass({
 React.render(
   <Routes>
     <Route handler={App}>
-      <Route name="app" path="/" handler={BigData} />
+      <Route name="app" path="/" handler={BigData} ignoreScrollBehavior={true} />
       <Route name="job" path="/job/:jobId" handler={Job} />
       <Route name="logs" path="/job/:jobId/logs" handler={JobLogs} />
     </Route>
