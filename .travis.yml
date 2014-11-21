@@ -1,0 +1,14 @@
+language: go
+go: 1.3
+script: true
+before_deploy: make release
+deploy:
+  provider: releases
+  api_key:
+    secure: rEJNFRzXQsyPLgScioCS81XKkCHX2R95LGMGpYG3VKzeJv3qN0b8r+pY/pEBosAqgFlHI2q0VOXqNaKHmYrmtTNgSlPv4sgr9vImblpgMTm02BPtB6Bb32o18QnX7iZXh/PCeBdBf4zT5LByqG83ru6C4LbUsU8SZZnqL+9WXa0=
+  file: timberlake-*.tar.gz
+  file_glob: true
+  on:
+    repo: stripe/timberlake
+    tags: true
+    all_branches: true
