@@ -70,8 +70,8 @@ links back to Timberlake.
             --external-timberlake-url https://timberlake.example.com \
             --slack-url https://hooks.slack.com/services/...
 
-You'll need to create a new [Incoming Webhook](https://slack.com/services) to
-generate the Slack URL for your bot.
+    You'll need to create a new [Incoming Webhook](https://slack.com/services)
+    to generate the Slack URL for your bot.
 
 
 # Limitations
