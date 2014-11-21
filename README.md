@@ -34,7 +34,7 @@ links back to Timberlake.
 ## Screenshots
 
 #### Job Details
-![Job Details](https://cloud.githubusercontent.com/assets/57258/5137475/f4972946-70ee-11e4-9040-08a905ce8842.png)
+![Job Details](https://cloud.githubusercontent.com/assets/57258/5138257/b65377fe-7100-11e4-89b9-13fbacf411b1.png)
 
 #### List of Jobs
 ![List of Jobs](https://cloud.githubusercontent.com/assets/57258/5137476/f755b92c-70ee-11e4-8d6f-6819e5035529.png)
