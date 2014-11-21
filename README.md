@@ -21,14 +21,13 @@ behavior of our jobs. And when jobs fail, Timberlake will show the key
 parts of the logs that will help us debug the job.
 
 Timberlake pairs well with Scalding and Cascading. It uses extra data from the
-Cascading planner to show the relationships between flow steps; it's clear which
-jobs are used as input to other jobs and how the whole flow performed.
-Visualizing the flow has helped us to find which steps in the flow are causing
-bottlenecks.
+Cascading planner to show the relationships between steps, and to clarify which
+jobs' outputs are used as inputs to other jobs in the flow. Visualizing that
+flow makes it much easier to figure out which steps are causing bottlenecks.
 
 We've also included a Slackbot that has significantly improved our Hadooping
 lives. The bot can notify you when your jobs start and finish, and provides
-links back to timberlake.
+links back to Timberlake.
 
 
 ## Screenshots
