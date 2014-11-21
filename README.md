@@ -50,9 +50,9 @@ links back to Timberlake.
 
         make
 
-The Makefile assumes that you've set up your
-[`$GOPATH`](http://golang.org/doc/code.html) and will try to install
-[`godep`](https://github.com/tools/godep) if it doesn't already exist.
+    The Makefile assumes that you've already set up your
+    [`$GOPATH`](http://golang.org/doc/code.html). It will try to install
+    [`godep`](https://github.com/tools/godep) if it doesn't already exist.
 
 3. Start the server.
 
