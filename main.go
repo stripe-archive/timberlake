@@ -14,7 +14,7 @@ import (
 var resourceManagerURL = flag.String("resource-manager-url", "http://localhost:8088", "The HTTP URL to access the resource manager.")
 var historyServerURL = flag.String("history-server-url", "http://localhost:19888", "The HTTP URL to access the history server.")
 var namenodeAddress = flag.String("namenode-address", "localhost:9000", "The host:port to access the Namenode metadata service.")
-var rootLogDir = flag.String("root-log-dir", "/tmp/logs", "The HDFS path where YARN stores logs. This is the controlled by the hadoop property yarn.nodemanager.remote-app-log-dir.")
+var yarnLogDir = flag.String("yarn-logs-dir", "/tmp/logs", "The HDFS path where YARN stores logs. This is the controlled by the hadoop property yarn.nodemanager.remote-app-log-dir.")
 
 var jt jobTracker
 
@@ -100,6 +100,12 @@ func main() {
 
 	jt = newJobTracker(*resourceManagerURL, *historyServerURL)
 	go jt.Loop()
+
+	if err := jt.TestLogsDir(); err != nil {
+		log.Printf("WARNING: Could not read yarn logs directory. Error message: `%s`\n", err)
+		log.Println("\tYou can change the path with --yarn-logs-dir=HDFS_PATH.")
+		log.Println("\tTo talk to HDFS, Timberlake needs to be able to access the namenode (--namenode-address) and datanodes.")
+	}
 
 	sse := newSSE()
 	go sse.Loop()

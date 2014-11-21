@@ -535,6 +535,16 @@ func (jt *jobTracker) FetchCounters(id string, host string) ([]counter, error) {
 	return counters, nil
 }
 
+func (jt *jobTracker) TestLogsDir() error {
+	client, err := hdfs.New(*namenodeAddress)
+	if err != nil {
+		return err
+	}
+
+	_, err = client.ReadDir(*yarnLogDir)
+	return err
+}
+
 func (jt *jobTracker) FetchLogs(id string) ([]string, error) {
 	client, err := hdfs.New(*namenodeAddress)
 	if err != nil {
@@ -543,7 +553,7 @@ func (jt *jobTracker) FetchLogs(id string) ([]string, error) {
 
 	appID, jobID := hadoopIDs(id)
 	user := jt.Jobs[jobID].Details.User
-	dir := fmt.Sprintf("%s/%s/logs/%s/", *rootLogDir, user, appID)
+	dir := fmt.Sprintf("%s/%s/logs/%s/", *yarnLogDir, user, appID)
 
 	files, err := client.ReadDir(dir)
 	if err != nil {
