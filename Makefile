@@ -12,7 +12,8 @@ release: clean build
 	tar -cvzf $(RELEASE_NAME).tar.gz $(RELEASE_NAME)
 
 timberlake:
-	go build
+	go get -v github.com/tools/godep
+	$(GOPATH)/bin/godep go build -v
 
 node_modules:
 	npm install
