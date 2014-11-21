@@ -1,0 +1,19 @@
+{
+  "name": "timberlake",
+  "version": "1.0.0",
+  "description": "Timberlake is a Job Tracker for Hadoop.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/stripe/timberlake.git"
+  },
+  "author": "Jeff Balogh",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/stripe/timberlake/issues"
+  },
+  "homepage": "https://github.com/stripe/timberlake",
+  "devDependencies": {
+    "gulp": "^3.8.10",
+    "gulp-react": "^2.0.0"
+  }
+}

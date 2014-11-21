@@ -1,0 +1,240 @@
+.job-status > td > div {
+  display: inline-block;
+  vertical-align: top;
+  margin-right: 2em;
+}
+
+.table .job-status > td {
+  border-top: none;
+  border-bottom: 2px solid #888;
+}
+
+.sortable th {
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.sortable th:after {
+  content: ' ';
+  display: inline-block;
+  visibility: hidden;
+  width: 19px;
+  height: 19px;
+  background-image: url(/static/img/sort_both.png);
+  vertical-align: bottom;
+  margin-left: 4px;
+}
+
+.sortable th:hover:after {
+  visibility: visible;
+}
+
+.sortable th.sort-asc:after {
+  visibility: visible;
+  background-image: url(/static/img/sort_asc.png);
+}
+
+.sortable th.sort-desc:after {
+  visibility: visible;
+  background-image: url(/static/img/sort_desc.png);
+}
+
+.sortable td {
+  max-width: 450px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+h3 .form-control {
+  font-size: 12px;
+  height: 24px;
+  font-weight: normal;
+  display: inline;
+  width: 175px;
+  margin-left: 1em;
+  vertical-align: text-bottom;
+  border-color: #efefef;
+  padding-bottom: 0;
+  padding-top: 0;
+}
+
+.counters {
+  font-family: monospace;
+}
+
+a {
+  color: #333;
+}
+
+a:hover,
+.list-view tr:hover a {
+  color: #07A4DD;
+}
+
+.list-view tr:hover {
+  cursor: pointer;
+}
+
+.counters th {
+  font-weight: normal;
+}
+
+/** progress bar **/
+/* via http://codepen.io/valiooo/pen/qyiov */
+.pct {
+  position: relative;
+  border: #ccc solid 1px;
+  width: 100px;
+  height: 22px;
+  vertical-align: midle;
+  overflow: hidden;
+  font-weight: 700;
+  box-shadow: 0 4px 10px -5px rgba(0, 0, 0, 0.25);
+}
+.pct .bar {
+  position: absolute;
+  height: 100%;
+  overflow: hidden;
+}
+.pct .bar span {
+  position: absolute;
+  display: block;
+  width: 100px;
+  height: 100%;
+  text-align: center;
+}
+.pct .bar.positive {
+  background: #07A4DD;
+  left: 0;
+}
+.pct .bar.positive span {
+  left: 0;
+  color: #fff;
+}
+.pct .bar.negative {
+  background: #fff;
+  right: 0;
+}
+.pct .bar.negative span {
+  right: -2px;  /* Accounts for the offset due to borders. */
+  color: #444;
+}
+/** progress bar **/
+
+.job-details td {
+  max-width: 500px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bytes dt,
+.bytes dd {
+  display: inline;
+}
+
+.bytes dd {
+  margin-right: 4em;
+}
+
+/** boxplot **/
+.box {
+  font: 10px sans-serif;
+}
+.box line,
+.box rect,
+.box circle {
+  fill: #fff;
+  stroke: #000;
+  stroke-width: 1.5px;
+}
+.box .center {
+  stroke-dasharray: 3,3;
+}
+.box .outlier {
+  fill: none;
+  stroke: #ccc;
+}
+/** boxplot **/
+
+/** waterfall **/
+.y.axis path.domain,
+.x.axis path.domain {
+  display: none;
+}
+.bar rect {
+  shape-rendering: crispEdges;
+}
+.bar text {
+  fill: #666;
+}
+/** waterfall **/
+
+.label.label-success {
+  background: #07A4DD;
+}
+
+.label.label-primary {
+  background: rgb(91, 192, 222);
+}
+
+.kill {
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: none;
+}
+
+.kill:hover {
+  background: #E86482;
+}
+
+.kill .label {
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  background: #E86482;
+}
+
+.navbar {
+  border: none;
+}
+
+.map-label,
+.reduce-label {
+  display: inline-block;
+  height: 6px;
+   width: 6px;
+  margin-bottom: 2px;
+  border-radius: 50%;
+}
+
+.map-label {
+  background: rgb(91, 192, 222);
+}
+
+.reduce-label {
+  background: #E86482;
+}
+
+.log-list {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.log-list li {
+  white-space: pre-wrap;
+  overflow: hidden;
+  padding: .5em;
+  background: #fafafa;
+  font-family: monospace;
+  border: 1px solid #777;
+  border-radius: 4px;
+  padding-bottom: 1em;
+  margin-bottom: 1em
+}
+
+.logs-link {
+  color: #07A4DD;
+  margin-left: 1em;
+}
