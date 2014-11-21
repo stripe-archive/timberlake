@@ -56,7 +56,8 @@ The Makefile assumes that you've set up your
 
 3. Start the server.
 
-        ./timberlake --bind :8000 \
+        ./timberlake \
+            --bind :8000 \
             --resource-manager-url http://bigdata:8088 \
             --history-server-url http://bigdata:19888 \
             --namenode-address http://bigdata:9000 \
