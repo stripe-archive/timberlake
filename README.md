@@ -10,25 +10,25 @@
 Timberlake is a Go server paired with a React.js frontend. It improves on
 existing Hadoop job trackers by providing a lightweight realtime view of your
 running and finished MapReduce jobs. Timberlake exposes the counters and
-configuration that we use the most at Stripe. We can get a quick overview of the
-whole cluster and we can dig into the performance and behavior of a single job.
+configuration that are the most useful, so you can get a quick overview of
+the whole cluster or dig into the performance and behavior of a single job.
 
-Timberlake visualizes your job's map and reduce tasks as a waterfall and as
-boxplots. These visualizations help us see why a job is slow. Is it launching
-too many mappers and overloading the cluster? Are reducers launching too early
-and starving the mappers? Does the job have reducer skew? We use the
-counters of bytes written, shuffled, and read to understand the network and I/O
-behavior of our jobs. And when jobs fail, Timberlake will show the key
-parts of the logs that will help us debug the job.
+Timberlake also provides waterfall and boxplot visualizations for jobs. We've
+found that hese  visualizations can be really helpful for figuring out why a job
+is too slow.. Is it launching too many mappers and overloading the cluster? Are
+reducers launching too early and starving the mappers? Does the job have reducer
+skew? You can the counters of bytes written, shuffled, and read to understand
+the network and I/O behavior of our jobs. And when jobs fail, Timberlake will
+show you tracebacks from the logs, to will help you debug the job.
 
 Timberlake pairs well with Scalding and Cascading. It uses extra data from the
 Cascading planner to show the relationships between steps, and to clarify which
 jobs' outputs are used as inputs to other jobs in the flow. Visualizing that
 flow makes it much easier to figure out which steps are causing bottlenecks.
 
-We've also included a Slackbot that has significantly improved our Hadooping
-lives. The bot can notify you when your jobs start and finish, and provides
-links back to Timberlake.
+Finally, we've also included a Slackbot that has significantly improved our
+Hadooping lives. The bot can notify you when your jobs start and finish, and
+provides links back to Timberlake.
 
 
 ## Screenshots
