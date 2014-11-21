@@ -42,37 +42,39 @@ links back to Timberlake.
 
 ## Installation
 
-1. Clone the source.
+The best way to install is with tarballs, which are available on the [release page](https://github.com/stripe/timberlake/releases).
 
-        git clone https://github.com/stripe/timberlake.git
+Download it somewhere on your server, and then untar it:
 
-2. Run make.
+    $ tar zxvf timberlake-v0.1.0-linux-amd64.tar.gz
+    $ mv -T timberlake-v0.1.0-linux-amd64 /opt/timberlake
 
-        make
+Now you can start the server:
 
-    The Makefile assumes that you've already set up your
-    [`$GOPATH`](http://golang.org/doc/code.html). It will try to install
-    [`godep`](https://github.com/tools/godep) if it doesn't already exist.
 
-3. Start the server.
+    $ /opt/timberlake/bin/timberlake \
+        --bind :8000 \
+        --resource-manager-url http://resourcemanager:8088 \
+        --history-server-url http://resourcemanager:19888 \
+        --namenode-address http://namenode:9000
 
-        ./timberlake \
-            --bind :8000 \
-            --resource-manager-url http://bigdata:8088 \
-            --history-server-url http://bigdata:19888 \
-            --namenode-address http://bigdata:9000 \
-            --root-log-dir /tmp/logs
+And optionally, start the Slackbot:
 
-4. Start the Slackbot (optional).
+    $ /opt/timberlake/bin/slack \
+        --internal-timberlake-url http://localhost:8000 \
+        --external-timberlake-url https://timberlake.example.com \
+        --slack-url https://hooks.slack.com/services/...
 
-        ./slack \
-            --internal-timberlake-url http://localhost:8000 \
-            --external-timberlake-url https://timberlake.example.com \
-            --slack-url https://hooks.slack.com/services/...
+You'll need to create a new [Incoming Webhook](https://slack.com/services)
+to generate the Slack URL for your bot.
 
-    You'll need to create a new [Incoming Webhook](https://slack.com/services)
-    to generate the Slack URL for your bot.
+## Building from Source
 
+You'll need `npm` and `go` on your path.
+
+    $ git clone https://github.com/stripe/timberlake.git
+    $ cd timberlake
+    $ make
 
 # Limitations
 
