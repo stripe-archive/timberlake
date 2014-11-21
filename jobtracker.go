@@ -119,8 +119,6 @@ func getJSON(url string, data interface{}) error {
 		return fmt.Errorf("Failed getJSON", url, resp.Status)
 	}
 
-	log.Println("getJSON", url, resp.Status)
-
 	defer resp.Body.Close()
 	jsonBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {

@@ -69,9 +69,8 @@ func (sse *sse) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	for event := range events {
 		// When we see a newline we need to add the prefix again.
 		event = bytes.Replace(event, newline, prefix, -1)
-		log.Println("Writing an SSE event. bytes:", len(event), "id:", id, header)
 		if _, err := fmt.Fprintf(w, "data: %s\n\n", event); err != nil {
-			log.Println("Error writing to SSE", id, err)
+			log.Println("Error writing to SSE", id, header, err)
 			break
 		}
 		w.(http.Flusher).Flush()
