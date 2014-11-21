@@ -76,7 +76,7 @@ You'll need `npm` and `go` on your path.
     $ cd timberlake
     $ make
 
-# Limitations
+## Limitations
 
 Timberlake only works with the [YARN Resource
 Manager API](https://hadoop.apache.org/docs/r2.5.2/hadoop-yarn/hadoop-yarn-site/ResourceManagerRest.html). It's been tested on v2.4.x and v2.5.x, but the Kill Job feature uses an endpoint that's only avaiable in 2.5.x+.
