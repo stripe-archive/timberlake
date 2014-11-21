@@ -8,19 +8,23 @@ build: timberlake static
 
 release: clean build
 	mkdir -p $(RELEASE_NAME)
-	cp -r timberlake static README.md LICENSE.txt $(RELEASE_NAME)/
+	cp -r timberlake static README.md LICENSE $(RELEASE_NAME)/
 	tar -cvzf $(RELEASE_NAME).tar.gz $(RELEASE_NAME)
 
 timberlake:
-	go get -v github.com/tools/godep
-	$(GOPATH)/bin/godep go build -v
+	go get -v github.com/zenazn/goji
+	go get -v github.com/colinmarc/hdfs
+	go build -v
 
-static:
+static: node_modules
 	node_modules/.bin/gulp build
+
+node_modules:
+	npm install
 
 clean:
 	rm -f timberlake timberlake-*.tar.gz
 	rm -rf static
 	rm -rf $(RELEASE_NAME)
 
-.PHONY: clean release
+.PHONY: clean build release
