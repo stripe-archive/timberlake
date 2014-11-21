@@ -13,13 +13,13 @@ running and finished MapReduce jobs. Timberlake exposes the counters and
 configuration that are the most useful, so you can get a quick overview of
 the whole cluster or dig into the performance and behavior of a single job.
 
-Timberlake also provides waterfall and boxplot visualizations for jobs. We've
-found that hese  visualizations can be really helpful for figuring out why a job
-is too slow. Is it launching too many mappers and overloading the cluster? Are
-reducers launching too early and starving the mappers? Does the job have reducer
-skew? You can the counters of bytes written, shuffled, and read to understand
-the network and I/O behavior of our jobs. And when jobs fail, Timberlake will
-show you tracebacks from the logs, to will help you debug the job.
+It also provides waterfall and boxplot visualizations for jobs. We've found that
+these  visualizations can be really helpful for figuring out why a job is too
+slow. Is it launching too many mappers and overloading the cluster? Are reducers
+launching too early and starving the mappers? Does the job have reducer skew?
+You can the counters of bytes written, shuffled, and read to understand the
+network and I/O behavior of our jobs. And when jobs fail, Timberlake will show
+you tracebacks from the logs, to will help you debug the job.
 
 Timberlake pairs well with Scalding and Cascading. It uses extra data from the
 Cascading planner to show the relationships between steps, and to clarify which
