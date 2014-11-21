@@ -237,7 +237,7 @@ var JobTable = {
   },
 
   sort: function(key) {
-    var s = this.sorting(this.props.query[this.sortKey] || "");
+    var s = this.sorting(this.props.query[this.sortKey] || this.defaultSortKey);
     var n = s.key == key && s.dir == -1 ? key : '-' + key;
     var q = _.object([[this.sortKey, n]]);
     this.transitionTo("app", null, _.extend(this.props.query, q));
