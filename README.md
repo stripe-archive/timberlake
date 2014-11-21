@@ -44,26 +44,26 @@ links back to timberlake.
 
 1. Clone the source.
 
-    git clone https://github.com/stripe/timberlake.git
+        git clone https://github.com/stripe/timberlake.git
 
 2. Run make.
 
-    make
+        make
 
 3. Start the server.
 
-    ./timberlake --bind :8000 \
-        --resource-manager-url http://bigdata:8088 \
-        --history-server-url http://bigdata:19888 \
-        --namenode-address http://bigdata:9000 \
-        --root-log-dir /tmp/logs
+        ./timberlake --bind :8000 \
+            --resource-manager-url http://bigdata:8088 \
+            --history-server-url http://bigdata:19888 \
+            --namenode-address http://bigdata:9000 \
+            --root-log-dir /tmp/logs
 
 4. Start the Slackbot (optional).
 
-    ./slack \
-        --internal-timberlake-url http://localhost:8000 \
-        --external-timberlake-url https://timberlake.example.com \
-        --slack-url https://hooks.slack.com/services/...
+        ./slack \
+            --internal-timberlake-url http://localhost:8000 \
+            --external-timberlake-url https://timberlake.example.com \
+            --slack-url https://hooks.slack.com/services/...
 
 You'll need to create a new [Incoming Webhook](https://slack.com/services) to
 generate the Slack URL for your bot.
