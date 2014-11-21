@@ -7,6 +7,8 @@ import (
 	"github.com/zenazn/goji/web"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 )
 
 var resourceManagerURL = flag.String("resource-manager-url", "http://localhost:8088", "The HTTP URL to access the resource manager.")
@@ -102,7 +104,15 @@ func main() {
 	sse := newSSE()
 	go sse.Loop()
 
-	static := http.StripPrefix("/static/", http.FileServer(http.Dir("static")))
+	binPath, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	staticPath := filepath.Join(binPath, "..", "static")
+	static := http.StripPrefix("/static/", http.FileServer(http.Dir(staticPath)))
+	log.Println("serving static files from", staticPath)
+
 	goji.Get("/static/*", static)
 	goji.Get("/", index)
 	goji.Get("/jobs/", getJobs)
