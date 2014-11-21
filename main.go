@@ -102,7 +102,7 @@ func main() {
 	sse := newSSE()
 	go sse.Loop()
 
-	static := http.StripPrefix("/static/", http.FileServer(http.Dir("build")))
+	static := http.StripPrefix("/static/", http.FileServer(http.Dir("static")))
 	goji.Get("/static/*", static)
 	goji.Get("/", index)
 	goji.Get("/jobs/", getJobs)

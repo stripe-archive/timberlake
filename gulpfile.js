@@ -8,13 +8,13 @@ var paths = {
 };
 
 gulp.task('copy', function() {
-  return gulp.src(paths.copy, {base: './'}).pipe(gulp.dest('build'));
+  return gulp.src(paths.copy, {base: './'}).pipe(gulp.dest('static'));
 });
 
 gulp.task('react', function() {
   return gulp.src(paths.jsx)
     .pipe(react({harmony: true}))
-    .pipe(gulp.dest('build/js'));
+    .pipe(gulp.dest('static/js'));
 });
 
 gulp.task('watch', function() {
