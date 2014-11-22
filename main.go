@@ -103,8 +103,8 @@ func init() {
 		log.Fatal(err)
 	}
 
-	rootPath = filepath.Join(binPath, "..")
-	staticPath = filepath.Join(rootPath, "static")
+	rootPath = filepath.join(binPath, "..")
+	staticPath = filepath.join(rootPath, "static")
 }
 
 func main() {

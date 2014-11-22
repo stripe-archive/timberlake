@@ -8,7 +8,7 @@ build: bin/timberlake bin/slack static
 
 release: clean build
 	mkdir -p $(RELEASE_NAME)
-	cp -r bin static README.md LICENSE $(RELEASE_NAME)/
+	cp -r bin static index.html README.md LICENSE $(RELEASE_NAME)/
 	tar -cvzf $(RELEASE_NAME).tar.gz $(RELEASE_NAME)
 
 bin/timberlake:
@@ -28,7 +28,7 @@ node_modules:
 
 clean:
 	rm -f timberlake timberlake-*.tar.gz
-	rm -rf static/{js,css,img} bin node_modules
+	rm -rf static bin node_modules
 	rm -rf $(RELEASE_NAME)
 
 .PHONY: clean build release
