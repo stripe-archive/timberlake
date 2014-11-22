@@ -1,3 +1,5 @@
-static
+static/js
+static/css
+static/img
 bin
 node_modules
