@@ -21,7 +21,7 @@ var jt jobTracker
 var rootPath, staticPath string
 
 func index(c web.C, w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, filepath.Join(staticPath, "index.html"))
+	http.ServeFile(w, r, filepath.Join(rootPath, "index.html"))
 }
 
 func getJobs(c web.C, w http.ResponseWriter, r *http.Request) {
@@ -103,8 +103,8 @@ func init() {
 		log.Fatal(err)
 	}
 
-	rootPath = filepath.join(binPath, "..")
-	staticPath = filepath.join(rootPath, "static")
+	rootPath = filepath.Join(binPath, "..")
+	staticPath = filepath.Join(rootPath, "static")
 }
 
 func main() {
