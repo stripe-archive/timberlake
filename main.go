@@ -18,8 +18,10 @@ var yarnLogDir = flag.String("yarn-logs-dir", "/tmp/logs", "The HDFS path where 
 
 var jt jobTracker
 
+var rootPath, staticPath string
+
 func index(c web.C, w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "index.html")
+	http.ServeFile(w, r, filepath.Join(staticPath, "index.html"))
 }
 
 func getJobs(c web.C, w http.ResponseWriter, r *http.Request) {
@@ -95,6 +97,16 @@ func killJob(c web.C, w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func init() {
+	binPath, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	rootPath = filepath.join(binPath, "..")
+	staticPath = filepath.join(rootPath, "static")
+}
+
 func main() {
 	flag.Parse()
 
@@ -110,12 +122,6 @@ func main() {
 	sse := newSSE()
 	go sse.Loop()
 
-	binPath, err := filepath.Abs(filepath.Dir(os.Args[0]))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	staticPath := filepath.Join(binPath, "..", "static")
 	static := http.StripPrefix("/static/", http.FileServer(http.Dir(staticPath)))
 	log.Println("serving static files from", staticPath)
 

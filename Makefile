@@ -8,7 +8,7 @@ build: bin/timberlake bin/slack static
 
 release: clean build
 	mkdir -p $(RELEASE_NAME)
-	cp -r bin static README.md LICENSE $(RELEASE_NAME)/
+	cp -r bin static index.html README.md LICENSE $(RELEASE_NAME)/
 	tar -cvzf $(RELEASE_NAME).tar.gz $(RELEASE_NAME)
 
 bin/timberlake:
