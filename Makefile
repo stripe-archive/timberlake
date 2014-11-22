@@ -28,7 +28,7 @@ node_modules:
 
 clean:
 	rm -f timberlake timberlake-*.tar.gz
-	rm -rf static bin node_modules
+	rm -rf static/{js,css,img} bin node_modules
 	rm -rf $(RELEASE_NAME)
 
 .PHONY: clean build release
