@@ -24,9 +24,6 @@ const (
 	// primarily useful during the inital data backfill.
 	finishedJobWorkers = 3
 
-	// How often should we poll the job APIs, in seconds?
-	pollInterval = time.Second * 2
-
 	// Maximum number of jobs to keep track of. All data is retained in memory
 	// on the server, and the details for each job are sent to the browser.
 	jobLimit = 5000
@@ -40,12 +37,12 @@ const (
 	// history server.
 	fullDataDuration = time.Hour * 24
 
-	// We set this timeout on requests to the YARN APIs.
-	httpTimeout = time.Second * 2
-
 	// How many pairs of start/finish times should we keep around for each job?
 	taskLimit = 500
 )
+
+// We set this timeout on requests to the YARN APIs.
+var httpTimeout time.Duration
 
 var countersToKeep = map[string]string{
 	"FileSystemCounter.HDFS_BYTES_READ":    "hdfs.bytes_read",
@@ -85,11 +82,13 @@ var httpClient http.Client
 var httpClientMutex sync.Mutex
 
 func init() {
+	httpTimeout = time.Second * time.Duration(*httpTimeoutParam)
 	httpClientMutex = sync.Mutex{}
 	generateNewHTTPClient()
 }
 
 func generateNewHTTPClient() {
+	log.Println("generate httpTimeout:", httpTimeout)
 	httpClientMutex.Lock()
 	httpClient = http.Client{
 		Transport: &http.Transport{
@@ -132,21 +131,25 @@ type jobTracker struct {
 	Jobs     map[jobID]*job
 	rm       string
 	hs       string
+	pollInterval time.Duration
 	running  chan *job
 	finished chan *job
 	backfill chan *job
 	updates  chan *job
 }
 
-func newJobTracker(rmHost string, historyHost string) jobTracker {
+func newJobTracker(rmHost string, historyHost string, timeoutParam int, pollInterval int) jobTracker {
+	httpTimeout = time.Second * time.Duration(timeoutParam)
+	generateNewHTTPClient()
 	jt := jobTracker{
-		Jobs:     make(map[jobID]*job),
-		rm:       rmHost,
-		hs:       historyHost,
-		running:  make(chan *job, 100),
-		finished: make(chan *job, 100),
-		backfill: make(chan *job, 100),
-		updates:  make(chan *job, 100),
+		Jobs:     		make(map[jobID]*job),
+		rm:       		rmHost,
+		hs:       		historyHost,
+		pollInterval:	time.Second * time.Duration(pollInterval),
+		running:  		make(chan *job, 100),
+		finished: 		make(chan *job, 100),
+		backfill: 		make(chan *job, 100),
+		updates:  		make(chan *job, 100),
 	}
 	return jt
 }
@@ -180,7 +183,7 @@ func (jt *jobTracker) runningJobLoop() {
 		}()
 	}
 
-	for _ = range time.Tick(pollInterval) {
+	for _ = range time.Tick(jt.pollInterval) {
 		running := &appsResp{}
 		if err := jt.ListJobs(jt.rm, running); err != nil {
 			log.Println("Error listing running jobs:", err)
@@ -245,7 +248,7 @@ func (jt *jobTracker) finishedJobLoop() {
 		}
 	}()
 
-	for _ = range time.Tick(pollInterval) {
+	for _ = range time.Tick(jt.pollInterval) {
 		finished := &jobResp{}
 		if err := jt.ListJobs(jt.hs, finished); err != nil {
 			log.Println("Error listing finished jobs:", err)

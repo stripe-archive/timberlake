@@ -15,6 +15,8 @@ var resourceManagerURL = flag.String("resource-manager-url", "http://localhost:8
 var historyServerURL = flag.String("history-server-url", "http://localhost:19888", "The HTTP URL to access the history server.")
 var namenodeAddress = flag.String("namenode-address", "localhost:9000", "The host:port to access the Namenode metadata service.")
 var yarnLogDir = flag.String("yarn-logs-dir", "/tmp/logs", "The HDFS path where YARN stores logs. This is the controlled by the hadoop property yarn.nodemanager.remote-app-log-dir.")
+var httpTimeoutParam = flag.Int("http-timeout", 2, "The timeout used for connecting to YARN API.")
+var pollInterval = flag.Int("poll-interval", 2, "How often should we poll the job APIs, in seconds.")
 
 var jt jobTracker
 
@@ -110,7 +112,7 @@ func init() {
 func main() {
 	flag.Parse()
 
-	jt = newJobTracker(*resourceManagerURL, *historyServerURL)
+	jt = newJobTracker(*resourceManagerURL, *historyServerURL, *httpTimeoutParam, *pollInterval)
 	go jt.Loop()
 
 	if err := jt.TestLogsDir(); err != nil {
