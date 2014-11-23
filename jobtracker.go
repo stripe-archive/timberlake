@@ -41,9 +41,6 @@ const (
 	taskLimit = 500
 )
 
-// We set this timeout on requests to the YARN APIs.
-var httpTimeout time.Duration
-
 var countersToKeep = map[string]string{
 	"FileSystemCounter.HDFS_BYTES_READ":    "hdfs.bytes_read",
 	"FileSystemCounter.HDFS_BYTES_WRITTEN": "hdfs.bytes_written",
@@ -82,25 +79,23 @@ var httpClient http.Client
 var httpClientMutex sync.Mutex
 
 func init() {
-	httpTimeout = time.Second * time.Duration(*httpTimeoutParam)
 	httpClientMutex = sync.Mutex{}
 	generateNewHTTPClient()
 }
 
 func generateNewHTTPClient() {
-	log.Println("generate httpTimeout:", httpTimeout)
 	httpClientMutex.Lock()
 	httpClient = http.Client{
 		Transport: &http.Transport{
 			Proxy: http.ProxyFromEnvironment,
 			Dial: (&net.Dialer{
-				Timeout:   httpTimeout,
+				Timeout:   *httpTimeout,
 				KeepAlive: 30 * time.Second,
 			}).Dial,
 			TLSHandshakeTimeout: 10 * time.Second,
 		},
 		CheckRedirect: checkRedirect,
-		Timeout:       httpTimeout,
+		Timeout:       *httpTimeout,
 	}
 	httpClientMutex.Unlock()
 }
@@ -131,25 +126,22 @@ type jobTracker struct {
 	Jobs     map[jobID]*job
 	rm       string
 	hs       string
-	pollInterval time.Duration
 	running  chan *job
 	finished chan *job
 	backfill chan *job
 	updates  chan *job
 }
 
-func newJobTracker(rmHost string, historyHost string, timeoutParam int, pollInterval int) jobTracker {
-	httpTimeout = time.Second * time.Duration(timeoutParam)
+func newJobTracker(rmHost string, historyHost string) jobTracker {
 	generateNewHTTPClient()
 	jt := jobTracker{
-		Jobs:     		make(map[jobID]*job),
-		rm:       		rmHost,
-		hs:       		historyHost,
-		pollInterval:	time.Second * time.Duration(pollInterval),
-		running:  		make(chan *job, 100),
-		finished: 		make(chan *job, 100),
-		backfill: 		make(chan *job, 100),
-		updates:  		make(chan *job, 100),
+		Jobs:     make(map[jobID]*job),
+		rm:       rmHost,
+		hs:       historyHost,
+		running:  make(chan *job, 100),
+		finished: make(chan *job, 100),
+		backfill: make(chan *job, 100),
+		updates:  make(chan *job, 100),
 	}
 	return jt
 }
@@ -183,7 +175,7 @@ func (jt *jobTracker) runningJobLoop() {
 		}()
 	}
 
-	for _ = range time.Tick(jt.pollInterval) {
+	for _ = range time.Tick(*pollInterval) {
 		running := &appsResp{}
 		if err := jt.ListJobs(jt.rm, running); err != nil {
 			log.Println("Error listing running jobs:", err)
@@ -248,7 +240,7 @@ func (jt *jobTracker) finishedJobLoop() {
 		}
 	}()
 
-	for _ = range time.Tick(jt.pollInterval) {
+	for _ = range time.Tick(*pollInterval) {
 		finished := &jobResp{}
 		if err := jt.ListJobs(jt.hs, finished); err != nil {
 			log.Println("Error listing finished jobs:", err)

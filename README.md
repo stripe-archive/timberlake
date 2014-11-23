@@ -57,9 +57,7 @@ Now you can start the server:
         --bind :8000 \
         --resource-manager-url http://resourcemanager:8088 \
         --history-server-url http://resourcemanager:19888 \
-        --namenode-address namenode:9000 \
-		--http-timeout=2 \
-		--poll-interval=2
+        --namenode-address namenode:9000
 
 And optionally, start the Slackbot:
 
