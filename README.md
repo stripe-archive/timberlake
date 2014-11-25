@@ -82,7 +82,7 @@ You'll need `npm` and `go` on your path.
 Timberlake only works with the [YARN Resource Manager
 API](https://hadoop.apache.org/docs/r2.5.2/hadoop-yarn/hadoop-yarn-site/ResourceManagerRest.html).
 It's been tested on v2.4.x and v2.5.x, but the Kill Job feature uses an endpoint
-that's only avaiable in v2.5.x+.
+that's only available in v2.5.x+.
 
 Our cluster has 10-40 jobs running simultaneously and about 2,000 jobs running
 per day. Timberlake's performance has not been tested outside these bounds.
