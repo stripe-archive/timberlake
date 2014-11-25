@@ -9,12 +9,15 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 var resourceManagerURL = flag.String("resource-manager-url", "http://localhost:8088", "The HTTP URL to access the resource manager.")
 var historyServerURL = flag.String("history-server-url", "http://localhost:19888", "The HTTP URL to access the history server.")
 var namenodeAddress = flag.String("namenode-address", "localhost:9000", "The host:port to access the Namenode metadata service.")
 var yarnLogDir = flag.String("yarn-logs-dir", "/tmp/logs", "The HDFS path where YARN stores logs. This is the controlled by the hadoop property yarn.nodemanager.remote-app-log-dir.")
+var httpTimeout = flag.Duration("http-timeout", time.Second*2, "The timeout used for connecting to YARN API. Pass values like: 2s")
+var pollInterval = flag.Duration("poll-interval", time.Second*2, "How often should we poll the job APIs. Pass values like: 2s")
 
 var jt jobTracker
 

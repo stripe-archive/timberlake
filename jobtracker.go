@@ -24,9 +24,6 @@ const (
 	// primarily useful during the inital data backfill.
 	finishedJobWorkers = 3
 
-	// How often should we poll the job APIs, in seconds?
-	pollInterval = time.Second * 2
-
 	// Maximum number of jobs to keep track of. All data is retained in memory
 	// on the server, and the details for each job are sent to the browser.
 	jobLimit = 5000
@@ -39,9 +36,6 @@ const (
 	// fetch the job from the web the full data will be requested again from the
 	// history server.
 	fullDataDuration = time.Hour * 24
-
-	// We set this timeout on requests to the YARN APIs.
-	httpTimeout = time.Second * 2
 
 	// How many pairs of start/finish times should we keep around for each job?
 	taskLimit = 500
@@ -95,13 +89,13 @@ func generateNewHTTPClient() {
 		Transport: &http.Transport{
 			Proxy: http.ProxyFromEnvironment,
 			Dial: (&net.Dialer{
-				Timeout:   httpTimeout,
+				Timeout:   *httpTimeout,
 				KeepAlive: 30 * time.Second,
 			}).Dial,
 			TLSHandshakeTimeout: 10 * time.Second,
 		},
 		CheckRedirect: checkRedirect,
-		Timeout:       httpTimeout,
+		Timeout:       *httpTimeout,
 	}
 	httpClientMutex.Unlock()
 }
@@ -139,6 +133,7 @@ type jobTracker struct {
 }
 
 func newJobTracker(rmHost string, historyHost string) jobTracker {
+	generateNewHTTPClient()
 	jt := jobTracker{
 		Jobs:     make(map[jobID]*job),
 		rm:       rmHost,
@@ -180,7 +175,7 @@ func (jt *jobTracker) runningJobLoop() {
 		}()
 	}
 
-	for _ = range time.Tick(pollInterval) {
+	for _ = range time.Tick(*pollInterval) {
 		running := &appsResp{}
 		if err := jt.ListJobs(jt.rm, running); err != nil {
 			log.Println("Error listing running jobs:", err)
@@ -245,7 +240,7 @@ func (jt *jobTracker) finishedJobLoop() {
 		}
 	}()
 
-	for _ = range time.Tick(pollInterval) {
+	for _ = range time.Tick(*pollInterval) {
 		finished := &jobResp{}
 		if err := jt.ListJobs(jt.hs, finished); err != nil {
 			log.Println("Error listing finished jobs:", err)
