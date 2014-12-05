@@ -110,7 +110,7 @@ func getJSON(url string, data interface{}) error {
 	}
 
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("Failed getJSON", url, resp.Status)
+		return fmt.Errorf("Failed getJSON: %v (%v)", url, resp.Status)
 	}
 
 	defer resp.Body.Close()
