@@ -284,14 +284,9 @@ func (jt *jobTracker) cleanupLoop() {
 		// Drop tasks and counters for old jobs since those are only visible in
 		// details pages (and unlikely to be viewed).
 		counter := 0
-		for _, d := range details {
+		for _, job := range jt.Jobs {
 			cutoff := time.Now().Add(-fullDataDuration).Unix()
-			if d.FinishTime/1000 < cutoff {
-				_, jobID := hadoopIDs(d.ID)
-				job := jt.Jobs[jobID]
-				if !job.complete {
-					continue
-				}
+			if job.Details.FinishTime/1000 < cutoff && job.complete {
 				job.complete = false
 				job.Tasks = nil
 				job.Counters = nil
