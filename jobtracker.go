@@ -661,14 +661,16 @@ func (jt *jobTracker) KillJob(id string) error {
 		job.Details.ReducesKilled += job.Details.ReducesRunning
 		job.Details.ReducesRunning = 0
 
-		for _, task := range job.Tasks.Map {
-			if task[1] == 0 {
-				task[1] = killTime
+		if job.Tasks != nil {
+			for _, task := range job.Tasks.Map {
+				if task[1] == 0 {
+					task[1] = killTime
+				}
 			}
-		}
-		for _, task := range job.Tasks.Reduce {
-			if task[1] == 0 {
-				task[1] = killTime
+			for _, task := range job.Tasks.Reduce {
+				if task[1] == 0 {
+					task[1] = killTime
+				}
 			}
 		}
 		jt.updates <- job
