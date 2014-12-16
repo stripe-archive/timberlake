@@ -1,5 +1,7 @@
 package main
 
+import "time"
+
 type job struct {
 	Details  *jobDetail `json:"details"`
 	Counters []counter  `json:"counters"`
@@ -7,6 +9,7 @@ type job struct {
 	Tasks    *tasks     `json:"tasks"`
 	host     string
 	complete bool
+	updated  time.Time
 }
 
 type jobDetail struct {

@@ -185,8 +185,22 @@ func (jt *jobTracker) runningJobLoop() {
 		log.Println("Running jobs:", len(running.Apps.App))
 		log.Println("Jobs in cache:", len(jt.Jobs))
 		log.Println("Goroutines:", runtime.NumGoroutine())
+
+		// We rely on jobs moving from the RM to the History Server when they
+		// stop running. This doesn't always happen. If we detect a job that's
+		// disappeared, mark it as GONE and forget about it. The frontend
+		// doesn't know what GONE means so it ignores the job.
+		for jobID, job := range jt.Jobs {
+			if job.host == jt.rm && time.Now().Sub(job.updated).Seconds() > 5*pollInterval.Seconds() {
+				log.Printf("%s has not been updated in five ticks. Removing.", jobID)
+				job.Details.State = "GONE"
+				jt.updates <- job
+				delete(jt.Jobs, jobID)
+			}
+		}
+
 		for i := range running.Apps.App {
-			job := &job{Details: &running.Apps.App[i], host: jt.rm}
+			job := &job{Details: &running.Apps.App[i], host: jt.rm, updated: time.Now()}
 			jt.running <- job
 		}
 	}
