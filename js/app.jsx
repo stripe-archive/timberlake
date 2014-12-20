@@ -278,7 +278,7 @@ var JobTable = {
       <div>
         <h3>
           {this.title} ({jobs.length})
-          <input className="form-control" placeholder="Filter by user or text" onChange={this.props.onFilter} value={this.props.filter} />
+          <input className="form-control" placeholder="Filter by user or text" onChange={this.props.onFilter} value={this.props.filter} autoFocus={this.autoFocus} />
         </h3>
         <table className="table sortable list-view">
           <thead>
@@ -319,6 +319,7 @@ var RunningJobs = React.createClass({
   title: 'Running',
   headers: 'user name started duration map reduce'.split(' '),
   rowClass: () => RunningJobRow,
+  autoFocus: true,
 });
 
 
