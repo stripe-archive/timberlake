@@ -48,8 +48,8 @@ The best way to install is with tarballs, which are available on the
 
 Download it somewhere on your server, and then untar it:
 
-    $ tar zxvf timberlake-v0.1.0-linux-amd64.tar.gz
-    $ mv -T timberlake-v0.1.0-linux-amd64 /opt/timberlake
+    $ tar zxvf timberlake-v1.0.2-linux-amd64.tar.gz
+    $ mv -T timberlake-v1.0.2-linux-amd64 /opt/timberlake
 
 Now you can start the server:
 
