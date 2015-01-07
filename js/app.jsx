@@ -12,7 +12,7 @@ var isModifiedEvent = e => !!(event.metaKey || event.altKey || event.ctrlKey || 
 
 var ACTIVE_STATES = ['RUNNING', 'ACCEPTED'];
 var FINISHED_STATES = ['SUCCEEDED', 'KILLED', 'FAILED'];
-var FAILED_STATES = ['FAILED', 'KILLED'];
+var FAILED_STATES = ['FAILED', 'KILLED', 'ERROR'];
 
 
 function numFormat(n) {
@@ -58,6 +58,7 @@ function jobState(job) {
     'succeeded': 'success',
     'killed': 'warning',
     'failed': 'danger',
+    'error': 'danger',
     'running': 'primary'
   };
   return <span className={'label label-' + label[state.toLowerCase()]}>{state}</span>;
