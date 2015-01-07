@@ -11,7 +11,7 @@ var isLeftClickEvent = e => e.button === 0;
 var isModifiedEvent = e => !!(event.metaKey || event.altKey || event.ctrlKey || event.shiftKey);
 
 var ACTIVE_STATES = ['RUNNING', 'ACCEPTED'];
-var FINISHED_STATES = ['SUCCEEDED', 'KILLED', 'FAILED'];
+var FINISHED_STATES = ['SUCCEEDED', 'KILLED', 'FAILED', 'ERROR'];
 var FAILED_STATES = ['FAILED', 'KILLED', 'ERROR'];
 
 
