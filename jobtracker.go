@@ -126,18 +126,20 @@ type jobTracker struct {
 	Jobs     map[jobID]*job
 	rm       string
 	hs       string
+	ps       string
 	running  chan *job
 	finished chan *job
 	backfill chan *job
 	updates  chan *job
 }
 
-func newJobTracker(rmHost string, historyHost string) jobTracker {
+func newJobTracker(rmHost string, historyHost string, proxyHost string) jobTracker {
 	generateNewHTTPClient()
 	jt := jobTracker{
 		Jobs:     make(map[jobID]*job),
 		rm:       rmHost,
 		hs:       historyHost,
+		ps:       proxyHost,
 		running:  make(chan *job, 100),
 		finished: make(chan *job, 100),
 		backfill: make(chan *job, 100),
@@ -422,7 +424,7 @@ func (jt *jobTracker) FetchJobDetails(id string, host string) (*jobDetail, error
 	var url string
 	appID, jobID := hadoopIDs(id)
 	if host == jt.rm {
-		url = fmt.Sprintf("%s/proxy/%s/ws/v1/mapreduce/jobs", host, appID)
+		url = fmt.Sprintf("%s/proxy/%s/ws/v1/mapreduce/jobs", jt.ps, appID)
 	} else {
 		url = fmt.Sprintf("%s/ws/v1/history/mapreduce/jobs/%s", host, jobID)
 	}
@@ -444,7 +446,7 @@ func (jt *jobTracker) FetchTasks(id string, host string) (*tasks, error) {
 	var url string
 	appID, jobID := hadoopIDs(id)
 	if host == jt.rm {
-		url = fmt.Sprintf("%s/proxy/%s/ws/v1/mapreduce/jobs/%s/tasks", host, appID, jobID)
+		url = fmt.Sprintf("%s/proxy/%s/ws/v1/mapreduce/jobs/%s/tasks", jt.ps, appID, jobID)
 	} else {
 		url = fmt.Sprintf("%s/ws/v1/history/mapreduce/jobs/%s/tasks", host, jobID)
 	}
@@ -475,7 +477,7 @@ func (jt *jobTracker) FetchConf(id string, host string) (conf, error) {
 	var url string
 	appID, jobID := hadoopIDs(id)
 	if host == jt.rm {
-		url = fmt.Sprintf("%s/proxy/%s/ws/v1/mapreduce/jobs/%s/conf", host, appID, jobID)
+		url = fmt.Sprintf("%s/proxy/%s/ws/v1/mapreduce/jobs/%s/conf", jt.ps, appID, jobID)
 	} else {
 		url = fmt.Sprintf("%s/ws/v1/history/mapreduce/jobs/%s/conf", host, jobID)
 	}
@@ -506,7 +508,7 @@ func (jt *jobTracker) FetchCounters(id string, host string) ([]counter, error) {
 	var url string
 	appID, jobID := hadoopIDs(id)
 	if host == jt.rm {
-		url = fmt.Sprintf("%s/proxy/%s/ws/v1/mapreduce/jobs/%s/counters", host, appID, jobID)
+		url = fmt.Sprintf("%s/proxy/%s/ws/v1/mapreduce/jobs/%s/counters", jt.ps, appID, jobID)
 	} else {
 		url = fmt.Sprintf("%s/ws/v1/history/mapreduce/jobs/%s/counters", host, jobID)
 	}
