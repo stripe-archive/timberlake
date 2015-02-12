@@ -51,6 +51,13 @@ function secondFormat(n) {
   return numFormat(hour) + ":" + paddedInt(minute) + ":" + paddedInt(second);
 }
 
+function humanFormat(n) {
+  n = n / 1000;
+  var hour = Math.floor(n / 3600);
+  var minute = Math.floor(n % 3600 / 60);
+  return numFormat(hour) + " hours " + paddedInt(minute) + " minutes ";
+}
+
 function jobState(job) {
   var state = job.state;
   var label = {
@@ -766,6 +773,10 @@ var Summarizer = React.createClass({
   render: function() {
     var progress = this.props.progress;
     var records = this.props.records;
+    var recordsPerSec = records != notAvailable ? records / (progress.totalTime / 1000) : null;
+    var computeTime = recordsPerSec ?
+      <span>{humanFormat(progress.totalTime)}<br/>{numFormat(Math.floor(recordsPerSec))} records/sec</span>
+      : <span>{humanFormat(progress.totalTime)}</span>;
     var pairs = [
       ['Progress', percentFormat(progress.progress)],
       ['Total', numFormat(progress.total)],
@@ -775,6 +786,7 @@ var Summarizer = React.createClass({
       ['Killed', numFormat(progress.killed)],
       ['Failed', numFormat(progress.failed)],
       ['Records', records != notAvailable ? numFormat(records) : null],
+      ['Compute Time', computeTime],
     ];
     return (
       <table className="table">
@@ -840,6 +852,7 @@ function MRJob(data) {
     running: d.mapsRunning,
     failed: d.failedMapAttempts,
     killed: d.killedMapAttempts,
+    totalTime: d.mapsTotalTime,
   };
   this.reduces = {
     progress: d.reduceProgress || (d.reducesTotal === 0 ? notAvailable : 100 * (d.reducesCompleted / d.reducesTotal)),
@@ -849,6 +862,7 @@ function MRJob(data) {
     running: d.reducesRunning,
     failed: d.failedReduceAttempts,
     killed: d.killedReduceAttempts,
+    totalTime: d.reducesTotalTime,
   };
 
   this.counters = new MRCounters(data.counters);

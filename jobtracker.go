@@ -354,6 +354,22 @@ func (jt *jobTracker) UpdateJob(job *job, full bool) error {
 	return jt.UpdatePartialJob(job)
 }
 
+func sumTimes(pairs [][]int64) int64 {
+	var sum int64
+	now := time.Now().Unix() * 1000
+	for _, pair := range pairs {
+		if pair[0] == -1 {
+			continue
+		}
+		if pair[1] == 0 {
+			sum += now - pair[0]
+		} else {
+			sum += pair[1] - pair[0]
+		}
+	}
+	return sum
+}
+
 func (jt *jobTracker) UpdatePartialJob(job *job) error {
 	counters, err := jt.FetchCounters(job.Details.ID, job.host)
 	if err != nil {
@@ -366,6 +382,8 @@ func (jt *jobTracker) UpdatePartialJob(job *job) error {
 		return err
 	}
 	job.Tasks = tasks
+	job.Details.MapsTotalTime = sumTimes(tasks.Map)
+	job.Details.ReducesTotalTime = sumTimes(tasks.Reduce)
 	job.Tasks.Map = trimTasks(tasks.Map)
 	job.Tasks.Reduce = trimTasks(tasks.Reduce)
 

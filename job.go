@@ -27,6 +27,7 @@ type jobDetail struct {
 	MapsRunning   int     `json:"mapsRunning"`
 	MapsFailed    int     `json:"failedMapAttempts"`
 	MapsKilled    int     `json:"killedMapAttempts"`
+	MapsTotalTime int64   `json:"mapsTotalTime"`
 
 	ReducesTotal     int     `json:"reducesTotal"`
 	ReduceProgress   float32 `json:"reduceProgress"`
@@ -35,6 +36,7 @@ type jobDetail struct {
 	ReducesRunning   int     `json:"reducesRunning"`
 	ReducesFailed    int     `json:"failedReduceAttempts"`
 	ReducesKilled    int     `json:"killedReduceAttempts"`
+	ReducesTotalTime int64   `json:"reducesTotalTime"`
 }
 
 type jobDetails []jobDetail
