@@ -51,11 +51,21 @@ function secondFormat(n) {
   return numFormat(hour) + ":" + paddedInt(minute) + ":" + paddedInt(second);
 }
 
+function plural(n, s) {
+  return n == 1 ? s : s + "s";
+}
+
 function humanFormat(n) {
   n = n / 1000;
   var hour = Math.floor(n / 3600);
   var minute = Math.floor(n % 3600 / 60);
-  return numFormat(hour) + " hours " + paddedInt(minute) + " minutes ";
+  var second = Math.floor(n % 3600 % 60);
+  if (n < 60) {
+    return second + plural(second, " second");
+  } else if (n < 3600) {
+    return minute + plural(minute, " minute");
+  }
+  return numFormat(hour) + plural(hour, " hour") + " " + minute + plural(minute, " minute");
 }
 
 function jobState(job) {
@@ -773,9 +783,9 @@ var Summarizer = React.createClass({
   render: function() {
     var progress = this.props.progress;
     var records = this.props.records;
-    var recordsPerSec = records != notAvailable ? records / (progress.totalTime / 1000) : null;
+    var recordsPerSec = records != notAvailable ? Math.floor(records / (progress.totalTime / 1000)) : null;
     var computeTime = recordsPerSec ?
-      <span>{humanFormat(progress.totalTime)}<br/>{numFormat(Math.floor(recordsPerSec))} records/sec</span>
+      <span>{humanFormat(progress.totalTime)}<br/>{numFormat(recordsPerSec)} {plural(recordsPerSec, "record")}/sec</span>
       : <span>{humanFormat(progress.totalTime)}</span>;
     var pairs = [
       ['Progress', percentFormat(progress.progress)],
@@ -786,7 +796,7 @@ var Summarizer = React.createClass({
       ['Killed', numFormat(progress.killed)],
       ['Failed', numFormat(progress.failed)],
       ['Records', records != notAvailable ? numFormat(records) : null],
-      ['Compute Time', computeTime],
+      ['Compute Time', progress.totalTime > 0 ? computeTime : null],
     ];
     return (
       <table className="table">
