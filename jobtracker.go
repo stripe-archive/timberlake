@@ -541,6 +541,7 @@ func (jt *jobTracker) FetchCounters(id string, host string) ([]counter, error) {
 	}
 
 	var counters []counter
+	countersMap := make(map[string]counter)
 
 	for _, group := range counterResp.JobCounters.CounterGroups {
 		splits := strings.Split(group.Name, ".")
@@ -548,14 +549,27 @@ func (jt *jobTracker) FetchCounters(id string, host string) ([]counter, error) {
 		for _, c := range group.Counters {
 			counterName := groupName + "." + c.Name
 			if alias, exists := countersToKeep[counterName]; exists {
-				counters = append(counters, counter{
-					Name:   alias,
-					Total:  c.Total,
-					Map:    c.Map,
-					Reduce: c.Reduce,
-				})
+				if prevCounter, exists := countersMap[alias]; exists {
+					countersMap[alias] = counter{
+						Name:   alias,
+						Total:  c.Total + prevCounter.Total,
+						Map:    c.Map + prevCounter.Map,
+						Reduce: c.Reduce + prevCounter.Reduce,
+					}
+				} else {
+					countersMap[alias] = counter{
+						Name:   alias,
+						Total:  c.Total,
+						Map:    c.Map,
+						Reduce: c.Reduce,
+					}
+				}
 			}
 		}
+	}
+
+	for _, value := range countersMap {
+		counters = append(counters, value)
 	}
 
 	return counters, nil
