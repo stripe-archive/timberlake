@@ -486,8 +486,8 @@ var Job = React.createClass({
       ['Output', cleanJobPath(job.conf.output)],
     ];
     var bytes = {
-      read: bytesFormat(job.counters.get('hdfs.bytes_read').map),
-      written: bytesFormat(job.counters.get('hdfs.bytes_written').total),
+      read: bytesFormat(job.counters.get('bytes_read').map),
+      written: bytesFormat(job.counters.get('bytes_written').total),
       shuffled: bytesFormat(job.counters.get('hdfs.bytes_shuffled').reduce),
     };
     var rv = (

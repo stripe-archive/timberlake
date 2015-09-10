@@ -42,8 +42,12 @@ const (
 )
 
 var countersToKeep = map[string]string{
-	"FileSystemCounter.HDFS_BYTES_READ":    "hdfs.bytes_read",
-	"FileSystemCounter.HDFS_BYTES_WRITTEN": "hdfs.bytes_written",
+	"FileSystemCounter.HDFS_BYTES_READ":    "bytes_read",
+	"FileSystemCounter.S3_BYTES_READ":      "bytes_read",
+	"FileSystemCounter.FILE_BYTES_READ":	"bytes_read",
+	"FileSystemCounter.HDFS_BYTES_WRITTEN": "bytes_written",
+	"FileSystemCounter.S3_BYTES_WRITTEN":   "bytes_written",
+	"FileSystemCounter.FILE_BYTES_WRITTEN": "bytes_written",
 	"TaskCounter.REDUCE_SHUFFLE_BYTES":     "hdfs.bytes_shuffled",
 	"TaskCounter.MAP_INPUT_RECORDS":        "task.map_records",
 	"TaskCounter.REDUCE_INPUT_RECORDS":     "task.reduce_records",
