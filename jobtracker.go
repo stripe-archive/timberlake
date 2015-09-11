@@ -42,12 +42,12 @@ const (
 )
 
 var countersToKeep = map[string]string{
-	"FileSystemCounter.HDFS_BYTES_READ":    "bytes_read",
-	"FileSystemCounter.S3_BYTES_READ":      "bytes_read",
-	"FileSystemCounter.FILE_BYTES_READ":	"bytes_read",
-	"FileSystemCounter.HDFS_BYTES_WRITTEN": "bytes_written",
-	"FileSystemCounter.S3_BYTES_WRITTEN":   "bytes_written",
-	"FileSystemCounter.FILE_BYTES_WRITTEN": "bytes_written",
+	"FileSystemCounter.HDFS_BYTES_READ":    "hdfs.bytes_read",
+	"FileSystemCounter.S3_BYTES_READ":      "s3.bytes_read",
+	"FileSystemCounter.FILE_BYTES_READ":	"file.bytes_read",
+	"FileSystemCounter.HDFS_BYTES_WRITTEN": "hdfs.bytes_written",
+	"FileSystemCounter.S3_BYTES_WRITTEN":   "s3.bytes_written",
+	"FileSystemCounter.FILE_BYTES_WRITTEN": "file.bytes_written",
 	"TaskCounter.REDUCE_SHUFFLE_BYTES":     "hdfs.bytes_shuffled",
 	"TaskCounter.MAP_INPUT_RECORDS":        "task.map_records",
 	"TaskCounter.REDUCE_INPUT_RECORDS":     "task.reduce_records",
@@ -541,7 +541,6 @@ func (jt *jobTracker) FetchCounters(id string, host string) ([]counter, error) {
 	}
 
 	var counters []counter
-	countersMap := make(map[string]counter)
 
 	for _, group := range counterResp.JobCounters.CounterGroups {
 		splits := strings.Split(group.Name, ".")
@@ -549,27 +548,14 @@ func (jt *jobTracker) FetchCounters(id string, host string) ([]counter, error) {
 		for _, c := range group.Counters {
 			counterName := groupName + "." + c.Name
 			if alias, exists := countersToKeep[counterName]; exists {
-				if prevCounter, exists := countersMap[alias]; exists {
-					countersMap[alias] = counter{
-						Name:   alias,
-						Total:  c.Total + prevCounter.Total,
-						Map:    c.Map + prevCounter.Map,
-						Reduce: c.Reduce + prevCounter.Reduce,
-					}
-				} else {
-					countersMap[alias] = counter{
-						Name:   alias,
-						Total:  c.Total,
-						Map:    c.Map,
-						Reduce: c.Reduce,
-					}
-				}
+				counters = append(counters, counter{
+					Name:   alias,
+					Total:  c.Total,
+					Map:    c.Map,
+					Reduce: c.Reduce,
+				})
 			}
 		}
-	}
-
-	for _, value := range countersMap {
-		counters = append(counters, value)
 	}
 
 	return counters, nil

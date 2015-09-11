@@ -486,10 +486,24 @@ var Job = React.createClass({
       ['Output', cleanJobPath(job.conf.output)],
     ];
     var bytes = {
-      read: bytesFormat(job.counters.get('bytes_read').map),
-      written: bytesFormat(job.counters.get('bytes_written').total),
+      hdfs_read: bytesFormat(job.counters.get('hdfs.bytes_read').map),
+      s3_read: bytesFormat(job.counters.get('s3.bytes_read').map),
+      file_read: bytesFormat(job.counters.get('file.bytes_read').map),
+      total_read: bytesFormat(
+        job.counters.get('hdfs.bytes_read').map +
+        job.counters.get('s3.bytes_read').map +
+        job.counters.get('file.bytes_read').map),
+      hdfs_written: bytesFormat(job.counters.get('hdfs.bytes_written').total),
+      s3_written: bytesFormat(job.counters.get('s3.bytes_written').total),
+      file_written: bytesFormat(job.counters.get('file.bytes_written').total),
+      total_written: bytesFormat(
+        job.counters.get('hdfs.bytes_written').total +
+        job.counters.get('s3.bytes_written').total +
+        job.counters.get('file.bytes_written').total),
       shuffled: bytesFormat(job.counters.get('hdfs.bytes_shuffled').reduce),
     };
+    var bytes_read_title = "HDFS: " + bytes.hdfs_read + "\nS3: " + bytes.s3_read + "\nFile: " + bytes.file_read
+    var bytes_written_title = "HDFS: " + bytes.hdfs_written + "\nS3: " + bytes.s3_written + "\nFile: " + bytes.file_written
     var rv = (
       <div>
         <div className="row">
@@ -502,8 +516,8 @@ var Job = React.createClass({
                   <th>Bytes</th>
                   <td>
                     <dl className="bytes">
-                      <dt>Read</dt> <dd>{bytes.read}</dd>
-                      <dt>Write</dt> <dd>{bytes.written}</dd>
+                      <dt title={bytes_read_title}>Read</dt> <dd>{bytes.total_read}</dd>
+                      <dt title={bytes_written_title}>Write</dt> <dd>{bytes.total_written}</dd>
                       <dt>Shuffle</dt> <dd>{bytes.shuffled}</dd>
                     </dl>
                   </td>
