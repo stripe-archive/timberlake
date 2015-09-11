@@ -486,10 +486,22 @@ var Job = React.createClass({
       ['Output', cleanJobPath(job.conf.output)],
     ];
     var bytes = {
-      read: bytesFormat(job.counters.get('hdfs.bytes_read').map),
-      written: bytesFormat(job.counters.get('hdfs.bytes_written').total),
-      shuffled: bytesFormat(job.counters.get('hdfs.bytes_shuffled').reduce),
+      hdfs_read: job.counters.get('hdfs.bytes_read').map,
+      s3_read: job.counters.get('s3.bytes_read').map,
+      file_read: job.counters.get('file.bytes_read').map,
+      hdfs_written: job.counters.get('hdfs.bytes_written').total,
+      s3_written: job.counters.get('s3.bytes_written').total,
+      file_written: job.counters.get('file.bytes_written').total,
+      shuffled: job.counters.get('hdfs.bytes_shuffled').reduce,
     };
+    bytes.total_read = bytes.hdfs_read + bytes.s3_read + bytes.file_read
+    bytes.total_written = bytes.hdfs_written + bytes.s3_written + bytes.file_written
+    for (var key in bytes) {
+      bytes[key] = bytesFormat(bytes[key])
+    }
+    var bytesReadTitle = "HDFS: " + bytes.hdfs_read + "\nS3: " + bytes.s3_read + "\nFile: " + bytes.file_read
+    var bytesWrittenTitle = "HDFS: " + bytes.hdfs_written + "\nS3: " + bytes.s3_written + "\nFile: " + bytes.file_written
+    
     var rv = (
       <div>
         <div className="row">
@@ -502,8 +514,8 @@ var Job = React.createClass({
                   <th>Bytes</th>
                   <td>
                     <dl className="bytes">
-                      <dt>Read</dt> <dd>{bytes.read}</dd>
-                      <dt>Write</dt> <dd>{bytes.written}</dd>
+                      <dt title={bytesReadTitle}>Read</dt> <dd>{bytes.total_read}</dd>
+                      <dt title={bytesWrittenTitle}>Write</dt> <dd>{bytes.total_written}</dd>
                       <dt>Shuffle</dt> <dd>{bytes.shuffled}</dd>
                     </dl>
                   </td>
