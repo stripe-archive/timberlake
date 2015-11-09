@@ -71,7 +71,7 @@ to generate the Slack URL for your bot.
 
 ## Building from Source
 
-You'll need `npm` and `go` on your path.
+You'll need `npm`, `go` and `node` on your path.
 
     $ git clone https://github.com/stripe/timberlake.git
     $ cd timberlake
