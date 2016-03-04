@@ -18,7 +18,7 @@ bin/timberlake:
 	go build -o bin/timberlake .
 
 bin/slack:
-	go build -o bin/slack bots/slack.go
+	go build -o bin/timberlake-slackbot bots/slack.go
 
 static: node_modules
 	node_modules/.bin/gulp build
