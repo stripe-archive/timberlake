@@ -7,7 +7,7 @@ all: test build
 test:
 	go test -race
 
-build: bin/timberlake bin/slack static
+build: bin/timberlake bin/timberlake-slackbot static
 
 release: clean test build
 	mkdir -p $(RELEASE_NAME)
@@ -17,7 +17,7 @@ release: clean test build
 bin/timberlake:
 	go build -o bin/timberlake .
 
-bin/slack:
+bin/timberlake-slackbot:
 	go build -o bin/timberlake-slackbot bots/slack.go
 
 static: node_modules
