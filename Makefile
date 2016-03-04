@@ -2,23 +2,23 @@ TRAVIS_TAG ?= $(shell git describe --tags HEAD)
 TIMBERLAKE_VERSION ?= $(TRAVIS_TAG)-$(shell go env GOOS)-$(shell go env GOARCH)
 RELEASE_NAME = timberlake-$(TIMBERLAKE_VERSION)
 
-all: build
+all: test build
+
+test:
+	go test -race
 
 build: bin/timberlake bin/slack static
 
-release: clean build
+release: clean test build
 	mkdir -p $(RELEASE_NAME)
 	cp -r bin static index.html README.md LICENSE $(RELEASE_NAME)/
 	tar -cvzf $(RELEASE_NAME).tar.gz $(RELEASE_NAME)
 
 bin/timberlake:
-	go get -v github.com/zenazn/goji
-	go get -v github.com/colinmarc/hdfs
 	go build -o bin/timberlake .
 
 bin/slack:
-	go build -o bin/slack bots/slack.go
-
+	go build -o bin/timberlake-slackbot bots/slack.go
 
 static: node_modules
 	node_modules/.bin/gulp build
