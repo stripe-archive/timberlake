@@ -12,13 +12,10 @@ release: clean build
 	tar -cvzf $(RELEASE_NAME).tar.gz $(RELEASE_NAME)
 
 bin/timberlake:
-	go get -v github.com/zenazn/goji
-	go get -v github.com/colinmarc/hdfs
 	go build -o bin/timberlake .
 
 bin/slack:
 	go build -o bin/slack bots/slack.go
-
 
 static: node_modules
 	node_modules/.bin/gulp build
