@@ -1,0 +1,4 @@
+#!/bin/bash -eux
+
+svc -t /etc/service/jobtracker-srv
+svc -t /etc/service/jobtracker-bot
