@@ -389,6 +389,29 @@ var FinishedJobRow = React.createClass({
 });
 
 
+var KillModal = React.createClass({
+  render: function() {
+    var hideModal = this.props.hideModal;
+    var killJob = this.props.killJob;
+    return (
+      <div className="modal show" tabIndex="-1" role="dialog">
+        <div className="modal-dialog modal-kill">
+          <div className="modal-content">
+            <div className="modal-body">
+              <h4>Are you sure you want to kill this job?</h4>
+            </div>
+            <div className="modal-footer">
+              <button onClick={hideModal} className="btn btn-default">Close</button>
+              <button onClick={killJob} className="btn btn-danger">Kill</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+});
+
+
 var Job = React.createClass({
   getInitialState: function() {
     return {};
@@ -424,6 +447,7 @@ var Job = React.createClass({
   },
 
   kill: function() {
+    this.hideKillModal();
     this.setState({killing: true});
     var job = this.getJob();
     $.post('/jobs/' + job.id + '/kill', (data, status) => {
@@ -434,6 +458,14 @@ var Job = React.createClass({
       console.error(err);
       this.setState({killing: false});
     });
+  },
+
+  hideKillModal: function() {
+    this.setState({showKillModal: false});
+  },
+
+  showKillModal: function() {
+    this.setState({showKillModal: true});
   },
 
   render: function() {
@@ -464,9 +496,10 @@ var Job = React.createClass({
       var killing = this.state.killing;
       state = (
         <span>
-          {state} <button onClick={this.kill} className="btn btn-danger kill">
+          {state} <button onClick={this.showKillModal} className="btn btn-danger kill">
             <span className="label label-danger">{killing ? 'Killing' : 'Kill'}</span>
           </button>
+          {this.state.showKillModal ? <KillModal hideModal={this.hideKillModal} killJob={this.kill}/> : null}
           {this.state.killResult ? <code>{this.state.killResult}</code> : null}
         </span>
       );
@@ -501,7 +534,7 @@ var Job = React.createClass({
     }
     var bytesReadTitle = "HDFS: " + bytes.hdfs_read + "\nS3: " + bytes.s3_read + "\nFile: " + bytes.file_read
     var bytesWrittenTitle = "HDFS: " + bytes.hdfs_written + "\nS3: " + bytes.s3_written + "\nFile: " + bytes.file_written
-    
+
     var rv = (
       <div>
         <div className="row">
