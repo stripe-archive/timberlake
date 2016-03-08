@@ -17,10 +17,11 @@ var historyServerURL = flag.String("history-server-url", "http://localhost:19888
 var proxyServerURL = flag.String("proxy-server-url", "", "The HTTP URL to access the proxy server, if separate from the resource manager.")
 var namenodeAddress = flag.String("namenode-address", "localhost:9000", "The host:port to access the Namenode metadata service.")
 var yarnLogDir = flag.String("yarn-logs-dir", "/tmp/logs", "The HDFS path where YARN stores logs. This is the controlled by the hadoop property yarn.nodemanager.remote-app-log-dir.")
+var yarnHistoryDir = flag.String("yarn-history-dir", "/tmp/staging/history/done", "The HDFS path where YARN stores finished job history files. This is the controlled by the hadoop property mapreduce.jobhistory.done-dir.")
 var httpTimeout = flag.Duration("http-timeout", time.Second*2, "The timeout used for connecting to YARN API. Pass values like: 2s")
 var pollInterval = flag.Duration("poll-interval", time.Second*2, "How often should we poll the job APIs. Pass values like: 2s")
 
-var jt jobTracker
+var jt *jobTracker
 
 var rootPath, staticPath string
 
@@ -31,7 +32,7 @@ func index(c web.C, w http.ResponseWriter, r *http.Request) {
 func getJobs(c web.C, w http.ResponseWriter, r *http.Request) {
 	// We only need the details for listing pages.
 	var jobs []*job
-	for _, j := range jt.Jobs {
+	for _, j := range jt.jobs {
 		jobs = append(jobs, &job{Details: j.Details, Conf: j.Conf})
 	}
 
@@ -46,12 +47,12 @@ func getJobs(c web.C, w http.ResponseWriter, r *http.Request) {
 }
 
 func getJob(c web.C, w http.ResponseWriter, r *http.Request) {
-	if !jt.HasJob(c.URLParams["id"]) {
+	if !jt.hasJob(c.URLParams["id"]) {
 		w.WriteHeader(404)
 		return
 	}
 
-	job := jt.GetJob(c.URLParams["id"])
+	job := jt.reifyJob(c.URLParams["id"])
 
 	jsonBytes, err := json.Marshal(job)
 	if err != nil {
@@ -64,12 +65,12 @@ func getJob(c web.C, w http.ResponseWriter, r *http.Request) {
 }
 
 func getLogs(c web.C, w http.ResponseWriter, r *http.Request) {
-	if !jt.HasJob(c.URLParams["id"]) {
+	if !jt.hasJob(c.URLParams["id"]) {
 		w.WriteHeader(404)
 		return
 	}
 
-	lines, err := jt.FetchLogs(c.URLParams["id"])
+	lines, err := jt.fetchLogs(c.URLParams["id"])
 
 	if err != nil {
 		log.Println("error:", err)
@@ -88,13 +89,13 @@ func getLogs(c web.C, w http.ResponseWriter, r *http.Request) {
 }
 
 func killJob(c web.C, w http.ResponseWriter, r *http.Request) {
-	if !jt.HasJob(c.URLParams["id"]) {
+	if !jt.hasJob(c.URLParams["id"]) {
 		w.WriteHeader(404)
 		return
 	}
 
 	id := c.URLParams["id"]
-	err := jt.KillJob(id)
+	err := jt.killJob(id)
 	if err != nil {
 		log.Println("error: ", err)
 		w.WriteHeader(500)
@@ -121,7 +122,7 @@ func main() {
 	jt = newJobTracker(*resourceManagerURL, *historyServerURL, *proxyServerURL)
 	go jt.Loop()
 
-	if err := jt.TestLogsDir(); err != nil {
+	if err := jt.testLogsDir(); err != nil {
 		log.Printf("WARNING: Could not read yarn logs directory. Error message: `%s`\n", err)
 		log.Println("\tYou can change the path with --yarn-logs-dir=HDFS_PATH.")
 		log.Println("\tTo talk to HDFS, Timberlake needs to be able to access the namenode (--namenode-address) and datanodes.")
