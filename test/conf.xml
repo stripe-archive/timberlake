@@ -1,0 +1,18 @@
+<configuration>
+  <property>
+    <name>mapreduce.input.fileinputformat.inputdir</name>
+    <value>/input/dir</value>
+  </property>
+  <property>
+    <name>mapreduce.output.fileoutputformat.outputdir</name>
+    <value>/output/dir</value>
+  </property>
+  <property>
+    <name>cascading.app.name</name>
+    <value>appname</value>
+  </property>
+  <property>
+    <name>foo</name>
+    <value>bar</value>
+  </property>
+</configuration>

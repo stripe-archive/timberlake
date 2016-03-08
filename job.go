@@ -3,12 +3,12 @@ package main
 import "time"
 
 type job struct {
-	Details  *jobDetail `json:"details"`
-	Counters []counter  `json:"counters"`
-	Conf     conf       `json:"conf"`
-	Tasks    *tasks     `json:"tasks"`
-	host     string
-	complete bool
+	Details  jobDetail `json:"details"`
+	Counters []counter `json:"counters"`
+	Conf     conf      `json:"conf"`
+	Tasks    tasks     `json:"tasks"`
+	running  bool
+	partial  bool
 	updated  time.Time
 }
 
@@ -53,50 +53,11 @@ func (ds jobDetails) Less(i, j int) bool {
 	return ds[i].FinishTime < ds[j].FinishTime
 }
 
-type conf struct {
-	Input  string `json:"input"`
-	Output string `json:"output"`
-	name   string
-}
-
 type counter struct {
 	Name   string `json:"name"`
 	Total  int    `json:"total"`
 	Map    int    `json:"map"`
 	Reduce int    `json:"reduce"`
-}
-
-type tasks struct {
-	Map    [][]int64 `json:"maps"`
-	Reduce [][]int64 `json:"reduces"`
-}
-
-type taskListByStartTime [][]int64
-
-func (ts taskListByStartTime) Len() int {
-	return len(ts)
-}
-
-func (ts taskListByStartTime) Swap(i, j int) {
-	ts[i], ts[j] = ts[j], ts[i]
-}
-
-func (ts taskListByStartTime) Less(i, j int) bool {
-	return ts[i][0] < ts[j][0]
-}
-
-type taskListByDuration [][]int64
-
-func (ts taskListByDuration) Len() int {
-	return len(ts)
-}
-
-func (ts taskListByDuration) Swap(i, j int) {
-	ts[i], ts[j] = ts[j], ts[i]
-}
-
-func (ts taskListByDuration) Less(i, j int) bool {
-	return (ts[i][1] - ts[i][0]) < (ts[j][1] - ts[j][0])
 }
 
 type appsResp struct {
@@ -105,7 +66,7 @@ type appsResp struct {
 	} `json:"apps"`
 }
 
-type jobResp struct {
+type jobsResp struct {
 	Jobs struct {
 		Job []jobDetail `json:"job"`
 	} `json:"jobs"`
