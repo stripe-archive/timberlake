@@ -238,3 +238,7 @@ a:hover,
   color: #07A4DD;
   margin-left: 1em;
 }
+
+.modal-kill {
+  width: 400px;
+}
