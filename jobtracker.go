@@ -266,6 +266,7 @@ func (jt *jobTracker) finishedJobLoop() {
 func (jt *jobTracker) cleanupLoop() {
 	for _ = range time.Tick(time.Second * 60) {
 		jt.jobsLock.Lock()
+
 		details := make(jobDetails, 0)
 		for _, job := range jt.jobs {
 			if job.Details.State == "SUCCEEDED" {
@@ -278,7 +279,8 @@ func (jt *jobTracker) cleanupLoop() {
 		if len(details) > jobLimit {
 			sort.Sort(sort.Reverse(details))
 			for _, d := range details[jobLimit:] {
-				jt.deleteJob(d.ID)
+				_, jobID := hadoopIDs(d.ID)
+				delete(jt.jobs, jobID)
 			}
 		}
 
@@ -288,22 +290,21 @@ func (jt *jobTracker) cleanupLoop() {
 		// details pages (and unlikely to be viewed).
 
 		counter := 0
-		for _, job := range jt.jobs {
-			if job.running || job.partial {
+		for jobID, j := range jt.jobs {
+			if j.running || j.partial {
 				continue
 			}
 
 			cutoff := time.Now().Add(-fullDataDuration).Unix()
-			if job.Details.FinishTime/1000 < cutoff {
-				job.partial = true
-				job.Tasks = tasks{}
-				job.Counters = nil
+			if j.Details.FinishTime/1000 < cutoff {
+				cleaned := &job{Details: j.Details, running: j.running, partial: true}
+				jt.jobs[jobID] = cleaned
 				counter++
 			}
 		}
 
-		log.Printf("Dropped full data for %d older jobs.\n", counter)
 		jt.jobsLock.Unlock()
+		log.Printf("Dropped full data for %d older jobs.\n", counter)
 	}
 }
 
