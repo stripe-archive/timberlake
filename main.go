@@ -3,13 +3,16 @@ package main
 import (
 	"encoding/json"
 	"flag"
-	"github.com/zenazn/goji"
-	"github.com/zenazn/goji/web"
 	"log"
 	"net/http"
+	"net/http/pprof"
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/zenazn/goji/bind"
+	"github.com/zenazn/goji/web"
+	"github.com/zenazn/goji/web/middleware"
 )
 
 var resourceManagerURL = flag.String("resource-manager-url", "http://localhost:8088", "The HTTP URL to access the resource manager.")
@@ -20,10 +23,22 @@ var yarnLogDir = flag.String("yarn-logs-dir", "/tmp/logs", "The HDFS path where 
 var yarnHistoryDir = flag.String("yarn-history-dir", "/tmp/staging/history/done", "The HDFS path where YARN stores finished job history files. This is the controlled by the hadoop property mapreduce.jobhistory.done-dir.")
 var httpTimeout = flag.Duration("http-timeout", time.Second*2, "The timeout used for connecting to YARN API. Pass values like: 2s")
 var pollInterval = flag.Duration("poll-interval", time.Second*2, "How often should we poll the job APIs. Pass values like: 2s")
+var enableDebug = flag.Bool("pprof", false, "Enable pprof debugging tools at /debug.")
 
 var jt *jobTracker
 
 var rootPath, staticPath string
+
+var mux *web.Mux
+
+func init() {
+	bind.WithFlag()
+	mux = web.New()
+	mux.Use(middleware.RequestID)
+	mux.Use(middleware.Logger)
+	mux.Use(middleware.Recoverer)
+	mux.Use(middleware.AutomaticOptions)
+}
 
 func index(c web.C, w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, filepath.Join(rootPath, "index.html"))
@@ -134,13 +149,21 @@ func main() {
 	static := http.StripPrefix("/static/", http.FileServer(http.Dir(staticPath)))
 	log.Println("serving static files from", staticPath)
 
-	goji.Get("/static/*", static)
-	goji.Get("/", index)
-	goji.Get("/jobs/", getJobs)
-	goji.Get("/sse", sse)
-	goji.Get("/jobs/:id", getJob)
-	goji.Get("/jobs/:id/logs", getLogs)
-	goji.Post("/jobs/:id/kill", killJob)
+	mux.Get("/static/*", static)
+	mux.Get("/", index)
+	mux.Get("/jobs/", getJobs)
+	mux.Get("/sse", sse)
+	mux.Get("/jobs/:id", getJob)
+	mux.Get("/jobs/:id/logs", getLogs)
+	mux.Post("/jobs/:id/kill", killJob)
+
+	if *enableDebug {
+		mux.Get("/debug/pprof/*", pprof.Index)
+		mux.Get("/debug/pprof/cmdline", pprof.Cmdline)
+		mux.Get("/debug/pprof/profile", pprof.Profile)
+		mux.Get("/debug/pprof/symbol", pprof.Symbol)
+		mux.Get("/debug/pprof/trace", pprof.Trace)
+	}
 
 	go func() {
 		for job := range jt.updates {
@@ -153,5 +176,5 @@ func main() {
 		}
 	}()
 
-	goji.Serve()
+	http.Serve(bind.Default(), mux)
 }
