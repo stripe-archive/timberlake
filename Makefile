@@ -31,4 +31,4 @@ clean:
 	rm -rf static bin node_modules
 	rm -rf $(RELEASE_NAME)
 
-.PHONY: clean build release
+.PHONY: clean test build release
