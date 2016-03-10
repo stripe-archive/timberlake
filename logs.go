@@ -45,7 +45,7 @@ func (jt *jobTracker) fetchLogs(id string) ([]string, error) {
 
 	jt.jobsLock.Lock()
 	user := jt.jobs[jobID].Details.User
-	jt.jobsLock.Lock()
+	jt.jobsLock.Unlock()
 
 	dir := fmt.Sprintf("%s/%s/logs/%s/", *yarnLogDir, user, appID)
 
