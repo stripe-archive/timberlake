@@ -169,6 +169,7 @@ func alert(job Job) {
 		fmt.Println(err)
 	}
 	fmt.Println(resp)
+        defer resp.Body.Close()
 }
 
 func cleanName(name string) string {
