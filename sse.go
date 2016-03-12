@@ -72,7 +72,7 @@ func (sse *sse) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		event = bytes.Replace(event, newline, prefix, -1)
 		if _, err := fmt.Fprintf(w, "data: %s\n\n", event); err != nil {
 			log.Println("Error writing to SSE", id, header, err)
-			break
+			continue
 		}
 		w.(http.Flusher).Flush()
 	}
