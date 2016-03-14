@@ -67,9 +67,10 @@ func listen(events chan<- Job) {
 		var buf string
 
 		prefix := "data: "
-		scanner := bufio.NewScanner(resp.Body)
-		for scanner.Scan() {
-			line := scanner.Text()
+		reader := bufio.NewReader(resp.Body)
+		readline, err := reader.ReadString('\n')
+		for err == nil {
+			line := string(readline)
 			if strings.Index(line, prefix) == 0 {
 				buf += line[len(prefix):]
 			} else {
@@ -81,8 +82,9 @@ func listen(events chan<- Job) {
 				buf = ""
 				events <- *job
 			}
+			readline, err = reader.ReadString('\n')
 		}
-		fmt.Println("Scanner closed unexpectedly:", scanner.Err())
+		fmt.Println("Scanner closed unexpectedly:", err)
 		resp.Body.Close()
 	}
 }
