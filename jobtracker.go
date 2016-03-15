@@ -441,10 +441,17 @@ func (jt *jobTracker) fetchTasks(id string) (tasks, error) {
 	tasks := tasks{Map: make([][]int64, 0), Reduce: make([][]int64, 0)}
 
 	for _, task := range taskResp.Tasks.Task {
+		// The API reports the start time of scheduled tasks as the start time
+		// of the job. They haven't actually started though.
+		startTime := task.StartTime
+		if task.State == "SCHEDULED" {
+			startTime = -1
+		}
+
 		if task.Type == "MAP" {
-			tasks.Map = append(tasks.Map, []int64{task.StartTime, task.FinishTime})
+			tasks.Map = append(tasks.Map, []int64{startTime, task.FinishTime})
 		} else if task.Type == "REDUCE" {
-			tasks.Reduce = append(tasks.Reduce, []int64{task.StartTime, task.FinishTime})
+			tasks.Reduce = append(tasks.Reduce, []int64{startTime, task.FinishTime})
 		}
 	}
 
