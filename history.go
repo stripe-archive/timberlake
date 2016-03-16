@@ -76,6 +76,9 @@ type attemptEvent struct {
 	Type       string `json:"taskType"`
 	StartTime  int64  `json:"startTime"`
 	FinishTime int64  `json:"finishTime"`
+	Error      string `json:"error"`
+	Hostname   string `json:"hostname"`
+	Status     string `json:"status"`
 	Counters   struct {
 		Groups []struct {
 			Name   string `json:"name"`
@@ -189,7 +192,11 @@ func (jp *jhistParser) parse() error {
 	// tasks here when trimTasks runs over them. We can't just look at the task
 	// events, because the historyserver does the same misdirection - it sets
 	// startTime for the task to the startTime of the first attempt, for example.
-	tasks := tasks{Map: make([][]int64, 0), Reduce: make([][]int64, 0)}
+	tasks := tasks{
+		Map:    make([][]int64, 0),
+		Reduce: make([][]int64, 0),
+		Errors: make(map[string][]taskAttempt),
+	}
 	counters := make(map[string]counter)
 	for _, attempt := range jp.attempts {
 		// Save the task times.
@@ -197,6 +204,17 @@ func (jp *jhistParser) parse() error {
 			tasks.Map = append(tasks.Map, []int64{attempt.StartTime, attempt.FinishTime})
 		} else if attempt.Type == "REDUCE" {
 			tasks.Reduce = append(tasks.Reduce, []int64{attempt.StartTime, attempt.FinishTime})
+		}
+
+		if attempt.Status == "FAILED" && attempt.Error != "" {
+			if _, exists := tasks.Errors[attempt.Error]; !exists {
+				tasks.Errors[attempt.Error] = make([]taskAttempt, 0)
+			}
+			tasks.Errors[attempt.Error] = append(tasks.Errors[attempt.Error], taskAttempt{
+				ID:       attempt.ID,
+				Hostname: attempt.Hostname,
+				Type:     attempt.Type,
+			})
 		}
 
 		// Update any counters from the attempt.
@@ -225,6 +243,7 @@ func (jp *jhistParser) parse() error {
 	jp.job.Details.ReducesTotalTime = sumTimes(tasks.Reduce)
 	jp.job.Tasks.Map = trimTasks(tasks.Map)
 	jp.job.Tasks.Reduce = trimTasks(tasks.Reduce)
+	jp.job.Tasks.Errors = tasks.Errors
 	for _, counter := range counters {
 		jp.job.Counters = append(jp.job.Counters, counter)
 	}
