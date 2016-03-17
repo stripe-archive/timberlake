@@ -588,6 +588,16 @@ var Job = React.createClass({
 
 
 var JobLogs = React.createClass({
+  componentDidMount: function() {
+    Store.getJob(this.props.params.jobId);
+  },
+
+  componentWillReceiveProps: function (next) {
+    if (this.props.params.jobId != next.params.jobId) {
+      Store.getJob(next.params.jobId);
+    }
+  },
+
   getJob: function() {
     var jobId = lolhadoop(this.props.params.jobId);
     return _.find(this.props.jobs, d => lolhadoop(d.id) == jobId);
@@ -596,10 +606,25 @@ var JobLogs = React.createClass({
   render: function() {
     var job = this.getJob();
     if (!job) return null;
+    var logs = _.sortBy(_.pairs(job.tasks.errors), x => x[1].length).reverse().map(p => {
+      var attempts = p[1];
+      var errorMessage = p[0].split('\n')[0];
+      var errorBody = p[0].split('\n').slice(1).join('\n');
+      return (
+        <dl>
+          <dt>{attempts.length} time{attempts.length == 1 ? '' : 's'}</dt>
+          <pre>
+            <b>{errorMessage}</b><br/>
+            {errorBody}
+          </pre>
+        </dl>
+      );
+    });
     return (
       <div>
         <h3><Link to="job" params={{jobId: job.id}}>{job.name}</Link></h3>
-        <JobLogList job={job} />
+        <br/>
+        {logs}
       </div>
     );
   }
@@ -926,6 +951,7 @@ function MRJob(data) {
   this.tasks = {
     maps: (tasks.maps || []).map(d => new MRTask(d)),
     reduces: (tasks.reduces || []).map(d => new MRTask(d)),
+    errors: tasks.errors,
   };
 }
 MRJob.prototype = {
