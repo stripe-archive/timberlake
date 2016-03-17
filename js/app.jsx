@@ -631,44 +631,6 @@ var JobLogs = React.createClass({
 });
 
 
-var JobLogList = React.createClass({
-  getInitialState: function() {
-    return {logs: [], logsFetched: false};
-  },
-
-  componentDidMount: function() {
-    if (this.isMounted()) {
-      $.getJSON('/jobs/' + this.props.job.id + '/logs').then(data => {
-        this.setState({logs: data || [], logsFetched: true});
-      });
-    }
-  },
-
-  render: function() {
-    if (!this.state.logsFetched) {
-      return <img src="/static/img/spinner-24x24.gif" />;
-    } else if (this.state.logs.length === 0) {
-      return <div>No exceptions were found.</div>;
-    }
-
-    var chunks = this.state.logs.map(lines => {
-      return lines
-        .replace(/\n+/gm, "\n")
-        .split("\n")
-        .filter(x => x.length > 0 && x.indexOf('\0') == -1 && x.indexOf('\ufffd') == -1)
-        .map(x => x.indexOf("FATAL") != -1 || x.indexOf('Caused by') != -1 || x.match(/^java.*(Exception|Error)/) ?
-                  <div><b>{x}</b></div> : <div>{x}</div>);
-    }).filter(x => x.length > 0);
-
-    return (
-      <ul className="log-list">
-        {chunks.map(c => <li>{c}</li>)}
-      </ul>
-    );
-  }
-});
-
-
 var RelatedJobs = React.createClass({
   render: function() {
     var relatives = this.props.relatives;
