@@ -25,9 +25,9 @@ func TestLoadHistory(t *testing.T) {
 
 	assert.Equal(t, 10, job.Details.MapsTotal, "the number of map tasks should be correct")
 	assert.Equal(t, 10, job.Details.MapsCompleted, "the number of completed map attempts should be correct")
-	assert.Equal(t, 0, job.Details.MapsFailed, "the number of failed map attempts should be correct")
+	assert.Equal(t, 1, job.Details.MapsFailed, "the number of failed map attempts should be correct")
 	assert.Equal(t, 0, job.Details.MapsKilled, "the number of killed map attempts should be correct")
-	assert.Equal(t, int64(93081), job.Details.MapsTotalTime, "the total time spent in mappers should be correct")
+	assert.Equal(t, int64(101610), job.Details.MapsTotalTime, "the total time spent in mappers should be correct")
 
 	assert.Equal(t, 1, job.Details.ReducesTotal, "the number of reducer tasks should be correct")
 	assert.Equal(t, 1, job.Details.ReducesCompleted, "the number of completed reducer attempts should be correct")
@@ -35,8 +35,12 @@ func TestLoadHistory(t *testing.T) {
 	assert.Equal(t, 0, job.Details.ReducesKilled, "the number of killed reducer attempts should be correct")
 	assert.Equal(t, int64(3605), job.Details.ReducesTotalTime, "the total time spent in reducers should be correct")
 
-	assert.Equal(t, 10, len(job.Tasks.Map), "the list of map task times should be the right length")
+	assert.Equal(t, 11, len(job.Tasks.Map), "the list of map task times should be the right length")
 	assert.Equal(t, 1, len(job.Tasks.Reduce), "the list of reduce task times should be the right length")
+
+	assert.Equal(t, 1, len(job.Tasks.Errors), "the list of errors should be the right length")
+	attempts := []taskAttempt{taskAttempt{ID: "attempt_1457998088753_7918_m_000014_0", Hostname: "bigdata33", Type: "MAP"}}
+	assert.Equal(t, attempts, job.Tasks.Errors["This is an error."], "the error attempts are correct")
 
 	counters := make(map[string]counter)
 	for _, c := range job.Counters {

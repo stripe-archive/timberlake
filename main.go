@@ -79,30 +79,6 @@ func getJob(c web.C, w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonBytes)
 }
 
-func getLogs(c web.C, w http.ResponseWriter, r *http.Request) {
-	if !jt.hasJob(c.URLParams["id"]) {
-		w.WriteHeader(404)
-		return
-	}
-
-	lines, err := jt.fetchLogs(c.URLParams["id"])
-
-	if err != nil {
-		log.Println("error:", err)
-		w.WriteHeader(500)
-		return
-	}
-
-	jsonBytes, err := json.Marshal(lines)
-	if err != nil {
-		log.Println("error:", err)
-		w.WriteHeader(500)
-		return
-	}
-
-	w.Write(jsonBytes)
-}
-
 func killJob(c web.C, w http.ResponseWriter, r *http.Request) {
 	if !jt.hasJob(c.URLParams["id"]) {
 		w.WriteHeader(404)
@@ -154,7 +130,6 @@ func main() {
 	mux.Get("/jobs/", getJobs)
 	mux.Get("/sse", sse)
 	mux.Get("/jobs/:id", getJob)
-	mux.Get("/jobs/:id/logs", getLogs)
 	mux.Post("/jobs/:id/kill", killJob)
 
 	if *enableDebug {

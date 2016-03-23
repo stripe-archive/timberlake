@@ -6,8 +6,15 @@ import (
 )
 
 type tasks struct {
-	Map    [][]int64 `json:"maps"`
-	Reduce [][]int64 `json:"reduces"`
+	Map    [][]int64                `json:"maps"`
+	Reduce [][]int64                `json:"reduces"`
+	Errors map[string][]taskAttempt `json:"errors"`
+}
+
+type taskAttempt struct {
+	ID       string `json:"id"`
+	Hostname string `json:"hostname"`
+	Type     string `json:"type"`
 }
 
 type taskListByStartTime [][]int64
