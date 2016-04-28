@@ -1,0 +1,87 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "4Bm/KCKnST99C3glQfNI7HyBDP4=",
+			"path": "github.com/colinmarc/hdfs",
+			"revision": "5e5d664bed7859df0bda87baba3e4c10afc4b75d",
+			"revisionTime": "2016-03-08T16:24:17Z"
+		},
+		{
+			"checksumSHA1": "ph/DEOyUCFFPe3RrQcOOuNmWxxY=",
+			"path": "github.com/colinmarc/hdfs/protocol/hadoop_common",
+			"revision": "5e5d664bed7859df0bda87baba3e4c10afc4b75d",
+			"revisionTime": "2016-03-08T16:24:17Z"
+		},
+		{
+			"checksumSHA1": "KXBHoRitLWJav3ZfiFRTXimMTFI=",
+			"path": "github.com/colinmarc/hdfs/protocol/hadoop_hdfs",
+			"revision": "5e5d664bed7859df0bda87baba3e4c10afc4b75d",
+			"revisionTime": "2016-03-08T16:24:17Z"
+		},
+		{
+			"checksumSHA1": "yWQS9SH+Cwq96tzSFposMklX1j0=",
+			"path": "github.com/colinmarc/hdfs/rpc",
+			"revision": "5e5d664bed7859df0bda87baba3e4c10afc4b75d",
+			"revisionTime": "2016-03-08T16:24:17Z"
+		},
+		{
+			"checksumSHA1": "5rPfda8jFccr3A6heL+JAmi9K9g=",
+			"origin": "github.com/stretchr/testify/vendor/github.com/davecgh/go-spew/spew",
+			"path": "github.com/davecgh/go-spew/spew",
+			"revision": "6fe211e493929a8aac0469b93f28b1d0688a9a3a",
+			"revisionTime": "2016-03-05T16:54:46Z"
+		},
+		{
+			"checksumSHA1": "6bzNfOK5zu5dZXKlKesbNMNnwEU=",
+			"path": "github.com/golang/protobuf/proto",
+			"revision": "c75fbf01dc6cb73649c4cd4326182c3e44aa9dbb",
+			"revisionTime": "2016-03-03T22:17:00Z"
+		},
+		{
+			"checksumSHA1": "zKKp5SZ3d3ycKe4EKMNT0BqAWBw=",
+			"origin": "github.com/stretchr/testify/vendor/github.com/pmezard/go-difflib/difflib",
+			"path": "github.com/pmezard/go-difflib/difflib",
+			"revision": "6fe211e493929a8aac0469b93f28b1d0688a9a3a",
+			"revisionTime": "2016-03-05T16:54:46Z"
+		},
+		{
+			"checksumSHA1": "Bn333k9lTndxU3D6n/G5c+GMcYY=",
+			"path": "github.com/stretchr/testify/assert",
+			"revision": "6fe211e493929a8aac0469b93f28b1d0688a9a3a",
+			"revisionTime": "2016-03-05T16:54:46Z"
+		},
+		{
+			"checksumSHA1": "P9FJpir2c4G5PA46qEkaWy3l60U=",
+			"path": "github.com/stretchr/testify/require",
+			"revision": "6fe211e493929a8aac0469b93f28b1d0688a9a3a",
+			"revisionTime": "2016-03-05T16:54:46Z"
+		},
+		{
+			"checksumSHA1": "T9J7FOCeCaD5q8T2v+72WtRq2ds=",
+			"path": "github.com/zenazn/goji/bind",
+			"revision": "e9a3f0275121c2439e2bd4b5dc6a9eb3fbe88451",
+			"revisionTime": "2016-03-04T04:43:53Z"
+		},
+		{
+			"checksumSHA1": "2D1oFW10TM4Rhvza5qwyZ1F39ZI=",
+			"path": "github.com/zenazn/goji/web",
+			"revision": "e9a3f0275121c2439e2bd4b5dc6a9eb3fbe88451",
+			"revisionTime": "2016-03-04T04:43:53Z"
+		},
+		{
+			"checksumSHA1": "6rHgrhLBfPQ8+CZwH0tnVV8843k=",
+			"path": "github.com/zenazn/goji/web/middleware",
+			"revision": "e9a3f0275121c2439e2bd4b5dc6a9eb3fbe88451",
+			"revisionTime": "2016-03-04T04:43:53Z"
+		},
+		{
+			"checksumSHA1": "g9hmnkrmD9/3bVFYssjA1mu+r2o=",
+			"path": "github.com/zenazn/goji/web/mutil",
+			"revision": "e9a3f0275121c2439e2bd4b5dc6a9eb3fbe88451",
+			"revisionTime": "2016-03-04T04:43:53Z"
+		}
+	],
+	"rootPath": "github.com/stripe/timberlake"
+}
