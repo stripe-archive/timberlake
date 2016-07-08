@@ -520,15 +520,15 @@ var Job = React.createClass({
     ];
     var bytes = {
       hdfs_read: job.counters.get('hdfs.bytes_read').map,
-      s3_read: job.counters.get('s3.bytes_read').map,
-      file_read: job.counters.get('file.bytes_read').map,
-      hdfs_written: job.counters.get('hdfs.bytes_written').total,
-      s3_written: job.counters.get('s3.bytes_written').total,
-      file_written: job.counters.get('file.bytes_written').total,
-      shuffled: job.counters.get('hdfs.bytes_shuffled').reduce,
+      s3_read: job.counters.get('s3.bytes_read').map || 0,
+      file_read: job.counters.get('file.bytes_read').map || 0,
+      hdfs_written: job.counters.get('hdfs.bytes_written').total || 0,
+      s3_written: job.counters.get('s3.bytes_written').total || 0,
+      file_written: job.counters.get('file.bytes_written').total || 0,
+      shuffled: job.counters.get('hdfs.bytes_shuffled').reduce || 0,
     };
-    bytes.total_read = bytes.hdfs_read + bytes.s3_read + bytes.file_read
-    bytes.total_written = bytes.hdfs_written + bytes.s3_written + bytes.file_written
+    bytes.total_read = bytes.hdfs_read + bytes.s3_read + bytes.file_read;
+    bytes.total_written = bytes.hdfs_written + bytes.s3_written + bytes.file_written;
     for (var key in bytes) {
       bytes[key] = bytesFormat(bytes[key])
     }
