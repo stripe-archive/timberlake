@@ -7,9 +7,10 @@ import (
 )
 
 type conf struct {
-	Input  string `json:"input"`
-	Output string `json:"output"`
-	name   string
+	Input         string `json:"input"`
+	Output        string `json:"output"`
+	ScaldingSteps string `json:"scaldingSteps"`
+	name          string
 }
 
 type confProperty struct {
@@ -30,6 +31,8 @@ func (conf *conf) update(c map[string]string) {
 			conf.Input = value
 		case "mapreduce.output.fileoutputformat.outputdir":
 			conf.Output = value
+		case "scalding.step.descriptions":
+			conf.ScaldingSteps = value
 		case "cascading.app.name":
 			conf.name = value
 		}
