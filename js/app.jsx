@@ -518,6 +518,22 @@ var Job = React.createClass({
       ['Input', inputs],
       ['Output', cleanJobPath(job.conf.output)],
     ];
+
+    var stepsStr = job.conf.scaldingSteps;
+    if (stepsStr) {
+      var lines = stepsStr.split(',').map(val => {
+        var trimmed = val.trim();
+        var matches = trimmed.match(/[\w.]+:\d+/i);
+        return matches ? matches[0] : trimmed;
+      });
+      var steps = (
+        <ul className="list-unstyled">
+          {_.uniq(lines).map(line => <li>{line}</li>)}
+        </ul>
+      );
+      pairs.push(['Line Numbers', steps]);
+    }
+
     var bytes = {
       hdfs_read: job.counters.get('hdfs.bytes_read').map,
       s3_read: job.counters.get('s3.bytes_read').map || 0,
