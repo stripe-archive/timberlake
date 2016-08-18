@@ -276,7 +276,7 @@ var JobTable = {
         case 'name': return row.name;
         case 'started': return row.startTime;
         case 'finished': return row.finishTime;
-        case 'duration': return -row.startTime;
+        case 'duration': return row.duration(); 
         case 'map': return row.maps.progress;
         case 'reduce': return row.reduces.progress;
         case 'state': return row.state;
