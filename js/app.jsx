@@ -524,7 +524,7 @@ var Job = React.createClass({
       var lines = stepsStr.split(',').map(val => {
         var trimmed = val.trim();
         var matches = trimmed.match(/[\w.]+:\d+/i);
-        return {full: trimmed,short: matches ? matches[0] : trimmed};
+        return {full: trimmed, short: matches ? matches[0] : trimmed};
       });
       var steps = (
         <ul className="list-unstyled">
