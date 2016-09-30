@@ -419,6 +419,7 @@ var Job = React.createClass({
 
   componentDidMount: function() {
     Store.getJob(this.props.params.jobId);
+    $('.scalding-step-description').each(function() { $(this).tooltip(); });
   },
 
   componentWillReceiveProps: function (next) {
@@ -528,7 +529,7 @@ var Job = React.createClass({
       });
       var steps = (
         <ul className="list-unstyled">
-          {_.uniq(lines).map(line => <li><span title={line.full}>{line.short}</span></li>)}
+          {_.uniq(lines).map(line => <li><span className="scalding-step-description" title={line.full}>{line.short}</span></li>)}
         </ul>
       );
       pairs.push(['Line Numbers', steps]);
