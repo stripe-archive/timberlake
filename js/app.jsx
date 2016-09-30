@@ -419,6 +419,7 @@ var Job = React.createClass({
 
   componentDidMount: function() {
     Store.getJob(this.props.params.jobId);
+    $('.scalding-step-description').each(function() { $(this).tooltip(); });
   },
 
   componentWillReceiveProps: function (next) {
@@ -524,11 +525,11 @@ var Job = React.createClass({
       var lines = stepsStr.split(',').map(val => {
         var trimmed = val.trim();
         var matches = trimmed.match(/[\w.]+:\d+/i);
-        return matches ? matches[0] : trimmed;
+        return {full: trimmed, short: matches ? matches[0] : trimmed};
       });
       var steps = (
         <ul className="list-unstyled">
-          {_.uniq(lines).map(line => <li>{line}</li>)}
+          {_.uniq(lines).map(line => <li><span className="scalding-step-description" title={line.full}>{line.short}</span></li>)}
         </ul>
       );
       pairs.push(['Line Numbers', steps]);
