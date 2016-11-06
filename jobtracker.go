@@ -18,7 +18,7 @@ const (
 	runningJobWorkers = 3
 
 	// How parallel should we be when polling the history server? This is
-	// primarily useful during the inital data backfill.
+	// primarily useful during the initial data backfill.
 	finishedJobWorkers = 3
 
 	// Maximum number of jobs to keep track of. All data is retained in memory
