@@ -1,7 +1,14 @@
 import React from 'react';
 import { Link, hashHistory } from 'react-router';
 
-import { timeFormat, secondFormat, percentFormat, ACTIVE_STATES, FINISHED_STATES } from './utils';
+import {
+  timeFormat,
+  secondFormat,
+  percentFormat,
+  jobState,
+  ACTIVE_STATES,
+  FINISHED_STATES
+} from './utils';
 
 
 // Lifted from react-router.
