@@ -8,6 +8,7 @@ import {
   lolhadoop,
   jobState,
   ACTIVE_STATES,
+  FAILED_STATES,
   timeFormat,
   secondFormat,
   cleanJobPath,
