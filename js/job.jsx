@@ -94,11 +94,10 @@ export default class extends React.Component {
     var job = this.getJob();
     if (!job) return null;
     document.title = job.name;
-
     var inputs = (
       <ul className="list-unstyled">
-        {this.inputs(job, this.props.jobs).map(input =>
-          <li key={input.id || input}>
+        {this.inputs(job, this.props.jobs).map((input, i) =>
+          <li key={i}>
             {_.isString(input) ?
               cleanJobPath(input) :
               <Link to={`job/${input.id}`}>{input.name}</Link>}
@@ -149,7 +148,7 @@ export default class extends React.Component {
       });
       var steps = (
         <ul className="list-unstyled">
-          {_.uniq(lines).map(line => <li><span className="scalding-step-description" title={line.full}>{line.short}</span></li>)}
+          {_.uniq(lines).map((line, i) => <li key={i}><span className="scalding-step-description" title={line.full}>{line.short}</span></li>)}
         </ul>
       );
       pairs.push(['Line Numbers', steps]);
@@ -179,7 +178,7 @@ export default class extends React.Component {
             <h4>Job Details</h4>
             <table className="table job-details">
               <tbody>
-                {pairs.map(d => <tr key={d}><th>{d[0]}</th><td>{d[1]}</td></tr>)}
+                {pairs.map((d, i) => <tr key={i}><th>{d[0]}</th><td>{d[1]}</td></tr>)}
                 <tr>
                   <th>Bytes</th>
                   <td>
@@ -446,7 +445,7 @@ class Summarizer extends React.Component {
     ];
     return (
       <table className="table">
-        <tbody>{pairs.map(t => <tr key={t[0]}><th>{t[0]}</th><td>{t[1]}</td></tr>)}</tbody>
+        <tbody>{pairs.map((t, i) => <tr key={i}><th>{t[0]}</th><td>{t[1]}</td></tr>)}</tbody>
       </table>
     );
   }
