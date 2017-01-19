@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Link } from 'react-router';
 
+import ProgressBar from './components/progress-bar';
 import { Store } from './store';
 import {
   lolhadoop,
@@ -9,7 +10,6 @@ import {
   ACTIVE_STATES,
   timeFormat,
   secondFormat,
-  percentFormat,
   cleanJobPath,
   humanFormat,
   numFormat,
@@ -433,7 +433,7 @@ class Summarizer extends React.Component {
       <span>{humanFormat(progress.totalTime)}<br/>{numFormat(recordsPerSec)} {plural(recordsPerSec, "record")}/sec</span>
       : <span>{humanFormat(progress.totalTime)}</span>;
     var pairs = [
-      ['Progress', percentFormat(progress.progress)],
+      ['Progress', <ProgressBar value={progress.progress}/>],
       ['Total', numFormat(progress.total)],
       ['Completed', numFormat(progress.completed)],
       ['Running', numFormat(progress.running)],

@@ -4,11 +4,11 @@ import { Link, hashHistory } from 'react-router';
 import {
   timeFormat,
   secondFormat,
-  percentFormat,
   jobState,
   ACTIVE_STATES,
   FINISHED_STATES
 } from './utils';
+import ProgressBar from './components/progress-bar';
 
 
 // Lifted from react-router.
@@ -198,8 +198,8 @@ class RunningJobRow extends JobRow {
       <Link to={`/job/${job.id}`}>{job.name}</Link>,
       timeFormat(job.startTime),
       secondFormat(job.duration()),
-      percentFormat(job.maps.progress),
-      percentFormat(job.reduces.progress),
+      <ProgressBar value={job.maps.progress}/>,
+      <ProgressBar value={job.reduces.progress}/>,
     ];
   }
 }

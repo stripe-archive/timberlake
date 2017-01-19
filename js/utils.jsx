@@ -9,18 +9,6 @@ export function numFormat(n) {
   return d3.format(",d")(n);
 }
 
-export function percentFormat(n) {
-  if (_.isNaN(n)) n = 0;
-  var style = {width: n + '%'};
-  var val = d3.format(".2f")(n) + "%";
-  return (
-    <div className="pct">
-      <div className="bar positive" style={{width: n + '%'}}><span>{val}</span></div>
-      <div className="bar negative" style={{width: (100 - n) + '%'}}><span>{val}</span></div>
-    </div>
-  );
-}
-
 export function secondFormat(n) {
   n = n / 1000;
   var hour = Math.floor(n / 3600);
