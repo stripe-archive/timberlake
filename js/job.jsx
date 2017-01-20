@@ -172,7 +172,7 @@ export default class extends React.Component {
     var bytesReadTitle = "HDFS: " + bytes.hdfs_read + "\nS3: " + bytes.s3_read + "\nFile: " + bytes.file_read
     var bytesWrittenTitle = "HDFS: " + bytes.hdfs_written + "\nS3: " + bytes.s3_written + "\nFile: " + bytes.file_written
 
-    const relatedJobs = this.relatedJobs(job, this.props.jobs);
+    const relatedJobs = _.sortBy(this.relatedJobs(job, this.props.jobs), job => job.id);
 
     var rv = (
       <div>
