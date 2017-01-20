@@ -50,9 +50,9 @@ export default class extends React.Component {
       }
     }
 
-    // Link related jobs.
     dagre.layout(g);
 
+    // Make the canvas large enough to hold the graph.
     let width = 0, height = 0;
     g.nodes().forEach(key => {
       const node = g.node(key);
@@ -103,8 +103,8 @@ export default class extends React.Component {
                     <circle
                         r="20"
                         style={{
-                            fill: key == job.id ? "rgb(232, 100, 130)" : "rgb(91, 192, 222)",
-                            stroke: key == job.id ? "rgb(255, 100, 130)" : "rgb(91, 192, 255)"
+                            fill: key == job.id ? "rgb(100, 232, 130)" : "rgb(91, 192, 222)",
+                            stroke: key == job.id ? "rgb(100, 255, 130)" : "rgb(91, 192, 255)"
                         }} />
                     <a href={`/#/job/${key}`}>
                       <text style={{
