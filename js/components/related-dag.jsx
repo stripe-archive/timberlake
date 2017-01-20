@@ -80,7 +80,7 @@ export default class extends React.Component {
                 <path d="M0,0 L0,6 L9,3 z" fill="#000" />
               </marker>
             </defs>
-            <g tranform={`translate(${margin}, ${margin})`}>
+            <g transform={`translate(${margin}, ${margin})`}>
               {g.edges().map((key, i) => {
                 const edge = g.edge(key);
                 let path = `M ${edge.points[0].x},${edge.points[0].y}`;
