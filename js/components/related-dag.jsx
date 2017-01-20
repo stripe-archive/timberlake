@@ -10,10 +10,13 @@ export default class extends React.Component {
     let job = this.props.job;
     let jobs = this.props.relatives;
 
+    // Graph settings.
+    let margin = 20, size = 30;
+
     // Create a new dagre graph.
-    var g = new dagre.graphlib.Graph().setGraph({
-      marginx: 20,
-      marginy: 20
+    let g = new dagre.graphlib.Graph().setGraph({
+      marginx: margin,
+      marginy: margin
     });
 
     g.setDefaultEdgeLabel(function() { return {}; });
@@ -36,8 +39,8 @@ export default class extends React.Component {
       // Create a graph node.
       g.setNode(job.id, {
         label: /^[^0-9]+\(([0-9]+)/.exec(job.name)[1],
-        width: 29,
-        height: 29
+        width: size,
+        height: size
       });
     }
 
@@ -56,8 +59,8 @@ export default class extends React.Component {
     let width = 0, height = 0;
     g.nodes().forEach(key => {
       const node = g.node(key);
-      width = Math.max(width, node.x + 40);
-      height = Math.max(height, node.y + 40);
+      width = Math.max(width, node.x + margin * 2 + size);
+      height = Math.max(height, node.y + margin * 2 + size);
     });
 
     return (
@@ -77,45 +80,47 @@ export default class extends React.Component {
                 <path d="M0,0 L0,6 L9,3 z" fill="#000" />
               </marker>
             </defs>
-            {g.edges().map((key, i) => {
-              const edge = g.edge(key);
-              let path = `M ${edge.points[0].x},${edge.points[0].y}`;
-              for (let i = 1; i < edge.points.length; ++i) {
-                path += ` L ${edge.points[i].x},${edge.points[i].y}`;
-              }
-              return (
-                  <path
-                      key={i}
-                      d={path}
-                      style={{
-                          markerEnd: "url(#arrow)",
-                          stroke: "black",
-                          strokeWidth: 2,
-                          fill: "transparent"
-                      }}
-                  />
-              );
-            })}
-            {g.nodes().map((key, i) => {
-              const node = g.node(key);
-              return (
-                  <g key={i} transform={`translate(${node.x}, ${node.y})`}>
-                    <circle
-                        r="20"
+            <g tranform={`translate(${margin}, ${margin})`}>
+              {g.edges().map((key, i) => {
+                const edge = g.edge(key);
+                let path = `M ${edge.points[0].x},${edge.points[0].y}`;
+                for (let i = 1; i < edge.points.length; ++i) {
+                  path += ` L ${edge.points[i].x},${edge.points[i].y}`;
+                }
+                return (
+                    <path
+                        key={i}
+                        d={path}
                         style={{
-                            fill: key == job.id ? "rgb(100, 232, 130)" : "rgb(91, 192, 222)",
-                            stroke: key == job.id ? "rgb(100, 255, 130)" : "rgb(91, 192, 255)"
-                        }} />
-                    <a href={`/#/job/${key}`}>
-                      <text style={{
-                          textAnchor: "middle",
-                          alignmentBaseline: "middle"}}>
-                          {node.label}
-                      </text>
-                    </a>
-                  </g>
-              );
-            })}
+                            markerEnd: "url(#arrow)",
+                            stroke: "black",
+                            strokeWidth: 2,
+                            fill: "transparent"
+                        }}
+                    />
+                );
+              })}
+              {g.nodes().map((key, i) => {
+                const node = g.node(key);
+                return (
+                    <g key={i} transform={`translate(${node.x}, ${node.y})`}>
+                      <circle
+                          r="20"
+                          style={{
+                              fill: key == job.id ? "rgb(100, 232, 130)" : "rgb(91, 192, 222)",
+                              stroke: key == job.id ? "rgb(100, 255, 130)" : "rgb(91, 192, 255)"
+                          }} />
+                      <a href={`/#/job/${key}`}>
+                        <text style={{
+                            textAnchor: "middle",
+                            alignmentBaseline: "middle"}}>
+                            {node.label}
+                        </text>
+                      </a>
+                    </g>
+                );
+              })}
+            </g>
           </svg>
         </div>
       </div>
