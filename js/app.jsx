@@ -25,7 +25,7 @@ class NavBar extends React.Component {
             <a className="navbar-brand" href="#">Timberlake</a>
           </div>
           <div className="navbar-right">
-            <p className="navbar-text">mappers: {numFormat(reducers)}</p>
+            <p className="navbar-text">mappers: {numFormat(mappers)}</p>
             <p className="navbar-text">reducers: {numFormat(reducers)}</p>
           </div>
         </div>
