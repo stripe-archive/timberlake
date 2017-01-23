@@ -3,6 +3,58 @@ import React from 'react';
 
 
 /**
+ * Renders an edge in the DAG view.
+ */
+class DAGEdge extends React.Component {
+  render() {
+    const points = this.props.points;
+    let path = `M ${points[0].x},${points[0].y}`;
+    for (let i = 1; i < points.length; ++i) {
+      path += ` L ${points[i].x},${points[i].y}`;
+    }
+    return (
+        <path
+            d={path}
+            style={{
+                markerEnd: "url(#arrow)",
+                stroke: "black",
+                strokeWidth: 2,
+                fill: "transparent"
+            }}
+        />
+    );
+  }
+}
+
+/**
+ * Renders a node in the DAG view.
+ */
+class DAGNode extends React.Component {
+  render() {
+    const node = this.props.node;
+    const selected = this.props.selected;
+
+    return (
+        <g transform={`translate(${node.x}, ${node.y})`}>
+          <circle
+              r="20"
+              style={{
+                  fill: selected ? "rgb(100, 232, 130)" : "rgb(91, 192, 222)",
+                  stroke: selected ? "rgb(100, 255, 130)" : "rgb(91, 192, 255)"
+              }} />
+          <a href={`/#/job/${node.key}`}>
+            <text style={{
+                textAnchor: "middle",
+                alignmentBaseline: "middle"}}>
+                {node.label}
+            </text>
+          </a>
+        </g>
+    );
+  }
+}
+
+/**
  * View rendering the DAG of related scalding steps.
  */
 export default class extends React.Component {
@@ -39,6 +91,7 @@ export default class extends React.Component {
       // Create a graph node.
       g.setNode(job.id, {
         label: /^[^0-9]+\(([0-9]+)/.exec(job.name)[1],
+        key: job.id,
         width: size,
         height: size
       });
@@ -81,45 +134,8 @@ export default class extends React.Component {
               </marker>
             </defs>
             <g transform={`translate(${margin}, ${margin})`}>
-              {g.edges().map((key, i) => {
-                const edge = g.edge(key);
-                let path = `M ${edge.points[0].x},${edge.points[0].y}`;
-                for (let i = 1; i < edge.points.length; ++i) {
-                  path += ` L ${edge.points[i].x},${edge.points[i].y}`;
-                }
-                return (
-                    <path
-                        key={i}
-                        d={path}
-                        style={{
-                            markerEnd: "url(#arrow)",
-                            stroke: "black",
-                            strokeWidth: 2,
-                            fill: "transparent"
-                        }}
-                    />
-                );
-              })}
-              {g.nodes().map((key, i) => {
-                const node = g.node(key);
-                return (
-                    <g key={i} transform={`translate(${node.x}, ${node.y})`}>
-                      <circle
-                          r="20"
-                          style={{
-                              fill: key == job.id ? "rgb(100, 232, 130)" : "rgb(91, 192, 222)",
-                              stroke: key == job.id ? "rgb(100, 255, 130)" : "rgb(91, 192, 255)"
-                          }} />
-                      <a href={`/#/job/${key}`}>
-                        <text style={{
-                            textAnchor: "middle",
-                            alignmentBaseline: "middle"}}>
-                            {node.label}
-                        </text>
-                      </a>
-                    </g>
-                );
-              })}
+              {g.edges().map((id, i) => <DAGEdge key={i} points={g.edge(id).points}/>)}
+              {g.nodes().map((id, i) => <DAGNode key={i} node={g.node(id)} selected={id==job.id}/>)}
             </g>
           </svg>
         </div>
