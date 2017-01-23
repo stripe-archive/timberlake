@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { Link } from 'react-router';
 
 import ProgressBar from './components/progress-bar';
+import RelatedDAG from './components/related-dag';
 import { Store } from './store';
 import {
   lolhadoop,
@@ -171,6 +172,8 @@ export default class extends React.Component {
     var bytesReadTitle = "HDFS: " + bytes.hdfs_read + "\nS3: " + bytes.s3_read + "\nFile: " + bytes.file_read
     var bytesWrittenTitle = "HDFS: " + bytes.hdfs_written + "\nS3: " + bytes.s3_written + "\nFile: " + bytes.file_written
 
+    const relatedJobs = _.sortBy(this.relatedJobs(job, this.props.jobs), job => job.id);
+
     var rv = (
       <div>
         <div className="row">
@@ -213,7 +216,10 @@ export default class extends React.Component {
           </div>
         </div>
         <div className="row">
-          <RelatedJobs job={job} relatives={this.relatedJobs(job, this.props.jobs)} />
+          <RelatedJobs job={job} relatives={relatedJobs} />
+        </div>
+        <div className="row">
+          <RelatedDAG job={job} relatives={relatedJobs} />
         </div>
       </div>
     );
