@@ -36,6 +36,10 @@ export default class extends React.Component {
     super(props);
     this.state = {
     };
+
+    this.kill = this.kill.bind(this);
+    this.showKillModal = this.showKillModal.bind(this);
+    this.hideKillModal = this.hideKillModal.bind(this);
   }
 
   componentDidMount() {
