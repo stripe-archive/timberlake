@@ -90,7 +90,7 @@ export default class extends React.Component {
 
       // Create a graph node.
       g.setNode(job.id, {
-        label: /^[^0-9]+\(([0-9]+)/.exec(job.name)[1],
+        label: /^[^\(]+\(([0-9]+)/.exec(job.name)[1],
         key: job.id,
         width: size,
         height: size
