@@ -62,3 +62,8 @@ export function cleanJobPath(path) {
   path = path.replace(/,/, ', ');
   return path;
 }
+
+export const COLOUR_MAP = "rgb(91, 192, 222)";
+export const COLOUR_REDUCE = "#E86482";
+export const COLOUR_SELECTED = "rgb(100, 232, 130)";
+export const COLOUR_HOVER = "rgb(100, 232, 200)";

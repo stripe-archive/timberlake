@@ -15,7 +15,11 @@ import {
   cleanJobPath,
   humanFormat,
   numFormat,
-  plural
+  plural,
+  COLOUR_MAP,
+  COLOUR_REDUCE,
+  COLOUR_SELECTED,
+  COLOUR_HOVER
 } from './utils';
 import { notAvailable } from './mr';
 
@@ -220,10 +224,10 @@ export default class extends React.Component {
           </div>
         </div>
         <div className="row">
-          <RelatedJobs job={job} relatives={relatedJobs} />
+          <RelatedJobs job={job} relatives={relatedJobs} hover={this.state.hover}/>
         </div>
         <div className="row">
-          <RelatedDAG job={job} relatives={relatedJobs} />
+          <RelatedDAG job={job} relatives={relatedJobs} hover={j => { this.setState({hover:j}) }}/>
         </div>
       </div>
     );
@@ -256,18 +260,42 @@ class KillModal extends React.Component {
 
 class RelatedJobs extends React.Component {
   render() {
-    var relatives = this.props.relatives;
+    const relatives = this.props.relatives;
+    const job = this.props.job;
+    const hover = this.props.hover;
+
     if (relatives.length < 2) return null;
 
-    var data = relatives.map(j => { return {start: j.startTime, finish: j.finishTime || new Date, job: j}; });
+    var data = relatives.map(j => ({
+      start: j.startTime,
+      finish: j.finishTime || new Date,
+      job: j
+    }));
     data = _.sortBy(data, 'start');
 
     var fmt = d => secondFormat(d.job.duration()) + ' ' + d.job.name;
     var links = d => '#/job/' + d.job.id;
+    var fs = d => {
+      if (d.job.id == job.id) {
+        return COLOUR_SELECTED;
+      } else if (hover && d.job.id == hover.id) {
+        return COLOUR_HOVER;
+      } else {
+        return COLOUR_MAP;
+      }
+    };
+
     return (
       <div>
         <h4>Related Jobs</h4>
-        <Waterfall data={data} barHeight={30} lineHeight={40} width={1200} textFormat={fmt} fillStyle="rgb(91, 192, 222)" linkFormat={links} />
+        <Waterfall
+            data={data}
+            barHeight={30}
+            lineHeight={40}
+            width={1200}
+            textFormat={fmt}
+            fillStyle={fs}
+            linkFormat={links} />
       </div>
     );
   }
@@ -343,7 +371,9 @@ function waterfall(data, node, opts) {
     width: 550,
     textFormat: t => '',
     linkFormat: null,
-    fillStyle: d => d.type == 'map' ? 'rgb(91, 192, 222)' : '#E86482',
+    fillStyle: d => {
+      return d.type == 'map' ? COLOUR_MAP : COLOUR_REDUCE;
+    },
   };
   opts = _.extend(defaults, opts);
 

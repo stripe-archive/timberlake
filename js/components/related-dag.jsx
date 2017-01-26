@@ -1,6 +1,10 @@
 import React from 'react';
 
-
+import {
+  COLOUR_MAP,
+  COLOUR_SELECTED,
+  COLOUR_HOVER
+} from '../utils';
 
 /**
  * Renders an edge in the DAG view.
@@ -30,22 +34,56 @@ class DAGEdge extends React.Component {
  * Renders a node in the DAG view.
  */
 class DAGNode extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.onMouseEnter = this.onMouseEnter.bind(this);
+    this.onMouseLeave = this.onMouseLeave.bind(this);
+
+    this.state = {
+      hover: false
+    };
+  }
+
+  onMouseEnter() {
+    this.setState({ hover: true });
+    if (this.props.hover) {
+      this.props.hover(this.props.node.job);
+    }
+  }
+
+  onMouseLeave() {
+    this.setState({ hover: false });
+    if (this.props.hover) {
+      this.props.hover(null);
+    }
+  }
+
   render() {
     const node = this.props.node;
     const selected = this.props.selected;
 
+    let colour;
+    if (selected) {
+      colour = COLOUR_SELECTED;
+    } else if (this.state.hover) {
+      colour = COLOUR_HOVER;
+    } else {
+      colour = COLOUR_MAP;
+    }
+
     return (
-        <g transform={`translate(${node.x}, ${node.y})`}>
-          <circle
-              r="20"
-              style={{
-                  fill: selected ? "rgb(100, 232, 130)" : "rgb(91, 192, 222)",
-                  stroke: selected ? "rgb(100, 255, 130)" : "rgb(91, 192, 255)"
-              }} />
-          <a href={`/#/job/${node.key}`}>
-            <text style={{
-                textAnchor: "middle",
-                alignmentBaseline: "middle"}}>
+        <g
+            onMouseEnter={this.onMouseEnter}
+            onMouseLeave={this.onMouseLeave}
+            transform={`translate(${node.x}, ${node.y})`}>
+          <a href={`/#/job/${node.job.id}`}>
+            <circle r="20" style={{ fill: colour }} />
+            <text
+                style={{
+                  textAnchor: "middle",
+                  alignmentBaseline: "middle"
+                }}>
                 {node.label}
             </text>
           </a>
@@ -91,7 +129,7 @@ export default class extends React.Component {
       // Create a graph node.
       g.setNode(job.id, {
         label: /^[^\(]+\(([0-9]+)/.exec(job.name)[1],
-        key: job.id,
+        job: job,
         width: size,
         height: size
       });
@@ -135,7 +173,12 @@ export default class extends React.Component {
             </defs>
             <g transform={`translate(${margin}, ${margin})`}>
               {g.edges().map((id, i) => <DAGEdge key={i} points={g.edge(id).points}/>)}
-              {g.nodes().map((id, i) => <DAGNode key={i} node={g.node(id)} selected={id==job.id}/>)}
+              {g.nodes().map((id, i) => <DAGNode
+                  key={i}
+                  node={g.node(id)}
+                  selected={id==job.id}
+                  hover={this.props.hover}/>
+              )}
             </g>
           </svg>
         </div>
