@@ -1,6 +1,10 @@
 import React from 'react';
 
-
+import {
+  COLOUR_MAP,
+  COLOUR_SELECTED,
+  COLOUR_HOVER
+} from '../utils';
 
 /**
  * Renders an edge in the DAG view.
@@ -59,16 +63,13 @@ class DAGNode extends React.Component {
     const node = this.props.node;
     const selected = this.props.selected;
 
-    let fillColour, strokeColour;
+    let colour;
     if (selected) {
-      fillColour = "rgb(100, 232, 130)";
-      strokeColour = "rgb(100, 255, 130)";
+      colour = COLOUR_SELECTED;
     } else if (this.state.hover) {
-      fillColour = "rgb(100, 232, 200)";
-      strokeColour = "rgb(100, 255, 200)";
+      colour = COLOUR_HOVER;
     } else {
-      fillColour = "rgb(91, 192, 222)";
-      strokeColour = "rgb(91, 192, 255)";
+      colour = COLOUR_MAP;
     }
 
     return (
@@ -77,7 +78,7 @@ class DAGNode extends React.Component {
             onMouseLeave={this.onMouseLeave}
             transform={`translate(${node.x}, ${node.y})`}>
           <a href={`/#/job/${node.job.id}`}>
-            <circle r="20" style={{ fill: fillColour, stroke: strokeColour }} />
+            <circle r="20" style={{ fill: colour }} />
             <text
                 style={{
                   textAnchor: "middle",

@@ -15,7 +15,11 @@ import {
   cleanJobPath,
   humanFormat,
   numFormat,
-  plural
+  plural,
+  COLOUR_MAP,
+  COLOUR_REDUCE,
+  COLOUR_SELECTED,
+  COLOUR_HOVER
 } from './utils';
 import { notAvailable } from './mr';
 
@@ -273,11 +277,11 @@ class RelatedJobs extends React.Component {
     var links = d => '#/job/' + d.job.id;
     var fs = d => {
       if (d.job.id == job.id) {
-        return "rgb(100, 232, 130)";
+        return COLOUR_SELECTED;
       } else if (hover && d.job.id == hover.id) {
-        return "rgb(100, 232, 200)";
+        return COLOUR_HOVER;
       } else {
-        return "rgb(91, 192, 255)";
+        return COLOUR_MAP;
       }
     };
 
@@ -368,7 +372,7 @@ function waterfall(data, node, opts) {
     textFormat: t => '',
     linkFormat: null,
     fillStyle: d => {
-      return d.type == 'map' ? 'rgb(91, 192, 222)' : '#E86482'
+      return d.type == 'map' ? COLOUR_MAP : COLOUR_REDUCE;
     },
   };
   opts = _.extend(defaults, opts);
