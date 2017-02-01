@@ -242,3 +242,17 @@ a:hover,
 .modal-kill {
   width: 400px;
 }
+
+.viz .x.axis line,
+.viz .x.axis path {
+  display: block;
+  fill: none;
+  stroke: #000;
+}
+
+.viz .y.axis line,
+.viz .y.axis path {
+  display: block;
+  fill: none;
+  stroke: #000;
+}

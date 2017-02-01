@@ -1,9 +1,10 @@
 import React from 'react';
 import { render } from 'react-dom'
-import { Router, Route, IndexRoute, hashHistory } from 'react-router';
+import { Router, Route, IndexRoute, Link, hashHistory } from 'react-router';
 
 import BigData from './list';
 import Job from './job';
+import Viz from './viz';
 import { JobLogs } from './joblogs';
 import { Store } from './store';
 import { numFormat } from './utils';
@@ -24,9 +25,14 @@ class NavBar extends React.Component {
           <div className="navbar-header">
             <a className="navbar-brand" href="#">Timberlake</a>
           </div>
-          <div className="navbar-right">
-            <p className="navbar-text">mappers: {numFormat(mappers)}</p>
-            <p className="navbar-text">reducers: {numFormat(reducers)}</p>
+          <div className="collapse navbar-collapse">
+            <ul className="nav navbar-nav">
+              <li><Link to="/viz">Resources</Link></li>
+            </ul>
+            <div className="navbar-right">
+              <p className="navbar-text">mappers: {numFormat(mappers)}</p>
+              <p className="navbar-text">reducers: {numFormat(reducers)}</p>
+            </div>
           </div>
         </div>
       </nav>
@@ -99,6 +105,7 @@ render(
       <IndexRoute component={BigData} />
       <Route name="job" path="job/:jobId"      component={Job} />
       <Route name="log" path="job/:jobId/logs" component={JobLogs} />
+      <Route name="viz" path="viz"             component={Viz} />
     </Route>
   </Router>
 , document.getElementById("timberlake"));
