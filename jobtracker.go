@@ -71,7 +71,9 @@ var httpClient = http.Client{
 }
 
 func getJSON(url string, data interface{}) error {
-	resp, err := httpClient.Get(url)
+	req, err := http.NewRequest("GET", url, nil)
+	req.Close = true
+	resp, err := httpClient.Do(req)
 	if err != nil {
 		if strings.Index(err.Error(), "use of closed network connection") != -1 {
 		}
