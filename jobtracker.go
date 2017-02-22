@@ -46,8 +46,10 @@ var countersToKeep = map[string]string{
 	"FileSystemCounter.S3_BYTES_WRITTEN":   "s3.bytes_written",
 	"FileSystemCounter.FILE_BYTES_WRITTEN": "file.bytes_written",
 	"TaskCounter.REDUCE_SHUFFLE_BYTES":     "hdfs.bytes_shuffled",
-	"TaskCounter.MAP_INPUT_RECORDS":        "task.map_records",
-	"TaskCounter.REDUCE_INPUT_RECORDS":     "task.reduce_records",
+	"TaskCounter.MAP_INPUT_RECORDS":        "task.map_input_records",
+	"TaskCounter.REDUCE_INPUT_RECORDS":     "task.reduce_input_records",
+	"TaskCounter.MAP_OUTPUT_RECORDS":       "task.map_output_records",
+	"TaskCounter.REDUCE_OUTPUT_RECORDS":    "task.reduce_output_records",
 }
 
 // This forces us to be consistent about the keys used in the Jobs map.
