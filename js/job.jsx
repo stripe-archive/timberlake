@@ -467,8 +467,9 @@ function boxplot(data, node, tickFormat) {
 class Summarizer extends React.Component {
   render() {
     var progress = this.props.progress;
-    var records = this.props.records;
-    var recordsPerSec = records != notAvailable ? Math.floor(records / (progress.totalTime / 1000)) : null;
+    var input_records = this.props.input_records;
+    var output_records = this.props.output_records;
+    var recordsPerSec = input_records != notAvailable ? Math.floor(input_records / (progress.totalTime / 1000)) : null;
     var computeTime = recordsPerSec ?
       <span>{humanFormat(progress.totalTime)}<br/>{numFormat(recordsPerSec)} {plural(recordsPerSec, "record")}/sec</span>
       : <span>{humanFormat(progress.totalTime)}</span>;
@@ -480,7 +481,8 @@ class Summarizer extends React.Component {
       ['Pending', numFormat(progress.pending)],
       ['Killed', numFormat(progress.killed)],
       ['Failed', numFormat(progress.failed)],
-      ['Records', records != notAvailable ? numFormat(records) : null],
+      ['Input Records', input_records != notAvailable ? numFormat(input_records) : null],
+      ['Output Records', output_records != notAvailable ? numFormat(output_records) : null],
       ['Compute Time', progress.totalTime > 0 ? computeTime : null],
     ];
     return (
@@ -495,8 +497,9 @@ class Summarizer extends React.Component {
 class MapSummary extends React.Component {
   render() {
     var job = this.props.job;
-    var records = this.props.counters.get('task.map_records');
-    return <Summarizer progress={job.maps} records={records.map} />;
+    var input_records = this.props.counters.get('task.map_input_records');
+    var output_records = this.props.counters.get('task.map_output_records');
+    return <Summarizer progress={job.maps} input_records={input_records.map} output_records={output_records.map} />;
   }
 }
 
@@ -504,7 +507,8 @@ class MapSummary extends React.Component {
 class ReduceSummary extends React.Component {
   render() {
     var job = this.props.job;
-    var records = this.props.counters.get('task.reduce_records');
-    return <Summarizer progress={job.reduces} records={records.reduce} />;
+    var input_records = this.props.counters.get('task.reduce_input_records');
+    var output_records = this.props.counters.get('task.reduce_output_records');
+    return <Summarizer progress={job.reduces} input_records={input_records.reduce} output_records={output_records.reduce} />;
   }
 }
