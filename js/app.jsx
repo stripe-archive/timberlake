@@ -69,7 +69,18 @@ class App extends React.Component {
   }
 
   flushUpdates() {
-    this.setState({jobs: _.extend(this.state.jobs, this.updates)});
+    let jobs = _.extend(this.state.jobs, this.updates);
+
+    // Drop mapper & reducer info of jobs that are not viewed on the detail page.
+    for (let key in jobs) {
+      if (key != Store.lastJob) {
+        let job = jobs[key];
+        job.tasks.maps = [];
+        job.tasks.reduces = [];
+      }
+    }
+
+    this.setState({jobs: jobs});
     this.updates = {};
   }
 
