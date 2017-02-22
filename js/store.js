@@ -3,10 +3,12 @@ import { MRJob } from './mr';
 class JobStore {
   constructor() {
     this.pipes = {};
+    this.lastJob = null;
   }
 
   getJob(id) {
-    $.getJSON('/jobs/' + id).then(data => {
+    this.lastJob = id;
+    $.getJSON(`/jobs/${id}`).then(data => {
       this.trigger('job', new MRJob(data));
     }).then(null, error => console.error(error));
   }
