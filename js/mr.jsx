@@ -21,7 +21,6 @@ export class MRJob {
     this.finishTime = d.finishTime ? new Date(d.finishTime) : null;
     this.user = d.user;
     this.searchString = (this.name + ' ' + this.user + ' ' + this.id).toLowerCase();
-    this.conf = data.conf || {};
 
     this.maps = {
       progress: d.mapProgress || (d.mapsTotal === 0 ? notAvailable : 100 * (d.mapsCompleted / d.mapsTotal)),
@@ -44,6 +43,8 @@ export class MRJob {
       totalTime: d.reducesTotalTime,
     };
 
+    this.conf = data.conf || {};
+
     this.counters = new MRCounters(data.counters);
 
     var tasks = data.tasks || {};
@@ -56,6 +57,13 @@ export class MRJob {
 
   duration() {
     return (this.finishTime || new Date) - this.startTime;
+  }
+
+  compact() {
+    this.tasks.maps = [];
+    this.tasks.reduces = [];
+    this.conf.flags = {};
+    this.counters = new MRCounters([]);
   }
 };
 

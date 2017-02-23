@@ -38,20 +38,6 @@ const (
 	taskLimit = 500
 )
 
-var countersToKeep = map[string]string{
-	"FileSystemCounter.HDFS_BYTES_READ":    "hdfs.bytes_read",
-	"FileSystemCounter.S3_BYTES_READ":      "s3.bytes_read",
-	"FileSystemCounter.FILE_BYTES_READ":    "file.bytes_read",
-	"FileSystemCounter.HDFS_BYTES_WRITTEN": "hdfs.bytes_written",
-	"FileSystemCounter.S3_BYTES_WRITTEN":   "s3.bytes_written",
-	"FileSystemCounter.FILE_BYTES_WRITTEN": "file.bytes_written",
-	"TaskCounter.REDUCE_SHUFFLE_BYTES":     "hdfs.bytes_shuffled",
-	"TaskCounter.MAP_INPUT_RECORDS":        "task.map_input_records",
-	"TaskCounter.REDUCE_INPUT_RECORDS":     "task.reduce_input_records",
-	"TaskCounter.MAP_OUTPUT_RECORDS":       "task.map_output_records",
-	"TaskCounter.REDUCE_OUTPUT_RECORDS":    "task.reduce_output_records",
-}
-
 // This forces us to be consistent about the keys used in the Jobs map.
 type jobID string
 
@@ -477,15 +463,12 @@ func (jt *jobTracker) fetchCounters(id string) ([]counter, error) {
 		splits := strings.Split(group.Name, ".")
 		groupName := splits[len(splits)-1]
 		for _, c := range group.Counters {
-			counterName := groupName + "." + c.Name
-			if alias, exists := countersToKeep[counterName]; exists {
-				counters = append(counters, counter{
-					Name:   alias,
-					Total:  c.Total,
-					Map:    c.Map,
-					Reduce: c.Reduce,
-				})
-			}
+			counters = append(counters, counter{
+				Name:   groupName + "." + c.Name,
+				Total:  c.Total,
+				Map:    c.Map,
+				Reduce: c.Reduce,
+			})
 		}
 	}
 

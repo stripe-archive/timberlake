@@ -4,7 +4,8 @@ import { Router, Route, IndexRoute, hashHistory } from 'react-router';
 
 import BigData from './list';
 import Job from './job';
-import { JobLogs } from './joblogs';
+import JobConf from './jobconf'
+import JobLogs from './joblogs';
 import { Store } from './store';
 import { numFormat } from './utils';
 
@@ -76,12 +77,10 @@ class App extends React.Component {
   flushUpdates() {
     let jobs = _.extend(this.state.jobs, this.updates);
 
-    // Drop mapper & reducer info of jobs that are not viewed on the detail page.
+    // Drop mapper, reducer & config info of jobs that are not viewed on the detail page.
     for (let key in jobs) {
       if (key != Store.lastJob) {
-        let job = jobs[key];
-        job.tasks.maps = [];
-        job.tasks.reduces = [];
+        jobs[key].compact();
       }
     }
 
@@ -124,6 +123,7 @@ render(
       <IndexRoute component={BigData} />
       <Route name="job" path="job/:jobId"      component={Job} />
       <Route name="log" path="job/:jobId/logs" component={JobLogs} />
+      <Route name="cfg" path="job/:jobId/conf" component={JobConf} />
     </Route>
   </Router>
 , document.getElementById("timberlake"));
