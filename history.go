@@ -222,19 +222,17 @@ func (jp *jhistParser) parse() error {
 			groupName := group.Name[strings.LastIndex(group.Name, ".")+1:]
 			for _, count := range group.Counts {
 				counterName := fmt.Sprintf("%s.%s", groupName, count.Name)
-				if alias, exists := countersToKeep[counterName]; exists {
-					counter := counters[alias]
-					counter.Name = alias
-					counter.Total += count.Value
+				counter := counters[counterName]
+				counter.Name = counterName
+				counter.Total += count.Value
 
-					if attempt.Type == "MAP" {
-						counter.Map += count.Value
-					} else if attempt.Type == "REDUCE" {
-						counter.Reduce += count.Value
-					}
-
-					counters[alias] = counter
+				if attempt.Type == "MAP" {
+					counter.Map += count.Value
+				} else if attempt.Type == "REDUCE" {
+					counter.Reduce += count.Value
 				}
+
+				counters[counterName] = counter
 			}
 		}
 	}

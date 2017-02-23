@@ -48,7 +48,12 @@ func getJobs(c web.C, w http.ResponseWriter, r *http.Request) {
 	// We only need the details for listing pages.
 	var jobs []*job
 	for _, j := range jt.jobs {
-		jobs = append(jobs, &job{Details: j.Details, Conf: j.Conf})
+		jobs = append(jobs, &job{Details: j.Details, Conf: conf{
+			Input:         j.Conf.Input,
+			Output:        j.Conf.Output,
+			ScaldingSteps: j.Conf.ScaldingSteps,
+			name:          j.Conf.name,
+		}})
 	}
 
 	jsonBytes, err := json.Marshal(jobs)

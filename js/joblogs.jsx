@@ -6,7 +6,7 @@ import { lolhadoop } from './utils';
 
 
 
-export class JobLogs extends React.Component {
+export default class extends React.Component {
   componentDidMount() {
     Store.getJob(this.props.params.jobId);
   }

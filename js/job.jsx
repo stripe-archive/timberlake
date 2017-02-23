@@ -164,13 +164,13 @@ export default class extends React.Component {
     }
 
     var bytes = {
-      hdfs_read: job.counters.get('hdfs.bytes_read').map,
-      s3_read: job.counters.get('s3.bytes_read').map || 0,
-      file_read: job.counters.get('file.bytes_read').map || 0,
-      hdfs_written: job.counters.get('hdfs.bytes_written').total || 0,
-      s3_written: job.counters.get('s3.bytes_written').total || 0,
-      file_written: job.counters.get('file.bytes_written').total || 0,
-      shuffled: job.counters.get('hdfs.bytes_shuffled').reduce || 0,
+      hdfs_read: job.counters.get('FileSystemCounter.HDFS_BYTES_READ').map,
+      s3_read: job.counters.get('FileSystemCounter.S3_BYTES_READ').map || 0,
+      file_read: job.counters.get('FileSystemCounter.FILE_BYTES_READ').map || 0,
+      hdfs_written: job.counters.get('FileSystemCounter.HDFS_BYTES_WRITTEN').total || 0,
+      s3_written: job.counters.get('FileSystemCounter.S3_BYTES_WRITTEN').total || 0,
+      file_written: job.counters.get('FileSystemCounter.FILE_BYTES_WRITTEN').total || 0,
+      shuffled: job.counters.get('TaskCounter.REDUCE_SHUFFLE_BYTES').reduce || 0,
     };
     bytes.total_read = bytes.hdfs_read + bytes.s3_read + bytes.file_read;
     bytes.total_written = bytes.hdfs_written + bytes.s3_written + bytes.file_written;
@@ -186,7 +186,9 @@ export default class extends React.Component {
       <div>
         <div className="row">
           <div className="col-md-5">
-            <h4>Job Details</h4>
+            <div>
+              <h4><Link to={`job/${job.id}/conf`}>Job Details</Link></h4>
+            </div>
             <table className="table job-details">
               <tbody>
                 {pairs.map((d, i) => <tr key={i}><th>{d[0]}</th><td>{d[1]}</td></tr>)}
@@ -497,8 +499,8 @@ class Summarizer extends React.Component {
 class MapSummary extends React.Component {
   render() {
     var job = this.props.job;
-    var input_records = this.props.counters.get('task.map_input_records');
-    var output_records = this.props.counters.get('task.map_output_records');
+    var input_records = this.props.counters.get('TaskCounter.MAP_INPUT_RECORDS');
+    var output_records = this.props.counters.get('TaskCounter.MAP_OUTPUT_RECORDS');
     return <Summarizer progress={job.maps} input_records={input_records.map} output_records={output_records.map} />;
   }
 }
@@ -507,8 +509,8 @@ class MapSummary extends React.Component {
 class ReduceSummary extends React.Component {
   render() {
     var job = this.props.job;
-    var input_records = this.props.counters.get('task.reduce_input_records');
-    var output_records = this.props.counters.get('task.reduce_output_records');
+    var input_records = this.props.counters.get('TaskCounter.REDUCE_INPUT_RECORDS');
+    var output_records = this.props.counters.get('TaskCounter.REDUCE_OUTPUT_RECORDS');
     return <Summarizer progress={job.reduces} input_records={input_records.reduce} output_records={output_records.reduce} />;
   }
 }

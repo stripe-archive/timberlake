@@ -7,9 +7,10 @@ import (
 )
 
 type conf struct {
-	Input         string `json:"input"`
-	Output        string `json:"output"`
-	ScaldingSteps string `json:"scaldingSteps"`
+	Flags         map[string]string `json:"flags"`
+	Input         string            `json:"input"`
+	Output        string            `json:"output"`
+	ScaldingSteps string            `json:"scaldingSteps"`
 	name          string
 }
 
@@ -25,7 +26,11 @@ type jobConf struct {
 
 // update applies known configuration properties to the job object.
 func (conf *conf) update(c map[string]string) {
+	if conf.Flags == nil {
+		conf.Flags = make(map[string]string)
+	}
 	for key, value := range c {
+		conf.Flags[key] = value
 		switch key {
 		case "mapreduce.input.fileinputformat.inputdir":
 			conf.Input = value

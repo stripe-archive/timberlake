@@ -47,8 +47,8 @@ func TestLoadHistory(t *testing.T) {
 		counters[c.Name] = c
 	}
 
-	assert.Equal(t, "hdfs.bytes_read", counters["hdfs.bytes_read"].Name, "the hdfs.bytes_read counter should be set")
-	assert.Equal(t, 480, counters["hdfs.bytes_read"].Total, "the hdfs.bytes_read counter total should be correct")
-	assert.Equal(t, 480, counters["hdfs.bytes_read"].Map, "the hdfs.bytes_read counter for maps should be correct")
-	assert.Equal(t, 0, counters["hdfs.bytes_read"].Reduce, "the hdfs.bytes_read counter for reduces should be correct")
+	assert.Equal(t, "FileSystemCounter.HDFS_BYTES_READ", counters["FileSystemCounter.HDFS_BYTES_READ"].Name, "the FileSystemCounter.HDFS_BYTES_READ counter should be set")
+	assert.Equal(t, 480, counters["FileSystemCounter.HDFS_BYTES_READ"].Total, "the FileSystemCounter.HDFS_BYTES_READ counter total should be correct")
+	assert.Equal(t, 480, counters["FileSystemCounter.HDFS_BYTES_READ"].Map, "the FileSystemCounter.HDFS_BYTES_READ counter for maps should be correct")
+	assert.Equal(t, 0, counters["FileSystemCounter.HDFS_BYTES_READ"].Reduce, "the FileSystemCounter.HDFS_BYTES_READ counter for reduces should be correct")
 }
