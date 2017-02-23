@@ -8,6 +8,11 @@ import { JobLogs } from './joblogs';
 import { Store } from './store';
 import { numFormat } from './utils';
 
+/**
+ * Number of most recent jobs to keep in the finished tab.
+ */
+const JOBS_TO_KEEP = 5000;
+
 
 /**
  * Component responsible for rendering the top navigation bar.
@@ -53,10 +58,10 @@ class App extends React.Component {
     });
 
     Store.on('jobs', jobs => {
-      var jobs = _.object(jobs.map(d => [d.id, d]));
       // We may have more specific info this.state.jobs already, so merge that
       // into what we're getting from /jobs.
-      this.setState({jobs: _.extend(jobs, this.state.jobs)});
+      this.updates = _.extend(this.updates, _.object(jobs.map(d => [d.id, d])));
+      this.flushUpdates();
     });
 
     Store.getJobs();
@@ -77,6 +82,15 @@ class App extends React.Component {
         let job = jobs[key];
         job.tasks.maps = [];
         job.tasks.reduces = [];
+      }
+    }
+
+    // Drop old finished jobs, keeping only 5000 of them.
+    let ids = Object.keys(jobs).filter(id => jobs[id].finishTime != null);
+    if (ids.length > JOBS_TO_KEEP) {
+      ids.sort((a, b) => jobs[a].finishTime - jobs[b].finishTime);
+      for (let id of _.first(ids, ids.length - JOBS_TO_KEEP)) {
+        delete jobs[id];
       }
     }
 
