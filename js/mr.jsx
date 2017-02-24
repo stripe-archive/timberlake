@@ -10,7 +10,6 @@ export class MRJob {
   constructor(data) {
     var _m;
     var d = data.details;
-    this._data = data;
     this.id = d.id.replace('application_', 'job_');
     this.fullName = d.name;
     this.name = cleanJobName(d.name);
