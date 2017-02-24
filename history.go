@@ -359,10 +359,10 @@ func (jt *jobTracker) updateFromHistoryFile(job *job, full bool) error {
 	now := time.Now()
 
 	client, err := hdfs.New(*namenodeAddress)
-	defer client.Close()
 	if err != nil {
 		return err
 	}
+	defer client.Close()
 
 	_, jobID := hadoopIDs(job.Details.ID)
 	confFile, histFile, err := findHistoryAndConfFiles(client, jobID, job.Details.FinishTime)
