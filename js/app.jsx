@@ -61,8 +61,7 @@ class App extends React.Component {
     Store.on('jobs', jobs => {
       // We may have more specific info this.state.jobs already, so merge that
       // into what we're getting from /jobs.
-      this.updates = _.extend(this.updates, _.object(jobs.map(d => [d.id, d])));
-      this.flushUpdates();
+      this.setState({jobs: _.extend(_.object(jobs.map(d => [d.id, d])), this.state.jobs)});
     });
 
     Store.getJobs();
@@ -75,6 +74,8 @@ class App extends React.Component {
   }
 
   flushUpdates() {
+    // Merge the updates into the list of jobs. Updates are merged into the existing map
+    // since they contain more specific & more recent information than the existing list.
     let jobs = _.extend(this.state.jobs, this.updates);
 
     // Drop mapper, reducer & config info of jobs that are not viewed on the detail page.
