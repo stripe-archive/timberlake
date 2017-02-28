@@ -187,11 +187,19 @@ export default class extends React.Component {
         <div className="row">
           <div className="col-md-5">
             <div>
-              <h4><Link to={`job/${job.id}/conf`}>Job Details</Link></h4>
+              <h4>Job Details</h4>
             </div>
             <table className="table job-details">
               <tbody>
                 {pairs.map((d, i) => <tr key={i}><th>{d[0]}</th><td>{d[1]}</td></tr>)}
+                <tr>
+                  <th>Configuration</th>
+                  <td><Link to={`job/${job.id}/conf`}>Link</Link></td>
+                </tr>
+                <tr>
+                  <th>Counters</th>
+                  <td><Link to={`job/${job.id}/counters`}>Link</Link></td>
+                </tr>
                 <tr>
                   <th>Bytes</th>
                   <td>
