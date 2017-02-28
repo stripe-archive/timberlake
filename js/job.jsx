@@ -193,12 +193,12 @@ export default class extends React.Component {
               <tbody>
                 {pairs.map((d, i) => <tr key={i}><th>{d[0]}</th><td>{d[1]}</td></tr>)}
                 <tr>
-                  <th>Configuration</th>
-                  <td><Link to={`job/${job.id}/conf`}>Link</Link></td>
-                </tr>
-                <tr>
-                  <th>Counters</th>
-                  <td><Link to={`job/${job.id}/counters`}>Link</Link></td>
+                  <th>Details</th>
+                  <td>
+                    <Link to={`job/${job.id}/conf`}>Configuration</Link>
+                    <br />
+                    <Link to={`job/${job.id}/counters`}>Counters</Link>
+                  </td>
                 </tr>
                 <tr>
                   <th>Bytes</th>
