@@ -33,16 +33,21 @@ export default class extends React.Component {
         <table className="table">
           <thead>
             <tr>
-              <th>Flag</th>
-              <th>Value</th>
+              <th>Name</th>
+              <th>Total</th>
+              <th>Map</th>
+              <th>Reduce</th>
             </tr>
           </thead>
           <tbody>
-            {Object.keys(job.conf.flags || {}).map(function(key) {
+            {Object.keys(job.counters.data).sort().map(function(key) {
+              const counter = job.counters.get(key);
               return (
                 <tr key={key}>
-                  <th>{key}</th>
-                  <th>{job.conf.flags[key]}</th>
+                  <th>{counter.name}</th>
+                  <td>{counter.total||0}</td>
+                  <td>{counter.map||0}</td>
+                  <td>{counter.reduce||0}</td>
                 </tr>
               );
             })}

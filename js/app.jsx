@@ -6,6 +6,7 @@ import BigData from './list';
 import Job from './job';
 import JobConf from './jobconf'
 import JobLogs from './joblogs';
+import JobCounters from './jobcounters';
 import { Store } from './store';
 import { numFormat } from './utils';
 
@@ -122,9 +123,10 @@ render(
   <Router history={hashHistory}>
     <Route path="/" component={App}>
       <IndexRoute component={BigData} />
-      <Route name="job" path="job/:jobId"      component={Job} />
-      <Route name="log" path="job/:jobId/logs" component={JobLogs} />
-      <Route name="cfg" path="job/:jobId/conf" component={JobConf} />
+      <Route name="job" path="job/:jobId"          component={Job} />
+      <Route name="log" path="job/:jobId/logs"     component={JobLogs} />
+      <Route name="cfg" path="job/:jobId/conf"     component={JobConf} />
+      <Route name="cnt" path="job/:jobId/counters" component={JobCounters} />
     </Route>
   </Router>
 , document.getElementById("timberlake"));
