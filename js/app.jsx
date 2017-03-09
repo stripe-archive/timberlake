@@ -87,7 +87,7 @@ class App extends React.Component {
     }
 
     // Drop old finished jobs, keeping only 5000 of them.
-    let ids = Object.keys(jobs).filter(id => jobs[id].finishTime != null);
+    let ids = Object.keys(jobs).filter(id => jobs[id].finishTime != null && id != Store.lastJob);
     if (ids.length > JOBS_TO_KEEP) {
       ids.sort((a, b) => jobs[a].finishTime - jobs[b].finishTime);
       for (let id of _.first(ids, ids.length - JOBS_TO_KEEP)) {
