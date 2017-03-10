@@ -15,7 +15,7 @@ import (
 
 const (
 	// How parallel should we be when polling the resource manager?
-	runningJobWorkers = 3
+	runningJobWorkers = 1
 
 	// How parallel should we be when polling the history server? This is
 	// primarily useful during the initial data backfill.

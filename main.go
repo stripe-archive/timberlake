@@ -22,7 +22,7 @@ var namenodeAddress = flag.String("namenode-address", "localhost:9000", "The hos
 var yarnLogDir = flag.String("yarn-logs-dir", "/tmp/logs", "The HDFS path where YARN stores logs. This is the controlled by the hadoop property yarn.nodemanager.remote-app-log-dir.")
 var yarnHistoryDir = flag.String("yarn-history-dir", "/tmp/staging/history/done", "The HDFS path where YARN stores finished job history files. This is the controlled by the hadoop property mapreduce.jobhistory.done-dir.")
 var httpTimeout = flag.Duration("http-timeout", time.Second*2, "The timeout used for connecting to YARN API. Pass values like: 2s")
-var pollInterval = flag.Duration("poll-interval", time.Second*2, "How often should we poll the job APIs. Pass values like: 2s")
+var pollInterval = flag.Duration("poll-interval", time.Second*5, "How often should we poll the job APIs. Pass values like: 2s")
 var enableDebug = flag.Bool("pprof", false, "Enable pprof debugging tools at /debug.")
 
 var jt *jobTracker
