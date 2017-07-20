@@ -13,7 +13,7 @@ import ProgressBar from './components/progress-bar';
 
 // Lifted from react-router.
 const isLeftClickEvent = e => e.button === 0;
-const isModifiedEvent = event => !!(event.metaKey || event.altKey || event.ctrlKey || event.shiftKey);
+const isModifiedEvent = event => event.metaKey || event.altKey || event.ctrlKey || event.shiftKey;
 
 export default class extends React.Component {
   constructor(props) {
