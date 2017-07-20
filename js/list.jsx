@@ -12,9 +12,8 @@ import ProgressBar from './components/progress-bar';
 
 
 // Lifted from react-router.
-var isLeftClickEvent = e => e.button === 0;
-var isModifiedEvent = e => !!(event.metaKey || event.altKey || event.ctrlKey || event.shiftKey);
-
+const isLeftClickEvent = e => e.button === 0;
+const isModifiedEvent = event => event.metaKey || event.altKey || event.ctrlKey || event.shiftKey;
 
 export default class extends React.Component {
   constructor(props) {
@@ -35,7 +34,7 @@ export default class extends React.Component {
     // 1. Transitioning on every keypress was leading to dropped keys.
     // 2. Debouncing prevents every single keypress from becoming a history item.
     this.updateLocation = _.debounce(() => {
-      var q = {filter: this.state.filter};
+      const q = {filter: this.state.filter};
       hashHistory.push({
         pathname: '/',
         query: _.extend(this.props.location.query, q)
@@ -59,9 +58,9 @@ export default class extends React.Component {
 
   render() {
     console.time('BigData');
-    var jobs = this.props.jobs;
-    var filter = this.state.filter.toLowerCase();
-    var rv = (
+    const jobs = this.props.jobs;
+    const filter = this.state.filter.toLowerCase();
+    const rv = (
       <div>
         <RunningJobs jobs={jobs} query={this.props.location.query} onFilter={this.onFilter} filter={filter} />
         <FinishedJobs jobs={jobs} query={this.props.location.query} onFilter={this.onFilter} filter={filter} />
@@ -74,14 +73,14 @@ export default class extends React.Component {
 
 class JobTable extends React.Component {
   sorting(sort) {
-    var s = sort.split('-');
-    return s.length == 1 ? {key: s[0], dir: 1} : {key: s[1], dir: -1};
+    const s = sort.split('-');
+    return s.length === 1 ? {key: s[0], dir: 1} : {key: s[1], dir: -1};
   }
 
   sort(key) {
-    var s = this.sorting(this.props.query[this.sortKey] || this.defaultSortKey);
-    var n = s.key == key && s.dir == -1 ? key : '-' + key;
-    var q = _.object([[this.sortKey, n]]);
+    const s = this.sorting(this.props.query[this.sortKey] || this.defaultSortKey);
+    const n = s.key == key && s.dir == -1 ? key : '-' + key;
+    const q = _.object([[this.sortKey, n]]);
 
     hashHistory.push({
       pathname: '/',
@@ -90,14 +89,14 @@ class JobTable extends React.Component {
   }
 
   sortedJobs() {
-    var jobs = this.props.jobs.filter(j => _.contains(this.states, j.state));
+    let jobs = this.props.jobs.filter(j => _.contains(this.states, j.state));
     if (this.props.filter) {
-      var parts = this.props.filter.split(/\s+/);
+      const parts = this.props.filter.split(/\s+/);
       jobs = jobs.filter(job => {
-        return parts.every(p => job.searchString.indexOf(p) != -1);
+        return parts.every(p => job.searchString.indexOf(p) !== -1);
       });
     }
-    var sort = this.sorting(this.props.query[this.sortKey] || this.defaultSortKey);
+    const sort = this.sorting(this.props.query[this.sortKey] || this.defaultSortKey);
     jobs = _.sortBy(jobs, row => {
       switch (sort.key) {
         case 'user': return row.user;
@@ -115,10 +114,10 @@ class JobTable extends React.Component {
   }
 
   render() {
-    var [sort, jobs] = this.sortedJobs();
-    var sortDir = 'sort-' + (sort.dir > 0 ? 'asc' : 'desc');
-    var Row = this.rowClass();
-    var rows = jobs.slice(0, 150).map(job => <Row key={job.id} job={job} />);
+    const [sort, jobs] = this.sortedJobs();
+    const sortDir = 'sort-' + (sort.dir > 0 ? 'asc' : 'desc');
+    const Row = this.rowClass();
+    const rows = jobs.slice(0, 150).map(job => <Row key={job.id} job={job} />);
     return (
       <div>
         <h3>
@@ -129,8 +128,8 @@ class JobTable extends React.Component {
           <thead>
             <tr>
               {this.headers.map(h => {
-                var cls = sort.key == h ? sortDir : "";
-                var click = this.sort.bind(this, h);
+                const cls = sort.key == h ? sortDir : "";
+                const click = this.sort.bind(this, h);
                 return <th key={h} className={cls} onClick={click}>{h}</th>;
               })}
             </tr>
@@ -140,7 +139,7 @@ class JobTable extends React.Component {
       </div>
     );
   }
-};
+}
 
 
 class FinishedJobs extends JobTable {
@@ -185,14 +184,14 @@ class JobRow extends React.Component {
   }
 
   render() {
-    var columns = this.columns();
+    const columns = this.columns();
     return <tr onClick={this.onClick.bind(this)}>{columns.map((d, i) => <td key={i}>{d}</td>)}</tr>;
   }
 }
 
 class RunningJobRow extends JobRow {
   columns() {
-    var job = this.props.job;
+    const job = this.props.job;
     return [
       job.user,
       <Link to={`/job/${job.id}`}>{job.name}</Link>,
@@ -207,7 +206,7 @@ class RunningJobRow extends JobRow {
 
 class FinishedJobRow extends JobRow {
   columns() {
-    var job = this.props.job;
+    const job = this.props.job;
     return [
       job.user,
       <Link to={`/job/${job.id}`}>{job.name}</Link>,
