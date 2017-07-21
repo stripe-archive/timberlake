@@ -397,7 +397,7 @@ func (jt *jobTracker) listJobs() (*appsResp, error) {
 }
 
 func (jt *jobTracker) listFinishedJobs(since time.Time) (*jobsResp, error) {
-	url := fmt.Sprintf("%s/ws/v1/history/mapreduce/jobs?finishedTimeBegin=%d000", jt.hs, since.Unix())
+	url := fmt.Sprintf("%s/ws/v1/history/mapreduce/jobs", jt.hs, since.Unix())
 	resp := &jobsResp{}
 	err := getJSON(url, resp)
 	if err != nil {
