@@ -118,7 +118,7 @@ func (jt *jobTracker) runningJobLoop() {
 			for job := range jt.running {
 				err := jt.updateJob(job)
 				if err != nil {
-					log.Println(err)
+					log.Println("An error occurred updating the job", job.Details.ID, err)
 					// If a job is brand new we won't be able to fetch details from
 					// the RM, so we'll get an error and end up here. If the job
 					// doesn't exist in the jobs map then we'll assume that's
@@ -181,7 +181,7 @@ func (jt *jobTracker) finishedJobLoop() {
 				full := (job.Details.FinishTime/1000 > time.Now().Add(-fullDataDuration).Unix())
 				err := jt.updateFromHistoryFile(job, full)
 				if err != nil {
-					log.Println(err)
+					log.Println("An error occurred updating from history file", job.Details.ID, err)
 					continue
 				}
 
