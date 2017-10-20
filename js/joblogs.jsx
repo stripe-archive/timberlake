@@ -1,9 +1,8 @@
 import React from 'react';
-import { Link } from 'react-router';
+import {Link} from 'react-router';
 
-import { Store } from './store';
-import { lolhadoop } from './utils';
-
+import {Store} from './store';
+import {lolhadoop} from './utils';
 
 
 export default class extends React.Component {
@@ -19,13 +18,13 @@ export default class extends React.Component {
 
   getJob() {
     var jobId = lolhadoop(this.props.params.jobId);
-    return _.find(this.props.jobs, d => lolhadoop(d.id) == jobId);
+    return _.find(this.props.jobs, (d) => lolhadoop(d.id) == jobId);
   }
 
   render() {
     var job = this.getJob();
     if (!job) return null;
-    var logs = _.sortBy(_.pairs(job.tasks.errors), x => x[1].length).reverse().map(p => {
+    var logs = _.sortBy(_.pairs(job.tasks.errors), (x) => x[1].length).reverse().map((p) => {
       var attempts = p[1];
       var errorMessage = p[0].split('\n')[0];
       var errorBody = p[0].split('\n').slice(1).join('\n');
@@ -33,7 +32,7 @@ export default class extends React.Component {
         <dl>
           <dt>{attempts.length} time{attempts.length == 1 ? '' : 's'}</dt>
           <pre>
-            <b>{errorMessage}</b><br/>
+            <b>{errorMessage}</b><br />
             {errorBody}
           </pre>
         </dl>
@@ -42,7 +41,7 @@ export default class extends React.Component {
     return (
       <div>
         <h3><Link to={`/job/${job.id}`}>{job.name}</Link></h3>
-        <br/>
+        <br />
         {logs}
       </div>
     );

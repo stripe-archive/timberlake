@@ -1,4 +1,4 @@
-import { MRJob } from './mr';
+import {MRJob} from './mr';
 
 class JobStore {
   constructor() {
@@ -8,26 +8,26 @@ class JobStore {
 
   getJob(id) {
     this.lastJob = id;
-    $.getJSON(`/jobs/${id}`).then(data => {
+    $.getJSON(`/jobs/${id}`).then((data) => {
       this.trigger('job', new MRJob(data));
-    }).then(null, error => console.error(error));
+    }).then(null, (error) => console.error(error));
   }
 
   getJobs() {
-    $.getJSON('/jobs/').then(data => {
-      this.trigger('jobs', data.map(d => new MRJob(d)));
-    }).then(null, error => console.error(error));
+    $.getJSON('/jobs/').then((data) => {
+      this.trigger('jobs', data.map((d) => new MRJob(d)));
+    }).then(null, (error) => console.error(error));
   }
 
   startSSE() {
     var sse = new EventSource('/sse');
-    sse.onmessage = e => {
+    sse.onmessage = (e) => {
       this.trigger('job', new MRJob(JSON.parse(e.data)));
     };
   }
 
   trigger(key, data) {
-    (this.pipes[key] || []).map(f => f(data));
+    (this.pipes[key] || []).map((f) => f(data));
   }
 
   on(key, f) {

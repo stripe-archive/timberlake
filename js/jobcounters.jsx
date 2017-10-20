@@ -1,9 +1,8 @@
 import React from 'react';
-import { Link } from 'react-router';
+import {Link} from 'react-router';
 
-import { Store } from './store';
-import { lolhadoop } from './utils';
-
+import {Store} from './store';
+import {lolhadoop} from './utils';
 
 
 export default class extends React.Component {
@@ -19,7 +18,7 @@ export default class extends React.Component {
 
   getJob() {
     var jobId = lolhadoop(this.props.params.jobId);
-    return _.find(this.props.jobs, d => lolhadoop(d.id) == jobId);
+    return _.find(this.props.jobs, (d) => lolhadoop(d.id) == jobId);
   }
 
   render() {
@@ -45,9 +44,9 @@ export default class extends React.Component {
               return (
                 <tr key={key}>
                   <th>{counter.name}</th>
-                  <td>{counter.total||0}</td>
-                  <td>{counter.map||0}</td>
-                  <td>{counter.reduce||0}</td>
+                  <td>{counter.total || 0}</td>
+                  <td>{counter.map || 0}</td>
+                  <td>{counter.reduce || 0}</td>
                 </tr>
               );
             })}

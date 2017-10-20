@@ -1,19 +1,19 @@
 import React from 'react';
-import { Link, hashHistory } from 'react-router';
+import {Link, hashHistory} from 'react-router';
 
 import {
   timeFormat,
   secondFormat,
   jobState,
   ACTIVE_STATES,
-  FINISHED_STATES
+  FINISHED_STATES,
 } from './utils';
 import ProgressBar from './components/progress-bar';
 
 
 // Lifted from react-router.
-const isLeftClickEvent = e => e.button === 0;
-const isModifiedEvent = event => event.metaKey || event.altKey || event.ctrlKey || event.shiftKey;
+const isLeftClickEvent = (e) => e.button === 0;
+const isModifiedEvent = (event) => event.metaKey || event.altKey || event.ctrlKey || event.shiftKey;
 
 export default class extends React.Component {
   constructor(props) {
@@ -22,13 +22,13 @@ export default class extends React.Component {
     this.onFilter = this.onFilter.bind(this);
 
     this.state = {
-      filter: "",
-      flushed: true
+      filter: '',
+      flushed: true,
     };
   }
 
   componentDidMount() {
-    document.title = "Timberlake :: The 20/20 Experience";
+    document.title = 'Timberlake :: The 20/20 Experience';
 
     // Two reasons for debouncing:
     // 1. Transitioning on every keypress was leading to dropped keys.
@@ -37,7 +37,7 @@ export default class extends React.Component {
       const q = {filter: this.state.filter};
       hashHistory.push({
         pathname: '/',
-        query: _.extend(this.props.location.query, q)
+        query: _.extend(this.props.location.query, q),
       });
       this.state.flushed = true;
     }, 250, false);
@@ -47,7 +47,7 @@ export default class extends React.Component {
     // A change to the filter when we're flushed indicates a legit transition, probably via browser
     // back button. If we're not flushed then it's just the location bar catching up to our state.
     if (this.state.flushed && this.state.filter != nextProps.location.query.filter) {
-      this.setState({filter: nextProps.location.query.filter || ""});
+      this.setState({filter: nextProps.location.query.filter || ''});
     }
   }
 
@@ -79,25 +79,25 @@ class JobTable extends React.Component {
 
   sort(key) {
     const s = this.sorting(this.props.query[this.sortKey] || this.defaultSortKey);
-    const n = s.key == key && s.dir == -1 ? key : '-' + key;
+    const n = s.key == key && s.dir == -1 ? key : `-${key}`;
     const q = _.object([[this.sortKey, n]]);
 
     hashHistory.push({
       pathname: '/',
-      query: _.extend(this.props.query, q)
+      query: _.extend(this.props.query, q),
     });
   }
 
   sortedJobs() {
-    let jobs = this.props.jobs.filter(j => _.contains(this.states, j.state));
+    let jobs = this.props.jobs.filter((j) => _.contains(this.states, j.state));
     if (this.props.filter) {
       const parts = this.props.filter.split(/\s+/);
-      jobs = jobs.filter(job => {
-        return parts.every(p => job.searchString.indexOf(p) !== -1);
+      jobs = jobs.filter((job) => {
+        return parts.every((p) => job.searchString.indexOf(p) !== -1);
       });
     }
     const sort = this.sorting(this.props.query[this.sortKey] || this.defaultSortKey);
-    jobs = _.sortBy(jobs, row => {
+    jobs = _.sortBy(jobs, (row) => {
       switch (sort.key) {
         case 'user': return row.user;
         case 'name': return row.name;
@@ -115,9 +115,9 @@ class JobTable extends React.Component {
 
   render() {
     const [sort, jobs] = this.sortedJobs();
-    const sortDir = 'sort-' + (sort.dir > 0 ? 'asc' : 'desc');
+    const sortDir = `sort-${sort.dir > 0 ? 'asc' : 'desc'}`;
     const Row = this.rowClass();
-    const rows = jobs.slice(0, 150).map(job => <Row key={job.id} job={job} />);
+    const rows = jobs.slice(0, 150).map((job) => <Row key={job.id} job={job} />);
     return (
       <div>
         <h3>
@@ -127,8 +127,8 @@ class JobTable extends React.Component {
         <table className="table sortable list-view">
           <thead>
             <tr>
-              {this.headers.map(h => {
-                const cls = sort.key == h ? sortDir : "";
+              {this.headers.map((h) => {
+                const cls = sort.key == h ? sortDir : '';
                 const click = this.sort.bind(this, h);
                 return <th key={h} className={cls} onClick={click}>{h}</th>;
               })}
@@ -197,8 +197,8 @@ class RunningJobRow extends JobRow {
       <Link to={`/job/${job.id}`}>{job.name}</Link>,
       timeFormat(job.startTime),
       secondFormat(job.duration()),
-      <ProgressBar value={job.maps.progress}/>,
-      <ProgressBar value={job.reduces.progress}/>,
+      <ProgressBar value={job.maps.progress} />,
+      <ProgressBar value={job.reduces.progress} />,
     ];
   }
 }
