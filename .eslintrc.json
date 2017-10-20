@@ -13,6 +13,45 @@
     },
     "plugins": [
         "react"
-    ]
+    ],
+    "rules": {
+        "camelcase": "off",
+        "class-methods-use-this": "off",
+        "comma-dangle": ["error", {
+            "arrays": "always-multiline",
+            "exports": "always-multiline",
+            "functions": "never",
+            "imports": "always-multiline",
+            "objects": "always-multiline"
+        }],
+        "default-case": "off",
+        "eqeqeq": "off",
+        "guard-for-in": "off",
+        "import/no-mutable-exports": "off",
+        "indent": "off",
+        "max-len": "off",
+        "no-cond-assign": "off",
+        "no-continue": "off",
+        "no-param-reassign": "off",
+        "no-plusplus": "off",
+        "no-redeclare": "off",
+        "no-restricted-syntax": "off",
+        "no-return-assign": "off",
+        "no-shadow": "off",
+        "no-undef": "off",
+        "no-unused-vars": "off",
+        "no-useless-escape": "off",
+        "no-var": "off",
+        "one-var": "off",
+        "prefer-destructuring": "off",
+        "react/jsx-handler-names": "off",
+        "react/jsx-indent": "off",
+        "react/jsx-no-bind": "off",
+        "react/no-array-index-key": "off",
+        "react/no-direct-mutation-state": "off",
+        "react/no-find-dom-node": "off",
+        "react/no-multi-comp": "off",
+        "react/sort-comp": "off",
+        "vars-on-top": "off"
+    }
 }
-
