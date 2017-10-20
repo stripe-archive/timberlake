@@ -55,7 +55,7 @@ export function jobState(job) {
 }
 
 export function cleanJobName(name) {
-  return name.replace(/\[[A-Z0-9\/]+\]\s+/, '').replace(/(\w+\.)+(\w+)/, '$1$2');
+  return name.replace(/\[[A-Z0-9/]+]\s+/, '').replace(/(\w+\.)+(\w+)/, '$1$2');
 }
 
 export function cleanJobPath(path) {
