@@ -4,7 +4,8 @@ RELEASE_NAME = timberlake-$(TIMBERLAKE_VERSION)
 
 all: test build
 
-test:
+test: node_modules
+	npm run test
 	go test -race
 
 build: bin/timberlake bin/timberlake-slackbot static
