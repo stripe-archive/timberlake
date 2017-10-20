@@ -29,7 +29,6 @@
         "guard-for-in": "off",
         "import/no-mutable-exports": "off",
         "indent": "off",
-        "max-len": "off",
         "no-cond-assign": "off",
         "no-continue": "off",
         "no-param-reassign": "off",

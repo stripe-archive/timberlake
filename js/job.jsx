@@ -439,7 +439,12 @@ class BoxPlot extends React.Component {
 }
 
 function boxplot(data, node, tickFormat) {
-  const margin = {top: 10, right: 100, bottom: 20, left: 100};
+  const margin = {
+    top: 10,
+    right: 100,
+    bottom: 20,
+    left: 100,
+  };
   const width = 220 - margin.left - margin.right;
   const height = 400 - margin.top - margin.bottom;
 

@@ -122,7 +122,13 @@ class JobTable extends React.Component {
       <div>
         <h3>
           {this.title} ({jobs.length})
-          <input className="form-control" placeholder="Filter by user or text" onChange={this.props.onFilter} value={this.props.filter} autoFocus={this.autoFocus} />
+          <input
+            autoFocus={this.autoFocus}
+            className="form-control"
+            onChange={this.props.onFilter}
+            placeholder="Filter by user or text"
+            value={this.props.filter}
+          />
         </h3>
         <table className="table sortable list-view">
           <thead>
