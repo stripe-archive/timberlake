@@ -36,6 +36,9 @@ function bytesFormat(n) {
   }
 }
 
+function relatedJobs(job, allJobs) {
+  return allJobs.filter((d) => d.fullName.indexOf(job.taskFamily) == 1);
+}
 
 export default class extends React.Component {
   constructor(props) {
@@ -68,12 +71,8 @@ export default class extends React.Component {
     return _.find(this.props.jobs, (d) => lolhadoop(d.id) == jobId);
   }
 
-  relatedJobs(job, allJobs) {
-    return allJobs.filter((d) => d.fullName.indexOf(job.taskFamily) == 1);
-  }
-
   inputs(job, allJobs) {
-    var relatives = this.relatedJobs(job, allJobs);
+    var relatives = relatedJobs(job, allJobs);
     var outputs = _.object(_.flatten(relatives.map((j) => (j.conf.output || '').split(/,/g).map((o) => [o, j])), 1));
     return (job.conf.input || '').split(/,/g).map((input) => outputs[input] || input);
   }
@@ -184,7 +183,7 @@ export default class extends React.Component {
     var bytesReadTitle = `HDFS: ${bytes.hdfs_read}\nS3: ${bytes.s3_read}\nFile: ${bytes.file_read}`;
     var bytesWrittenTitle = `HDFS: ${bytes.hdfs_written}\nS3: ${bytes.s3_written}\nFile: ${bytes.file_written}`;
 
-    const relatedJobs = _.sortBy(this.relatedJobs(job, this.props.jobs), (relatedJob) => relatedJob.id);
+    const sortedRelatedJobs = _.sortBy(relatedJobs(job, this.props.jobs), (relatedJob) => relatedJob.id);
 
     var rv = (
       <div>
@@ -238,10 +237,10 @@ export default class extends React.Component {
           </div>
         </div>
         <div className="row">
-          <RelatedJobs job={job} relatives={relatedJobs} hover={this.state.hover} />
+          <RelatedJobs job={job} relatives={sortedRelatedJobs} hover={this.state.hover} />
         </div>
         <div className="row">
-          <RelatedDAG job={job} relatives={relatedJobs} hover={(j) => { this.setState({hover: j}); }} />
+          <RelatedDAG job={job} relatives={sortedRelatedJobs} hover={(j) => { this.setState({hover: j}); }} />
         </div>
       </div>
     );

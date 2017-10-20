@@ -11,13 +11,13 @@ const {_} = window;
 const HEADERS = ['user', 'name', 'started', 'duration', 'map', 'reduce'];
 
 class JobTable extends React.Component {
-  sorting(sort) {
+  static sorting(sort) {
     const s = sort.split('-');
     return s.length === 1 ? {key: s[0], dir: 1} : {key: s[1], dir: -1};
   }
 
   sort(key) {
-    const s = this.sorting(this.props.query[this.sortKey] || this.defaultSortKey);
+    const s = JobTable.sorting(this.props.query[this.sortKey] || this.defaultSortKey);
     const n = s.key == key && s.dir == -1 ? key : `-${key}`;
     const q = _.object([[this.sortKey, n]]);
 
@@ -35,7 +35,7 @@ class JobTable extends React.Component {
         return parts.every((p) => job.searchString.indexOf(p) !== -1);
       });
     }
-    const sort = this.sorting(this.props.query[this.sortKey] || this.defaultSortKey);
+    const sort = JobTable.sorting(this.props.query[this.sortKey] || this.defaultSortKey);
     jobs = _.sortBy(jobs, (row) => {
       switch (sort.key) {
         case 'user': return row.user;
