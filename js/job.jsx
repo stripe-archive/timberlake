@@ -425,8 +425,8 @@ function waterfall(data, node, opts) {
 
 
 class BoxPlot extends React.Component {
-  render() {
-    return <div />;
+  componentDidMount() {
+    boxplot(this.props.data, ReactDOM.findDOMNode(this), this.props.tickFormat);
   }
 
   shouldComponentUpdate() {
@@ -435,8 +435,8 @@ class BoxPlot extends React.Component {
     return false;
   }
 
-  componentDidMount() {
-    boxplot(this.props.data, ReactDOM.findDOMNode(this), this.props.tickFormat);
+  render() {
+    return <div />;
   }
 }
 
