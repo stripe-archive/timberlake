@@ -15,7 +15,6 @@
         "react"
     ],
     "rules": {
-        "camelcase": "warn",
         "class-methods-use-this": "warn",
         "comma-dangle": ["error", {
             "arrays": "always-multiline",
