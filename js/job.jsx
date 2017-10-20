@@ -333,7 +333,7 @@ function sample(arr, limit, comparator) {
   if (arr.length <= limit) return arr;
   var rv = [];
   var sampleSize = arr.length / limit;
-  for (var i = 0; i < arr.length / sampleSize; i++) {
+  for (var i = 0; i < arr.length / sampleSize; i += 1) {
     var vals = arr.slice(i * sampleSize, (i + 1) * sampleSize);
     if (vals.length === 0) continue;
     rv.push(_.max(vals, comparator));
@@ -475,8 +475,8 @@ function boxplot(data, node, tickFormat) {
       const iqr = (q3 - q1) * k;
       i = -1;
       let j = d.length;
-      while (d[++i] < q1 - iqr);
-      while (d[--j] > q3 + iqr);
+      while (d[i += 1] < q1 - iqr);
+      while (d[j -= 1] > q3 + iqr);
       return [i, j];
     };
   }

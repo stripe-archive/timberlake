@@ -29,7 +29,6 @@
         "no-cond-assign": "warn",
         "no-continue": "warn",
         "no-param-reassign": "warn",
-        "no-plusplus": "warn",
         "no-redeclare": "warn",
         "no-restricted-syntax": "warn",
         "no-return-assign": "warn",
