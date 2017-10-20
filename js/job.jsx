@@ -335,8 +335,9 @@ function sample(arr, limit, comparator) {
   var sampleSize = arr.length / limit;
   for (var i = 0; i < arr.length / sampleSize; i += 1) {
     var vals = arr.slice(i * sampleSize, (i + 1) * sampleSize);
-    if (vals.length === 0) continue;
-    rv.push(_.max(vals, comparator));
+    if (vals.length !== 0) {
+      rv.push(_.max(vals, comparator));
+    }
   }
   return rv;
 }
