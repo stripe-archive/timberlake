@@ -23,7 +23,6 @@
             "imports": "always-multiline",
             "objects": "always-multiline"
         }],
-        "default-case": "warn",
         "eqeqeq": "warn",
         "import/no-mutable-exports": "warn",
         "no-cond-assign": "warn",

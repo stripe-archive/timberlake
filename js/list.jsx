@@ -108,6 +108,7 @@ class JobTable extends React.Component {
         case 'map': return row.maps.progress;
         case 'reduce': return row.reduces.progress;
         case 'state': return row.state;
+        default: return undefined;
       }
     });
     if (sort.dir == -1) jobs.reverse();
