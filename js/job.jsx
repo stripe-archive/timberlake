@@ -178,7 +178,7 @@ export default class extends React.Component {
     };
     bytes.total_read = bytes.hdfs_read + bytes.s3_read + bytes.file_read;
     bytes.total_written = bytes.hdfs_written + bytes.s3_written + bytes.file_written;
-    for (var key in bytes) {
+    for (const key of Object.keys(bytes)) {
       bytes[key] = bytesFormat(bytes[key]);
     }
     var bytesReadTitle = `HDFS: ${bytes.hdfs_read}\nS3: ${bytes.s3_read}\nFile: ${bytes.file_read}`;
