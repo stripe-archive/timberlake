@@ -48,8 +48,8 @@ export class MRJob {
 
     var tasks = data.tasks || {};
     this.tasks = {
-      maps: (tasks.maps || []).map((d) => new MRTask(d)),
-      reduces: (tasks.reduces || []).map((d) => new MRTask(d)),
+      maps: (tasks.maps || []).map((taskData) => new MRTask(taskData)),
+      reduces: (tasks.reduces || []).map((taskData) => new MRTask(taskData)),
       errors: tasks.errors,
     };
   }

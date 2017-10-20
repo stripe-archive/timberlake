@@ -184,7 +184,7 @@ export default class extends React.Component {
     var bytesReadTitle = `HDFS: ${bytes.hdfs_read}\nS3: ${bytes.s3_read}\nFile: ${bytes.file_read}`;
     var bytesWrittenTitle = `HDFS: ${bytes.hdfs_written}\nS3: ${bytes.s3_written}\nFile: ${bytes.file_written}`;
 
-    const relatedJobs = _.sortBy(this.relatedJobs(job, this.props.jobs), (job) => job.id);
+    const relatedJobs = _.sortBy(this.relatedJobs(job, this.props.jobs), (relatedJob) => relatedJob.id);
 
     var rv = (
       <div>
@@ -469,14 +469,14 @@ function boxplot(data, node, tickFormat) {
     .call(chart);
 
   function iqr(k) {
-    return function(d, i) {
+    return function(d) {
       const q1 = d.quartiles[0];
       const q3 = d.quartiles[2];
-      const iqr = (q3 - q1) * k;
-      i = -1;
+      const iqrange = (q3 - q1) * k;
+      let i = -1;
       let j = d.length;
-      while (d[i += 1] < q1 - iqr);
-      while (d[j -= 1] > q3 + iqr);
+      while (d[i += 1] < q1 - iqrange);
+      while (d[j -= 1] > q3 + iqrange);
       return [i, j];
     };
   }

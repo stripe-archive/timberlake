@@ -32,7 +32,6 @@
         "no-redeclare": "warn",
         "no-restricted-syntax": "warn",
         "no-return-assign": "warn",
-        "no-shadow": "warn",
         "no-var": "warn",
         "react/jsx-handler-names": "warn",
         "react/jsx-indent": "warn",
