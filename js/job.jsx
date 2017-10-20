@@ -439,11 +439,9 @@ class BoxPlot extends React.Component {
 }
 
 function boxplot(data, node, tickFormat) {
-  var margin = {
-      top: 10, right: 100, bottom: 20, left: 100,
-    },
-    width = 220 - margin.left - margin.right,
-    height = 400 - margin.top - margin.bottom;
+  const margin = {top: 10, right: 100, bottom: 20, left: 100};
+  const width = 220 - margin.left - margin.right;
+  const height = 400 - margin.top - margin.bottom;
 
   var chart = d3.box()
     .whiskers(iqr(1.5))
@@ -465,11 +463,11 @@ function boxplot(data, node, tickFormat) {
 
   function iqr(k) {
     return function(d, i) {
-      var q1 = d.quartiles[0],
-        q3 = d.quartiles[2],
-        iqr = (q3 - q1) * k,
-        i = -1,
-        j = d.length;
+      const q1 = d.quartiles[0];
+      const q3 = d.quartiles[2];
+      const iqr = (q3 - q1) * k;
+      i = -1;
+      let j = d.length;
       while (d[++i] < q1 - iqr);
       while (d[--j] > q3 + iqr);
       return [i, j];

@@ -42,7 +42,6 @@
         "no-unused-vars": "off",
         "no-useless-escape": "off",
         "no-var": "off",
-        "one-var": "off",
         "prefer-destructuring": "off",
         "react/jsx-handler-names": "off",
         "react/jsx-indent": "off",
