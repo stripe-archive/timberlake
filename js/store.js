@@ -1,5 +1,7 @@
 import {MRJob} from './mr';
 
+const $ = window.$;
+
 class JobStore {
   constructor() {
     this.pipes = {};

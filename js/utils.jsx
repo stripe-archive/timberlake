@@ -1,5 +1,7 @@
 import React from 'react';
 
+const d3 = window.d3;
+
 export var paddedInt = d3.format('02d');
 export var timeFormat = d3.time.format.utc('%a %H:%M:%S');
 export var lolhadoop = (s) => s.replace(/application|job/, '');

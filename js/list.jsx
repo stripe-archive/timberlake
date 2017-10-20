@@ -10,6 +10,7 @@ import {
 } from './utils';
 import ProgressBar from './components/progress-bar';
 
+const _ = window._;
 
 // Lifted from react-router.
 const isLeftClickEvent = (e) => e.button === 0;

@@ -1,4 +1,4 @@
-
+const _ = window._;
 
 export var notAvailable = {};
 

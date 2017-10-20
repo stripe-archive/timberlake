@@ -23,6 +23,11 @@ import {
 } from './utils';
 import {notAvailable} from './mr';
 
+const $ = window.$;
+const _ = window._;
+const d3 = window.d3;
+
+
 function bytesFormat(n) {
   if (n == notAvailable || !n) return null;
   var M = 1024.0 * 1024;
@@ -413,7 +418,7 @@ function waterfall(data, node, opts) {
     chart.tickFormat(d3.time.format.utc('%H:%M:%S'));
   }
 
-  var svg = d3.select(node).selectAll('svg')
+  d3.select(node).selectAll('svg')
     .data([data])
     .enter().append('svg')
     .attr('class', 'waterfall')
@@ -459,7 +464,7 @@ function boxplot(data, node, tickFormat) {
 
   chart.domain(d3.extent(data));
 
-  var svg = d3.select(node).selectAll('svg')
+  d3.select(node).selectAll('svg')
     .data([data])
     .enter().append('svg')
     .attr('class', 'box')

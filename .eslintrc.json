@@ -36,8 +36,6 @@
         "no-restricted-syntax": "off",
         "no-return-assign": "off",
         "no-shadow": "off",
-        "no-undef": "off",
-        "no-unused-vars": "off",
         "no-useless-escape": "off",
         "no-var": "off",
         "prefer-destructuring": "off",
