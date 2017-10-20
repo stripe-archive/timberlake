@@ -10,7 +10,7 @@ import {
 } from './utils';
 import ProgressBar from './components/progress-bar';
 
-const _ = window._;
+const {_} = window;
 
 // Lifted from react-router.
 const isLeftClickEvent = (e) => e.button === 0;
@@ -59,7 +59,7 @@ export default class extends React.Component {
 
   render() {
     console.time('BigData');
-    const jobs = this.props.jobs;
+    const {jobs} = this.props;
     const filter = this.state.filter.toLowerCase();
     const rv = (
       <div>
@@ -198,7 +198,7 @@ class JobRow extends React.Component {
 
 class RunningJobRow extends JobRow {
   columns() {
-    const job = this.props.job;
+    const {job} = this.props;
     return [
       job.user,
       <Link to={`/job/${job.id}`}>{job.name}</Link>,
@@ -213,7 +213,7 @@ class RunningJobRow extends JobRow {
 
 class FinishedJobRow extends JobRow {
   columns() {
-    const job = this.props.job;
+    const {job} = this.props;
     return [
       job.user,
       <Link to={`/job/${job.id}`}>{job.name}</Link>,

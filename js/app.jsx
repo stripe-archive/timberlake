@@ -10,7 +10,7 @@ import JobCounters from './jobcounters';
 import {Store} from './store';
 import {numFormat} from './utils';
 
-const _ = window._;
+const {_} = window;
 
 /**
  * Number of most recent jobs to keep in the finished tab.

@@ -4,7 +4,7 @@ import {Link} from 'react-router';
 import {Store} from './store';
 import {lolhadoop} from './utils';
 
-const _ = window._;
+const {_} = window;
 
 export default class extends React.Component {
   componentDidMount() {

@@ -1,6 +1,6 @@
 import React from 'react';
 
-const d3 = window.d3;
+const {d3} = window.d3;
 
 export var paddedInt = d3.format('02d');
 export var timeFormat = d3.time.format.utc('%a %H:%M:%S');
@@ -42,8 +42,8 @@ export var FINISHED_STATES = ['SUCCEEDED', 'KILLED', 'FAILED', 'ERROR'];
 export var FAILED_STATES = ['FAILED', 'KILLED', 'ERROR'];
 
 export function jobState(job) {
-  var state = job.state;
-  var label = {
+  const {state} = job;
+  const label = {
     accepted: 'success',
     succeeded: 'success',
     killed: 'warning',

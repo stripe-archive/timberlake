@@ -1,6 +1,6 @@
 import {MRJob} from './mr';
 
-const $ = window.$;
+const {$} = window;
 
 class JobStore {
   constructor() {

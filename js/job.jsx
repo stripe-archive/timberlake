@@ -23,15 +23,12 @@ import {
 } from './utils';
 import {notAvailable} from './mr';
 
-const $ = window.$;
-const _ = window._;
-const d3 = window.d3;
-
+const {$, _, d3} = window;
 
 function bytesFormat(n) {
   if (n == notAvailable || !n) return null;
-  var M = 1024.0 * 1024;
-  var G = M * 1024;
+  const M = 1024.0 * 1024;
+  const G = M * 1024;
   if (n < G) {
     return `${d3.format(',.1f')(n / M)}M`;
   } else {
@@ -67,7 +64,7 @@ export default class extends React.Component {
   }
 
   getJob() {
-    var jobId = lolhadoop(this.props.params.jobId);
+    const jobId = lolhadoop(this.props.params.jobId);
     return _.find(this.props.jobs, (d) => lolhadoop(d.id) == jobId);
   }
 
@@ -128,7 +125,7 @@ export default class extends React.Component {
 
     var state = jobState(job);
     if (_.contains(ACTIVE_STATES, job.state)) {
-      var killing = this.state.killing;
+      var {killing} = this.state;
       state = (
         <span>
           {state}
@@ -255,8 +252,7 @@ export default class extends React.Component {
 
 class KillModal extends React.Component {
   render() {
-    var hideModal = this.props.hideModal;
-    var killJob = this.props.killJob;
+    var {hideModal, killJob} = this.props;
     return (
       <div className="modal show" tabIndex="-1" role="dialog">
         <div className="modal-dialog modal-kill">
@@ -277,9 +273,7 @@ class KillModal extends React.Component {
 
 class RelatedJobs extends React.Component {
   render() {
-    const relatives = this.props.relatives;
-    const job = this.props.job;
-    const hover = this.props.hover;
+    const {hover, job, relatives} = this.props;
 
     if (relatives.length < 2) return null;
 
@@ -350,7 +344,7 @@ function sample(arr, limit, comparator) {
 
 class TaskWaterfall extends React.Component {
   render() {
-    var tasks = this.props.tasks;
+    var {tasks} = this.props;
     tasks.maps.forEach((d) => d.type = 'map');
     tasks = tasks.maps.concat(tasks.reduces).filter((t) => !t.bogus).map((t) => {
       return {start: t.startTime, finish: t.finishTime || new Date(), type: t.type};
@@ -491,10 +485,10 @@ function boxplot(data, node, tickFormat) {
 
 class Summarizer extends React.Component {
   render() {
-    var progress = this.props.progress;
-    var input_records = this.props.input_records;
-    var output_records = this.props.output_records;
-    var recordsPerSec = input_records != notAvailable ? Math.floor(input_records / (progress.totalTime / 1000)) : null;
+    var {progress} = this.props;
+    var inputRecords = this.props.input_records;
+    var outputRecords = this.props.output_records;
+    var recordsPerSec = inputRecords != notAvailable ? Math.floor(inputRecords / (progress.totalTime / 1000)) : null;
     var computeTime = recordsPerSec ?
       <span>{humanFormat(progress.totalTime)}<br />{numFormat(recordsPerSec)} {plural(recordsPerSec, 'record')}/sec</span>
       : <span>{humanFormat(progress.totalTime)}</span>;
@@ -506,8 +500,8 @@ class Summarizer extends React.Component {
       ['Pending', numFormat(progress.pending)],
       ['Killed', numFormat(progress.killed)],
       ['Failed', numFormat(progress.failed)],
-      ['Input Records', input_records != notAvailable ? numFormat(input_records) : null],
-      ['Output Records', output_records != notAvailable ? numFormat(output_records) : null],
+      ['Input Records', inputRecords != notAvailable ? numFormat(inputRecords) : null],
+      ['Output Records', outputRecords != notAvailable ? numFormat(outputRecords) : null],
       ['Compute Time', progress.totalTime > 0 ? computeTime : null],
     ];
     return (
@@ -521,19 +515,19 @@ class Summarizer extends React.Component {
 
 class MapSummary extends React.Component {
   render() {
-    var job = this.props.job;
-    var input_records = this.props.counters.get('TaskCounter.MAP_INPUT_RECORDS');
-    var output_records = this.props.counters.get('TaskCounter.MAP_OUTPUT_RECORDS');
-    return <Summarizer progress={job.maps} input_records={input_records.map} output_records={output_records.map} />;
+    const {job} = this.props;
+    const inputRecords = this.props.counters.get('TaskCounter.MAP_INPUT_RECORDS');
+    const outputRecords = this.props.counters.get('TaskCounter.MAP_OUTPUT_RECORDS');
+    return <Summarizer progress={job.maps} input_records={inputRecords.map} output_records={outputRecords.map} />;
   }
 }
 
 
 class ReduceSummary extends React.Component {
   render() {
-    var job = this.props.job;
-    var input_records = this.props.counters.get('TaskCounter.REDUCE_INPUT_RECORDS');
-    var output_records = this.props.counters.get('TaskCounter.REDUCE_OUTPUT_RECORDS');
-    return <Summarizer progress={job.reduces} input_records={input_records.reduce} output_records={output_records.reduce} />;
+    const {job} = this.props;
+    const inputRecords = this.props.counters.get('TaskCounter.REDUCE_INPUT_RECORDS');
+    const outputRecords = this.props.counters.get('TaskCounter.REDUCE_OUTPUT_RECORDS');
+    return <Summarizer progress={job.reduces} input_records={inputRecords.reduce} output_records={outputRecords.reduce} />;
   }
 }
