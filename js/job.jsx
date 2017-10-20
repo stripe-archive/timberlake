@@ -361,10 +361,6 @@ class TaskWaterfall extends React.Component {
 
 
 class Waterfall extends React.Component {
-  render() {
-    return <div />;
-  }
-
   componentDidMount() {
     waterfall(this.props.data, ReactDOM.findDOMNode(this), this.props);
   }
@@ -373,6 +369,10 @@ class Waterfall extends React.Component {
     d3.select(ReactDOM.findDOMNode(this)).selectAll('svg').remove();
     waterfall(this.props.data, ReactDOM.findDOMNode(this), this.props);
     return false;
+  }
+
+  render() {
+    return <div />;
   }
 }
 

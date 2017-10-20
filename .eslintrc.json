@@ -34,7 +34,6 @@
         "no-return-assign": "warn",
         "no-var": "warn",
         "react/jsx-handler-names": "warn",
-        "react/jsx-indent": "warn",
         "react/jsx-no-bind": "warn",
         "react/no-array-index-key": "warn",
         "react/no-direct-mutation-state": "warn",
