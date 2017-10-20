@@ -1,0 +1,42 @@
+{
+    "env": {
+        "browser": true,
+        "es6": true
+    },
+    "extends": "stripe",
+    "parserOptions": {
+        "ecmaFeatures": {
+            "experimentalObjectRestSpread": true,
+            "jsx": true
+        },
+        "sourceType": "module"
+    },
+    "plugins": [
+        "react"
+    ],
+    "rules": {
+        "class-methods-use-this": "warn",
+        "comma-dangle": ["error", {
+            "arrays": "always-multiline",
+            "exports": "always-multiline",
+            "functions": "never",
+            "imports": "always-multiline",
+            "objects": "always-multiline"
+        }],
+        "eqeqeq": "warn",
+        "import/no-mutable-exports": "warn",
+        "no-cond-assign": "warn",
+        "no-param-reassign": "warn",
+        "no-redeclare": "warn",
+        "no-restricted-syntax": "warn",
+        "no-return-assign": "warn",
+        "no-var": "warn",
+        "react/jsx-handler-names": "warn",
+        "react/jsx-no-bind": "warn",
+        "react/no-array-index-key": "warn",
+        "react/no-direct-mutation-state": "warn",
+        "react/no-find-dom-node": "warn",
+        "react/no-multi-comp": "warn",
+        "vars-on-top": "warn"
+    }
+}

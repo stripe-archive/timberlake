@@ -18,10 +18,9 @@
     "babel-preset-react": "^6.16.0",
     "babelify": "^7.3.0",
     "browserify": "^13.3.0",
-    "eslint": "^3.13.1",
-    "eslint-config-standard": "^6.2.1",
-    "eslint-plugin-promise": "^3.4.0",
-    "eslint-plugin-standard": "^2.0.1",
+    "eslint": "^4.9.0",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-config-stripe": "^1.2.0",
     "gulp": "^3.9.1",
     "gulp-react": "^2.0.0",
     "vinyl-source-stream": "^1.1.0"
@@ -36,6 +35,6 @@
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "eslint **/*.js **/*.jsx"
   }
 }

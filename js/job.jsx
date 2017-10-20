@@ -1,10 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Link } from 'react-router';
+import {Link} from 'react-router';
 
 import ProgressBar from './components/progress-bar';
 import RelatedDAG from './components/related-dag';
-import { Store } from './store';
+import {Store} from './store';
 import {
   lolhadoop,
   jobState,
@@ -19,18 +19,20 @@ import {
   COLOUR_MAP,
   COLOUR_REDUCE,
   COLOUR_SELECTED,
-  COLOUR_HOVER
+  COLOUR_HOVER,
 } from './utils';
-import { notAvailable } from './mr';
+import {notAvailable} from './mr';
+
+const {$, _, d3} = window;
 
 function bytesFormat(n) {
   if (n == notAvailable || !n) return null;
-  var M = 1024.0 * 1024;
-  var G = M * 1024;
+  const M = 1024.0 * 1024;
+  const G = M * 1024;
   if (n < G) {
-    return d3.format(',.1f')(n / M) + 'M';
+    return `${d3.format(',.1f')(n / M)}M`;
   } else {
-    return d3.format(',.1f')(n / G) + 'G';
+    return `${d3.format(',.1f')(n / G)}G`;
   }
 }
 
@@ -62,29 +64,29 @@ export default class extends React.Component {
   }
 
   getJob() {
-    var jobId = lolhadoop(this.props.params.jobId);
-    return _.find(this.props.jobs, d => lolhadoop(d.id) == jobId);
+    const jobId = lolhadoop(this.props.params.jobId);
+    return _.find(this.props.jobs, (d) => lolhadoop(d.id) == jobId);
   }
 
   relatedJobs(job, allJobs) {
-    return allJobs.filter(d => d.fullName.indexOf(job.taskFamily) == 1);
+    return allJobs.filter((d) => d.fullName.indexOf(job.taskFamily) == 1);
   }
 
   inputs(job, allJobs) {
     var relatives = this.relatedJobs(job, allJobs);
-    var outputs = _.object(_.flatten(relatives.map(j => (j.conf.output || '').split(/,/g).map(o => [o, j])), 1));
-    return (job.conf.input || '').split(/,/g).map(input => outputs[input] || input);
+    var outputs = _.object(_.flatten(relatives.map((j) => (j.conf.output || '').split(/,/g).map((o) => [o, j])), 1));
+    return (job.conf.input || '').split(/,/g).map((input) => outputs[input] || input);
   }
 
   kill() {
     this.hideKillModal();
     this.setState({killing: true});
     var job = this.getJob();
-    $.post('/jobs/' + job.id + '/kill', (data, status) => {
+    $.post(`/jobs/${job.id}/kill`, (data, status) => {
       console.log(data, status);
       var result = data.err ? data.stderr : null;
       this.setState({killResult: result});
-    }).then(null, err => {
+    }).then(null, (err) => {
       console.error(err);
       this.setState({killing: false});
     });
@@ -106,29 +108,31 @@ export default class extends React.Component {
     var inputs = (
       <ul className="list-unstyled">
         {this.inputs(job, this.props.jobs).map((input, i) =>
-          <li key={i}>
-            {_.isString(input) ?
-              cleanJobPath(input) :
-              <Link to={`job/${input.id}`}>{input.name}</Link>}
-          </li>
-         )}
+          (
+            <li key={i}>
+              {_.isString(input) ?
+                cleanJobPath(input) :
+                <Link to={`job/${input.id}`}>{input.name}</Link>}
+            </li>
+          ))}
       </ul>
     );
 
-    var similar = this.props.jobs.filter(j => j.name.indexOf(job.name) != -1);
-    similar = similar.filter(j => j.startTime < job.startTime);
+    var similar = this.props.jobs.filter((j) => j.name.indexOf(job.name) != -1);
+    similar = similar.filter((j) => j.startTime < job.startTime);
     var prev = _.last(_.sortBy(similar, 'startTime'));
     var previous = prev ? <Link to={`job/${prev.id}`}>previous: {secondFormat(prev.duration())}</Link> : null;
 
     var state = jobState(job);
     if (_.contains(ACTIVE_STATES, job.state)) {
-      var killing = this.state.killing;
+      var {killing} = this.state;
       state = (
         <span>
-          {state} <button onClick={this.showKillModal} className="btn btn-danger kill">
+          {state}
+          <button onClick={this.showKillModal} className="btn btn-danger kill">
             <span className="label label-danger">{killing ? 'Killing' : 'Kill'}</span>
           </button>
-          {this.state.showKillModal ? <KillModal hideModal={this.hideKillModal} killJob={this.kill}/> : null}
+          {this.state.showKillModal ? <KillModal hideModal={this.hideKillModal} killJob={this.kill} /> : null}
           {this.state.killResult ? <code>{this.state.killResult}</code> : null}
         </span>
       );
@@ -150,7 +154,7 @@ export default class extends React.Component {
 
     var stepsStr = job.conf.scaldingSteps;
     if (stepsStr) {
-      var lines = stepsStr.split(',').map(val => {
+      var lines = stepsStr.split(',').map((val) => {
         var trimmed = val.trim();
         var matches = trimmed.match(/[\w.]+:\d+/i);
         return {full: trimmed, short: matches ? matches[0] : trimmed};
@@ -174,13 +178,13 @@ export default class extends React.Component {
     };
     bytes.total_read = bytes.hdfs_read + bytes.s3_read + bytes.file_read;
     bytes.total_written = bytes.hdfs_written + bytes.s3_written + bytes.file_written;
-    for (var key in bytes) {
-      bytes[key] = bytesFormat(bytes[key])
+    for (const key of Object.keys(bytes)) {
+      bytes[key] = bytesFormat(bytes[key]);
     }
-    var bytesReadTitle = "HDFS: " + bytes.hdfs_read + "\nS3: " + bytes.s3_read + "\nFile: " + bytes.file_read
-    var bytesWrittenTitle = "HDFS: " + bytes.hdfs_written + "\nS3: " + bytes.s3_written + "\nFile: " + bytes.file_written
+    var bytesReadTitle = `HDFS: ${bytes.hdfs_read}\nS3: ${bytes.s3_read}\nFile: ${bytes.file_read}`;
+    var bytesWrittenTitle = `HDFS: ${bytes.hdfs_written}\nS3: ${bytes.s3_written}\nFile: ${bytes.file_written}`;
 
-    const relatedJobs = _.sortBy(this.relatedJobs(job, this.props.jobs), job => job.id);
+    const relatedJobs = _.sortBy(this.relatedJobs(job, this.props.jobs), (relatedJob) => relatedJob.id);
 
     var rv = (
       <div>
@@ -234,10 +238,10 @@ export default class extends React.Component {
           </div>
         </div>
         <div className="row">
-          <RelatedJobs job={job} relatives={relatedJobs} hover={this.state.hover}/>
+          <RelatedJobs job={job} relatives={relatedJobs} hover={this.state.hover} />
         </div>
         <div className="row">
-          <RelatedDAG job={job} relatives={relatedJobs} hover={j => { this.setState({hover:j}) }}/>
+          <RelatedDAG job={job} relatives={relatedJobs} hover={(j) => { this.setState({hover: j}); }} />
         </div>
       </div>
     );
@@ -248,8 +252,7 @@ export default class extends React.Component {
 
 class KillModal extends React.Component {
   render() {
-    var hideModal = this.props.hideModal;
-    var killJob = this.props.killJob;
+    var {hideModal, killJob} = this.props;
     return (
       <div className="modal show" tabIndex="-1" role="dialog">
         <div className="modal-dialog modal-kill">
@@ -270,22 +273,20 @@ class KillModal extends React.Component {
 
 class RelatedJobs extends React.Component {
   render() {
-    const relatives = this.props.relatives;
-    const job = this.props.job;
-    const hover = this.props.hover;
+    const {hover, job, relatives} = this.props;
 
     if (relatives.length < 2) return null;
 
-    var data = relatives.map(j => ({
+    var data = relatives.map((j) => ({
       start: j.startTime,
-      finish: j.finishTime || new Date,
-      job: j
+      finish: j.finishTime || new Date(),
+      job: j,
     }));
     data = _.sortBy(data, 'start');
 
-    var fmt = d => secondFormat(d.job.duration()) + ' ' + d.job.name;
-    var links = d => '#/job/' + d.job.id;
-    var fs = d => {
+    var fmt = (d) => `${secondFormat(d.job.duration())} ${d.job.name}`;
+    var links = (d) => `#/job/${d.job.id}`;
+    var fs = (d) => {
       if (d.job.id == job.id) {
         return COLOUR_SELECTED;
       } else if (hover && d.job.id == hover.id) {
@@ -299,13 +300,14 @@ class RelatedJobs extends React.Component {
       <div>
         <h4>Related Jobs</h4>
         <Waterfall
-            data={data}
-            barHeight={30}
-            lineHeight={40}
-            width={1200}
-            textFormat={fmt}
-            fillStyle={fs}
-            linkFormat={links} />
+          data={data}
+          barHeight={30}
+          lineHeight={40}
+          width={1200}
+          textFormat={fmt}
+          fillStyle={fs}
+          linkFormat={links}
+        />
       </div>
     );
   }
@@ -314,8 +316,8 @@ class RelatedJobs extends React.Component {
 
 class TaskStats extends React.Component {
   render() {
-    var tasks = this.props.tasks.filter(t => !t.bogus);
-    var durations = sample(tasks.map(x => x.duration()).sort(), 100, _.identity);
+    var tasks = this.props.tasks.filter((t) => !t.bogus);
+    var durations = sample(tasks.map((x) => x.duration()).sort(), 100, _.identity);
     return (
       <div>
         <h4>{this.props.title} Timing</h4>
@@ -331,10 +333,11 @@ function sample(arr, limit, comparator) {
   if (arr.length <= limit) return arr;
   var rv = [];
   var sampleSize = arr.length / limit;
-  for (var i = 0; i < arr.length / sampleSize; i++) {
+  for (var i = 0; i < arr.length / sampleSize; i += 1) {
     var vals = arr.slice(i * sampleSize, (i + 1) * sampleSize);
-    if (vals.length === 0) continue;
-    rv.push(_.max(vals, comparator));
+    if (vals.length !== 0) {
+      rv.push(_.max(vals, comparator));
+    }
   }
   return rv;
 }
@@ -342,15 +345,15 @@ function sample(arr, limit, comparator) {
 
 class TaskWaterfall extends React.Component {
   render() {
-    var tasks = this.props.tasks;
-    tasks.maps.forEach(d => d.type = 'map');
-    tasks = tasks.maps.concat(tasks.reduces).filter(t => !t.bogus).map(t => {
-      return {start: t.startTime, finish: t.finishTime || new Date, type: t.type};
+    var {tasks} = this.props;
+    tasks.maps.forEach((d) => d.type = 'map');
+    tasks = tasks.maps.concat(tasks.reduces).filter((t) => !t.bogus).map((t) => {
+      return {start: t.startTime, finish: t.finishTime || new Date(), type: t.type};
     });
-    var data = sample(_.sortBy(tasks, 'start'), 400, d => d.finish - d.start);
+    var data = sample(_.sortBy(tasks, 'start'), 400, (d) => d.finish - d.start);
     return (
       <div>
-        <h4>Map <i className="map-label"></i> / <i className="reduce-label"></i> Reduce Waterfall</h4>
+        <h4>Map <i className="map-label" /> / <i className="reduce-label" /> Reduce Waterfall</h4>
         {data.length ? <Waterfall data={data} /> : null}
       </div>
     );
@@ -359,8 +362,8 @@ class TaskWaterfall extends React.Component {
 
 
 class Waterfall extends React.Component {
-  render() {
-    return <div></div>;
+  componentDidMount() {
+    waterfall(this.props.data, ReactDOM.findDOMNode(this), this.props);
   }
 
   shouldComponentUpdate() {
@@ -369,8 +372,8 @@ class Waterfall extends React.Component {
     return false;
   }
 
-  componentDidMount() {
-    waterfall(this.props.data, ReactDOM.findDOMNode(this), this.props);
+  render() {
+    return <div />;
   }
 }
 
@@ -379,25 +382,27 @@ function waterfall(data, node, opts) {
     lineHeight: 1,
     barHeight: 1,
     width: 550,
-    textFormat: t => '',
+    textFormat: (t) => '',
     linkFormat: null,
-    fillStyle: d => {
+    fillStyle: (d) => {
       return d.type == 'map' ? COLOUR_MAP : COLOUR_REDUCE;
     },
   };
   opts = _.extend(defaults, opts);
 
-  var margin = {top: 10, right: 20, bottom: 20, left: 20};
+  var margin = {
+    top: 10, right: 20, bottom: 20, left: 20,
+  };
   var width = opts.width - margin.left - margin.right;
   var height = Math.max(100, data.length * opts.lineHeight) - margin.top - margin.bottom;
 
   var chart = d3.waterfall()
-      .width(width)
-      .height(height)
-      .barHeight(opts.barHeight)
-      .textFormat(opts.textFormat)
-      .linkFormat(opts.linkFormat)
-      .barStyle(opts.fillStyle);
+    .width(width)
+    .height(height)
+    .barHeight(opts.barHeight)
+    .textFormat(opts.textFormat)
+    .linkFormat(opts.linkFormat)
+    .barStyle(opts.fillStyle);
 
   var start = d3.min(_.pluck(data, 'start'));
   var finish = d3.max(_.pluck(data, 'finish'));
@@ -408,21 +413,21 @@ function waterfall(data, node, opts) {
     chart.tickFormat(d3.time.format.utc('%H:%M:%S'));
   }
 
-  var svg = d3.select(node).selectAll('svg')
-      .data([data])
+  d3.select(node).selectAll('svg')
+    .data([data])
     .enter().append('svg')
-      .attr('class', 'waterfall')
-      .attr('width', width + margin.left + margin.right)
-      .attr('height', height + margin.bottom + margin.top)
+    .attr('class', 'waterfall')
+    .attr('width', width + margin.left + margin.right)
+    .attr('height', height + margin.bottom + margin.top)
     .append('g')
-      .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
-      .call(chart);
+    .attr('transform', `translate(${margin.left},${margin.top})`)
+    .call(chart);
 }
 
 
 class BoxPlot extends React.Component {
-  render() {
-    return <div></div>;
+  componentDidMount() {
+    boxplot(this.props.data, ReactDOM.findDOMNode(this), this.props.tickFormat);
   }
 
   shouldComponentUpdate() {
@@ -431,43 +436,48 @@ class BoxPlot extends React.Component {
     return false;
   }
 
-  componentDidMount() {
-    boxplot(this.props.data, ReactDOM.findDOMNode(this), this.props.tickFormat);
+  render() {
+    return <div />;
   }
 }
 
 function boxplot(data, node, tickFormat) {
-  var margin = {top: 10, right: 100, bottom: 20, left: 100},
-      width = 220 - margin.left - margin.right,
-      height = 400 - margin.top - margin.bottom;
+  const margin = {
+    top: 10,
+    right: 100,
+    bottom: 20,
+    left: 100,
+  };
+  const width = 220 - margin.left - margin.right;
+  const height = 400 - margin.top - margin.bottom;
 
   var chart = d3.box()
-      .whiskers(iqr(1.5))
-      .width(width)
-      .height(height)
-      .tickFormat(tickFormat);
+    .whiskers(iqr(1.5))
+    .width(width)
+    .height(height)
+    .tickFormat(tickFormat);
 
   chart.domain(d3.extent(data));
 
-  var svg = d3.select(node).selectAll('svg')
-      .data([data])
+  d3.select(node).selectAll('svg')
+    .data([data])
     .enter().append('svg')
-      .attr('class', 'box')
-      .attr('width', width + margin.left + margin.right)
-      .attr('height', height + margin.bottom + margin.top)
+    .attr('class', 'box')
+    .attr('width', width + margin.left + margin.right)
+    .attr('height', height + margin.bottom + margin.top)
     .append('g')
-      .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
-      .call(chart);
+    .attr('transform', `translate(${margin.left},${margin.top})`)
+    .call(chart);
 
   function iqr(k) {
-    return function(d, i) {
-      var q1 = d.quartiles[0],
-          q3 = d.quartiles[2],
-          iqr = (q3 - q1) * k,
-          i = -1,
-          j = d.length;
-      while (d[++i] < q1 - iqr);
-      while (d[--j] > q3 + iqr);
+    return function(d) {
+      const q1 = d.quartiles[0];
+      const q3 = d.quartiles[2];
+      const iqrange = (q3 - q1) * k;
+      let i = -1;
+      let j = d.length;
+      while (d[i += 1] < q1 - iqrange);
+      while (d[j -= 1] > q3 + iqrange);
       return [i, j];
     };
   }
@@ -476,23 +486,23 @@ function boxplot(data, node, tickFormat) {
 
 class Summarizer extends React.Component {
   render() {
-    var progress = this.props.progress;
-    var input_records = this.props.input_records;
-    var output_records = this.props.output_records;
-    var recordsPerSec = input_records != notAvailable ? Math.floor(input_records / (progress.totalTime / 1000)) : null;
+    var {progress} = this.props;
+    var inputRecords = this.props.input_records;
+    var outputRecords = this.props.output_records;
+    var recordsPerSec = inputRecords != notAvailable ? Math.floor(inputRecords / (progress.totalTime / 1000)) : null;
     var computeTime = recordsPerSec ?
-      <span>{humanFormat(progress.totalTime)}<br/>{numFormat(recordsPerSec)} {plural(recordsPerSec, "record")}/sec</span>
+      <span>{humanFormat(progress.totalTime)}<br />{numFormat(recordsPerSec)} {plural(recordsPerSec, 'record')}/sec</span>
       : <span>{humanFormat(progress.totalTime)}</span>;
     var pairs = [
-      ['Progress', <ProgressBar value={progress.progress}/>],
+      ['Progress', <ProgressBar value={progress.progress} />],
       ['Total', numFormat(progress.total)],
       ['Completed', numFormat(progress.completed)],
       ['Running', numFormat(progress.running)],
       ['Pending', numFormat(progress.pending)],
       ['Killed', numFormat(progress.killed)],
       ['Failed', numFormat(progress.failed)],
-      ['Input Records', input_records != notAvailable ? numFormat(input_records) : null],
-      ['Output Records', output_records != notAvailable ? numFormat(output_records) : null],
+      ['Input Records', inputRecords != notAvailable ? numFormat(inputRecords) : null],
+      ['Output Records', outputRecords != notAvailable ? numFormat(outputRecords) : null],
       ['Compute Time', progress.totalTime > 0 ? computeTime : null],
     ];
     return (
@@ -506,19 +516,19 @@ class Summarizer extends React.Component {
 
 class MapSummary extends React.Component {
   render() {
-    var job = this.props.job;
-    var input_records = this.props.counters.get('TaskCounter.MAP_INPUT_RECORDS');
-    var output_records = this.props.counters.get('TaskCounter.MAP_OUTPUT_RECORDS');
-    return <Summarizer progress={job.maps} input_records={input_records.map} output_records={output_records.map} />;
+    const {job} = this.props;
+    const inputRecords = this.props.counters.get('TaskCounter.MAP_INPUT_RECORDS');
+    const outputRecords = this.props.counters.get('TaskCounter.MAP_OUTPUT_RECORDS');
+    return <Summarizer progress={job.maps} input_records={inputRecords.map} output_records={outputRecords.map} />;
   }
 }
 
 
 class ReduceSummary extends React.Component {
   render() {
-    var job = this.props.job;
-    var input_records = this.props.counters.get('TaskCounter.REDUCE_INPUT_RECORDS');
-    var output_records = this.props.counters.get('TaskCounter.REDUCE_OUTPUT_RECORDS');
-    return <Summarizer progress={job.reduces} input_records={input_records.reduce} output_records={output_records.reduce} />;
+    const {job} = this.props;
+    const inputRecords = this.props.counters.get('TaskCounter.REDUCE_INPUT_RECORDS');
+    const outputRecords = this.props.counters.get('TaskCounter.REDUCE_OUTPUT_RECORDS');
+    return <Summarizer progress={job.reduces} input_records={inputRecords.reduce} output_records={outputRecords.reduce} />;
   }
 }

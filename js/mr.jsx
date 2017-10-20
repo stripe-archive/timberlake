@@ -1,10 +1,10 @@
+import {
+  cleanJobName,
+} from './utils';
 
+const {_} = window._;
 
 export var notAvailable = {};
-
-function cleanJobName(name) {
-  return name.replace(/\[[A-Z0-9\/]+\]\s+/, '').replace(/(\w+\.)+(\w+)/, '$1$2');
-}
 
 export class MRJob {
   constructor(data) {
@@ -15,11 +15,11 @@ export class MRJob {
     this.name = cleanJobName(d.name);
     this.taskFamily = (_m = /^\[(\w+)\/\w+\]/.exec(d.name)) ? _m[1] : undefined;
     this.state = d.state;
-    this.startTime = d.startTime ? new Date(d.startTime) : new Date;
+    this.startTime = d.startTime ? new Date(d.startTime) : new Date();
     this.startTime.setMilliseconds(0);
     this.finishTime = d.finishTime ? new Date(d.finishTime) : null;
     this.user = d.user;
-    this.searchString = (this.name + ' ' + this.user + ' ' + this.id).toLowerCase();
+    this.searchString = (`${this.name} ${this.user} ${this.id}`).toLowerCase();
 
     this.maps = {
       progress: d.mapProgress || (d.mapsTotal === 0 ? notAvailable : 100 * (d.mapsCompleted / d.mapsTotal)),
@@ -48,14 +48,14 @@ export class MRJob {
 
     var tasks = data.tasks || {};
     this.tasks = {
-      maps: (tasks.maps || []).map(d => new MRTask(d)),
-      reduces: (tasks.reduces || []).map(d => new MRTask(d)),
+      maps: (tasks.maps || []).map((taskData) => new MRTask(taskData)),
+      reduces: (tasks.reduces || []).map((taskData) => new MRTask(taskData)),
       errors: tasks.errors,
     };
   }
 
   duration() {
-    return (this.finishTime || new Date) - this.startTime;
+    return (this.finishTime || new Date()) - this.startTime;
   }
 
   compact() {
@@ -64,28 +64,28 @@ export class MRJob {
     this.conf.flags = {};
     this.counters = new MRCounters([]);
   }
-};
+}
 
 export class MRCounters {
   constructor(counters) {
-    this.data = _.object((counters || []).map(d => [d.name, d]));
+    this.data = _.object((counters || []).map((d) => [d.name, d]));
   }
 
   get(key) {
     return this.data[key] || {};
   }
-};
+}
 
 export class MRTask {
   constructor(data) {
     var [start, finish] = data;
-    this.startTime = start ? new Date(start) : new Date;
+    this.startTime = start ? new Date(start) : new Date();
     this.startTime.setMilliseconds(0);
     this.finishTime = finish ? new Date(finish) : null;
     this.bogus = start == -1;
   }
 
   duration() {
-    return (this.finishTime || new Date) - this.startTime;
+    return (this.finishTime || new Date()) - this.startTime;
   }
-};
+}
