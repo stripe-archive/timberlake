@@ -377,8 +377,8 @@ class Waterfall extends React.Component {
   }
 }
 
-function waterfall(data, node, opts) {
-  var defaults = {
+function waterfall(data, node, optsIn) {
+  const defaults = {
     lineHeight: 1,
     barHeight: 1,
     width: 550,
@@ -388,15 +388,15 @@ function waterfall(data, node, opts) {
       return d.type == 'map' ? COLOUR_MAP : COLOUR_REDUCE;
     },
   };
-  opts = _.extend(defaults, opts);
+  const opts = _.extend(defaults, optsIn);
 
-  var margin = {
+  const margin = {
     top: 10, right: 20, bottom: 20, left: 20,
   };
-  var width = opts.width - margin.left - margin.right;
-  var height = Math.max(100, data.length * opts.lineHeight) - margin.top - margin.bottom;
+  const width = opts.width - margin.left - margin.right;
+  const height = Math.max(100, data.length * opts.lineHeight) - margin.top - margin.bottom;
 
-  var chart = d3.waterfall()
+  const chart = d3.waterfall()
     .width(width)
     .height(height)
     .barHeight(opts.barHeight)
@@ -404,8 +404,8 @@ function waterfall(data, node, opts) {
     .linkFormat(opts.linkFormat)
     .barStyle(opts.fillStyle);
 
-  var start = d3.min(_.pluck(data, 'start'));
-  var finish = d3.max(_.pluck(data, 'finish'));
+  const start = d3.min(_.pluck(data, 'start'));
+  const finish = d3.max(_.pluck(data, 'finish'));
   chart.domain([start, finish]);
 
   if (((finish - start) / 1000) < 180) {

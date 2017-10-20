@@ -2,18 +2,20 @@ import {
   cleanJobName,
 } from './utils';
 
-const {_} = window._;
+const {_} = window;
 
-export var notAvailable = {};
+export const notAvailable = {};
 
 export class MRJob {
   constructor(data) {
-    var _m;
-    var d = data.details;
+    const d = data.details;
     this.id = d.id.replace('application_', 'job_');
     this.fullName = d.name;
     this.name = cleanJobName(d.name);
-    this.taskFamily = (_m = /^\[(\w+)\/\w+\]/.exec(d.name)) ? _m[1] : undefined;
+    const _m = /^\[(\w+)\/\w+]/.exec(d.name);
+    if (_m) {
+      [, this.taskFamily] = _m;
+    }
     this.state = d.state;
     this.startTime = d.startTime ? new Date(d.startTime) : new Date();
     this.startTime.setMilliseconds(0);
@@ -46,7 +48,7 @@ export class MRJob {
 
     this.counters = new MRCounters(data.counters);
 
-    var tasks = data.tasks || {};
+    const tasks = data.tasks || {};
     this.tasks = {
       maps: (tasks.maps || []).map((taskData) => new MRTask(taskData)),
       reduces: (tasks.reduces || []).map((taskData) => new MRTask(taskData)),
@@ -78,7 +80,7 @@ export class MRCounters {
 
 export class MRTask {
   constructor(data) {
-    var [start, finish] = data;
+    const [start, finish] = data;
     this.startTime = start ? new Date(start) : new Date();
     this.startTime.setMilliseconds(0);
     this.finishTime = finish ? new Date(finish) : null;

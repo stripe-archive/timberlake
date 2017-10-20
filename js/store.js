@@ -22,7 +22,7 @@ class JobStore {
   }
 
   startSSE() {
-    var sse = new EventSource('/sse');
+    const sse = new EventSource('/sse');
     sse.onmessage = (e) => {
       this.trigger('job', new MRJob(JSON.parse(e.data)));
     };
@@ -37,4 +37,4 @@ class JobStore {
   }
 }
 
-export var Store = new JobStore();
+export const Store = new JobStore();
