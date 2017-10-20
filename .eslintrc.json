@@ -26,7 +26,6 @@
         "eqeqeq": "warn",
         "import/no-mutable-exports": "warn",
         "no-cond-assign": "warn",
-        "no-param-reassign": "warn",
         "no-redeclare": "warn",
         "no-restricted-syntax": "warn",
         "no-return-assign": "warn",

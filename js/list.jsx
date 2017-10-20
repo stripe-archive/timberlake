@@ -1,20 +1,14 @@
 import React from 'react';
-import {Link, hashHistory} from 'react-router';
-
+import {hashHistory} from 'react-router';
+import {FinishedJobRow, RunningJobRow} from './jobrow';
 import {
-  timeFormat,
-  secondFormat,
-  jobState,
   ACTIVE_STATES,
   FINISHED_STATES,
 } from './utils';
-import ProgressBar from './components/progress-bar';
 
 const {_} = window;
 
-// Lifted from react-router.
-const isLeftClickEvent = (e) => e.button === 0;
-const isModifiedEvent = (event) => event.metaKey || event.altKey || event.ctrlKey || event.shiftKey;
+const HEADERS = ['user', 'name', 'started', 'duration', 'map', 'reduce'];
 
 export default class extends React.Component {
   constructor(props) {
@@ -155,11 +149,10 @@ class FinishedJobs extends JobTable {
     super(props);
 
     this.sortKey = 'fsort';
-    this.filterKey = 'filter';
     this.states = FINISHED_STATES;
     this.defaultSortKey = '-finished';
     this.title = 'Finished';
-    this.headers = 'user name started finished duration state'.split(' ');
+    this.headers = HEADERS;
     this.rowClass = () => FinishedJobRow;
   }
 }
@@ -169,59 +162,12 @@ class RunningJobs extends JobTable {
     super(props);
 
     this.sortKey = 'rsort';
-    this.filterKey = 'filter';
     this.states = ACTIVE_STATES;
     this.defaultSortKey = '-started';
     this.title = 'Running';
-    this.headers = 'user name started duration map reduce'.split(' ');
+    this.headers = HEADERS;
     this.rowClass = () => RunningJobRow;
     this.autoFocus = true;
   }
 }
 
-class JobRow extends React.Component {
-  constructor() {
-    super();
-    this.onClick = this.onClick.bind(this);
-  }
-
-  onClick(e) {
-    if (isLeftClickEvent(e) && !isModifiedEvent(e)) {
-      hashHistory.push(`/job/${this.props.job.id}`);
-    }
-  }
-
-  render() {
-    const columns = this.columns();
-    return <tr onClick={this.onClick.bind(this)}>{columns.map((d, i) => <td key={i}>{d}</td>)}</tr>;
-  }
-}
-
-class RunningJobRow extends JobRow {
-  columns() {
-    const {job} = this.props;
-    return [
-      job.user,
-      <Link to={`/job/${job.id}`}>{job.name}</Link>,
-      timeFormat(job.startTime),
-      secondFormat(job.duration()),
-      <ProgressBar value={job.maps.progress} />,
-      <ProgressBar value={job.reduces.progress} />,
-    ];
-  }
-}
-
-
-class FinishedJobRow extends JobRow {
-  columns() {
-    const {job} = this.props;
-    return [
-      job.user,
-      <Link to={`/job/${job.id}`}>{job.name}</Link>,
-      timeFormat(job.startTime),
-      timeFormat(job.finishTime),
-      secondFormat(job.duration()),
-      jobState(job),
-    ];
-  }
-}
