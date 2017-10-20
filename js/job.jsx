@@ -365,14 +365,14 @@ class Waterfall extends React.Component {
     return <div />;
   }
 
+  componentDidMount() {
+    waterfall(this.props.data, ReactDOM.findDOMNode(this), this.props);
+  }
+
   shouldComponentUpdate() {
     d3.select(ReactDOM.findDOMNode(this)).selectAll('svg').remove();
     waterfall(this.props.data, ReactDOM.findDOMNode(this), this.props);
     return false;
-  }
-
-  componentDidMount() {
-    waterfall(this.props.data, ReactDOM.findDOMNode(this), this.props);
   }
 }
 

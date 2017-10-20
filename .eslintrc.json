@@ -40,7 +40,6 @@
         "react/no-direct-mutation-state": "warn",
         "react/no-find-dom-node": "warn",
         "react/no-multi-comp": "warn",
-        "react/sort-comp": "warn",
         "vars-on-top": "warn"
     }
 }

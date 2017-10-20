@@ -76,6 +76,10 @@ class App extends React.Component {
     this.interval = setInterval(this.flushUpdates.bind(this), 1000);
   }
 
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
+
   flushUpdates() {
     // Merge the updates into the list of jobs. Updates are merged into the existing map
     // since they contain more specific & more recent information than the existing list.
@@ -99,10 +103,6 @@ class App extends React.Component {
 
     this.setState({jobs});
     this.updates = {};
-  }
-
-  componentWillUnmount() {
-    clearInterval(this.interval);
   }
 
   render() {
