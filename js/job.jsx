@@ -106,11 +106,13 @@ export default class extends React.Component {
     var inputs = (
       <ul className="list-unstyled">
         {this.inputs(job, this.props.jobs).map((input, i) =>
-          (<li key={i}>
-            {_.isString(input) ?
-              cleanJobPath(input) :
-              <Link to={`job/${input.id}`}>{input.name}</Link>}
-           </li>))}
+          (
+            <li key={i}>
+              {_.isString(input) ?
+                cleanJobPath(input) :
+                <Link to={`job/${input.id}`}>{input.name}</Link>}
+            </li>
+          ))}
       </ul>
     );
 
@@ -124,9 +126,10 @@ export default class extends React.Component {
       var killing = this.state.killing;
       state = (
         <span>
-          {state} <button onClick={this.showKillModal} className="btn btn-danger kill">
+          {state}
+          <button onClick={this.showKillModal} className="btn btn-danger kill">
             <span className="label label-danger">{killing ? 'Killing' : 'Kill'}</span>
-                  </button>
+          </button>
           {this.state.showKillModal ? <KillModal hideModal={this.hideKillModal} killJob={this.kill} /> : null}
           {this.state.killResult ? <code>{this.state.killResult}</code> : null}
         </span>
