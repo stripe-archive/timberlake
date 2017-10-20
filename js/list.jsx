@@ -34,7 +34,7 @@ export default class extends React.Component {
         pathname: '/',
         query: _.extend(this.props.location.query, q),
       });
-      this.state.flushed = true;
+      this.setState({flushed: true});
     }, 250, false);
   }
 

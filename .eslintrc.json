@@ -33,7 +33,6 @@
         "react/jsx-handler-names": "warn",
         "react/jsx-no-bind": "warn",
         "react/no-array-index-key": "warn",
-        "react/no-direct-mutation-state": "warn",
         "react/no-find-dom-node": "warn",
         "react/no-multi-comp": "warn",
         "vars-on-top": "warn"
