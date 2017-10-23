@@ -353,7 +353,7 @@ func findHistoryAndConfFiles(client *hdfs.Client, jobID jobID, finishTime int64)
 	return "", "", fmt.Errorf("no matching files found at %s", histPath)
 }
 
-// updateFromHistoryFile updates a job's details by loading it's saved 'jhist'
+// updateFromHistoryFile updates a job's details by loading its saved 'jhist'
 // file stored in hdfs, along with the stored jobconf xml file.
 func (jt *jobTracker) updateFromHistoryFile(job *job, full bool) error {
 	now := time.Now()
