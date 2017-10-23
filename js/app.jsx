@@ -79,7 +79,7 @@ class App extends React.Component {
   }
 
   render() {
-    var jobs = _.values(this.state.jobs);
+    const jobs = _.values(this.state.jobs);
     return (
       <div>
         <NavBar jobs={jobs} />
