@@ -1,19 +1,20 @@
 import React from 'react';
-
 import {
   COLOUR_MAP,
   COLOUR_SELECTED,
   COLOUR_HOVER,
 } from '../utils';
 
+const {dagre} = window;
+
 /**
  * Renders an edge in the DAG view.
  */
 class DAGEdge extends React.Component {
   render() {
-    const points = this.props.points;
+    const {points} = this.props;
     let path = `M ${points[0].x},${points[0].y}`;
-    for (let i = 1; i < points.length; ++i) {
+    for (let i = 1; i < points.length; i += 1) {
       path += ` L ${points[i].x},${points[i].y}`;
     }
     return (
@@ -60,8 +61,7 @@ class DAGNode extends React.Component {
   }
 
   render() {
-    const node = this.props.node;
-    const selected = this.props.selected;
+    const {node, selected} = this.props;
 
     let colour;
     if (selected) {
@@ -99,12 +99,12 @@ class DAGNode extends React.Component {
  */
 export default class extends React.Component {
   render() {
-    const job = this.props.job;
+    const {job} = this.props;
     const jobs = this.props.relatives;
 
     // Graph settings.
-    let margin = 20,
-      size = 30;
+    const margin = 20;
+    const size = 30;
 
     // Create a new dagre graph.
     const g = new dagre.graphlib.Graph().setGraph({
@@ -115,26 +115,26 @@ export default class extends React.Component {
     g.setDefaultEdgeLabel(function() { return {}; });
 
     // Find all jobs and files. Compute the time span.
-    let inputMap = [],
-      outputMap = [],
-      files = new Set();
-    for (const job of jobs) {
+    const inputMap = [];
+    const outputMap = [];
+    const files = new Set();
+    for (const currentJob of jobs) {
       // Find input & output jobs.
-      const inputs = job.conf.input ? job.conf.input.split(/,/g) : [];
+      const inputs = currentJob.conf.input ? currentJob.conf.input.split(/,/g) : [];
       for (const input of inputs) {
-        (inputMap[input] = inputMap[input] || []).push(job.id);
+        (inputMap[input] = inputMap[input] || []).push(currentJob.id);
         files.add(input);
       }
-      const outputs = job.conf.output ? job.conf.output.split(/,/g) : [];
+      const outputs = currentJob.conf.output ? currentJob.conf.output.split(/,/g) : [];
       for (const output of outputs) {
-        (outputMap[output] = outputMap[output] || []).push(job.id);
+        (outputMap[output] = outputMap[output] || []).push(currentJob.id);
         files.add(output);
       }
 
       // Create a graph node.
-      g.setNode(job.id, {
-        label: /^[^\(]+\(([0-9]+)/.exec(job.name)[1],
-        job,
+      g.setNode(currentJob.id, {
+        label: /^[^(]+\(([0-9]+)/.exec(currentJob.name)[1],
+        job: currentJob,
         width: size,
         height: size,
       });
@@ -152,8 +152,8 @@ export default class extends React.Component {
     dagre.layout(g);
 
     // Make the canvas large enough to hold the graph.
-    let width = 0,
-      height = 0;
+    let width = 0;
+    let height = 0;
     g.nodes().forEach((key) => {
       const node = g.node(key);
       width = Math.max(width, node.x + margin * 2 + size);
