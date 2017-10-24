@@ -9,7 +9,7 @@ const {_} = window;
 export default class extends React.Component {
   render() {
     let {tasks} = this.props;
-    tasks.maps.forEach((d) => d.type = 'map');
+    tasks.maps.forEach((d) => { d.type = 'map'; });
     tasks = tasks.maps.concat(tasks.reduces).filter((t) => !t.bogus).map((t) => {
       return {start: t.startTime, finish: t.finishTime || new Date(), type: t.type};
     });
