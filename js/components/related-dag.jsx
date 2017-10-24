@@ -38,22 +38,22 @@ class DAGNode extends React.Component {
   constructor(props) {
     super(props);
 
-    this.onMouseEnter = this.onMouseEnter.bind(this);
-    this.onMouseLeave = this.onMouseLeave.bind(this);
+    this.handleOnMouseEnter = this.handleOnMouseEnter.bind(this);
+    this.handleOnMouseLeave = this.handleOnMouseLeave.bind(this);
 
     this.state = {
       hover: false,
     };
   }
 
-  onMouseEnter() {
+  handleOnMouseEnter() {
     this.setState({hover: true});
     if (this.props.hover) {
       this.props.hover(this.props.node.job);
     }
   }
 
-  onMouseLeave() {
+  handleOnMouseLeave() {
     this.setState({hover: false});
     if (this.props.hover) {
       this.props.hover(null);
@@ -74,8 +74,8 @@ class DAGNode extends React.Component {
 
     return (
       <g
-        onMouseEnter={this.onMouseEnter}
-        onMouseLeave={this.onMouseLeave}
+        onMouseEnter={this.handleOnMouseEnter}
+        onMouseLeave={this.handleOnMouseLeave}
         transform={`translate(${node.x}, ${node.y})`}
       >
         <a href={`/#/job/${node.job.id}`}>

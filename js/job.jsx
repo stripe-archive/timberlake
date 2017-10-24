@@ -47,8 +47,8 @@ export default class extends React.Component {
     };
 
     this.kill = this.kill.bind(this);
-    this.showKillModal = this.showKillModal.bind(this);
-    this.hideKillModal = this.hideKillModal.bind(this);
+    this.handleShowKillModal = this.handleShowKillModal.bind(this);
+    this.handleHideKillModal = this.handleHideKillModal.bind(this);
   }
 
   componentDidMount() {
@@ -78,7 +78,7 @@ export default class extends React.Component {
   }
 
   kill() {
-    this.hideKillModal();
+    this.handleHideKillModal();
     this.setState({killing: true});
     const job = this.getJob();
     $.post(`/jobs/${job.id}/kill`, (data, status) => {
@@ -91,11 +91,11 @@ export default class extends React.Component {
     });
   }
 
-  hideKillModal() {
+  handleHideKillModal() {
     this.setState({showKillModal: false});
   }
 
-  showKillModal() {
+  handleShowKillModal() {
     this.setState({showKillModal: true});
   }
 
@@ -128,10 +128,10 @@ export default class extends React.Component {
       state = (
         <span>
           {state}
-          <button onClick={this.showKillModal} className="btn btn-danger kill">
+          <button onClick={this.handleShowKillModal} className="btn btn-danger kill">
             <span className="label label-danger">{killing ? 'Killing' : 'Kill'}</span>
           </button>
-          {this.state.showKillModal ? <KillModal hideModal={this.hideKillModal} killJob={this.kill} /> : null}
+          {this.state.showKillModal ? <KillModal onHideModal={this.handleHideKillModal} killJob={this.kill} /> : null}
           {this.state.killResult ? <code>{this.state.killResult}</code> : null}
         </span>
       );
@@ -251,7 +251,7 @@ export default class extends React.Component {
 
 class KillModal extends React.Component {
   render() {
-    const {hideModal, killJob} = this.props;
+    const {killJob, onHideModal} = this.props;
     return (
       <div className="modal show" tabIndex="-1" role="dialog">
         <div className="modal-dialog modal-kill">
@@ -260,7 +260,7 @@ class KillModal extends React.Component {
               <h4>Are you sure you want to kill this job?</h4>
             </div>
             <div className="modal-footer">
-              <button onClick={hideModal} className="btn btn-default">Close</button>
+              <button onClick={onHideModal} className="btn btn-default">Close</button>
               <button onClick={killJob} className="btn btn-danger">Kill</button>
             </div>
           </div>
