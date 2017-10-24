@@ -1,6 +1,6 @@
 import React from 'react';
 
-const {d3} = window;
+const {_, d3} = window;
 
 export const paddedInt = d3.format('02d');
 export const timeFormat = d3.time.format.utc('%a %H:%M:%S');
@@ -62,6 +62,21 @@ export function cleanJobPath(path) {
   return path
     .replace(/hdfs:\/\/\w+(\.\w+)*:\d+/g, '')
     .replace(/,/, ', ');
+}
+
+export function sample(arr, limit, comparator) {
+  // Sample arr down to size limit using comparator to take the largest value at
+  // each step. Works best if arr is already sorted.
+  if (arr.length <= limit) return arr;
+  const rv = [];
+  const sampleSize = arr.length / limit;
+  for (let i = 0; i < arr.length / sampleSize; i += 1) {
+    const vals = arr.slice(i * sampleSize, (i + 1) * sampleSize);
+    if (vals.length !== 0) {
+      rv.push(_.max(vals, comparator));
+    }
+  }
+  return rv;
 }
 
 export const COLOUR_MAP = 'rgb(91, 192, 222)';
