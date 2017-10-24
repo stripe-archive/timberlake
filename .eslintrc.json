@@ -24,9 +24,7 @@
             "objects": "always-multiline"
         }],
         "eqeqeq": "warn",
-        "import/no-mutable-exports": "warn",
         "no-restricted-syntax": "warn",
-        "no-var": "warn",
         "react/jsx-no-bind": "warn",
         "react/no-array-index-key": "warn",
         "react/no-find-dom-node": "warn"
