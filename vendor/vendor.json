@@ -27,6 +27,12 @@
 			"revisionTime": "2016-03-08T16:24:17Z"
 		},
 		{
+			"checksumSHA1": "AqYKr1FG6aA8p7glZBqBoj7tK/g=",
+			"path": "github.com/datadog/datadog-go/statsd",
+			"revision": "c74bd0589c83817c93e4eff39ccae69d6c46df9b",
+			"revisionTime": "2017-09-05T09:56:32Z"
+		},
+		{
 			"checksumSHA1": "5rPfda8jFccr3A6heL+JAmi9K9g=",
 			"origin": "github.com/stretchr/testify/vendor/github.com/davecgh/go-spew/spew",
 			"path": "github.com/davecgh/go-spew/spew",
