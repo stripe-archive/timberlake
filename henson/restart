@@ -1,4 +1,4 @@
 #!/bin/bash -eux
 
-svc -t /etc/service/jobtracker-srv
+svc -t /etc/service/${HENSON_SERVICE}
 svc -t /etc/service/jobtracker-bot
