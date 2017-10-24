@@ -36,10 +36,14 @@ function boxplot(data, node, tickFormat) {
       const q1 = d.quartiles[0];
       const q3 = d.quartiles[2];
       const iqrange = (q3 - q1) * k;
-      let i = -1;
-      let j = d.length;
-      while (d[i += 1] < q1 - iqrange);
-      while (d[j -= 1] > q3 + iqrange);
+      let i = 0;
+      let j = d.length - 1;
+      while (d[i] < q1 - iqrange) {
+        i += 1;
+      }
+      while (d[j] > q3 + iqrange) {
+        j -= 1;
+      }
       return [i, j];
     };
   }

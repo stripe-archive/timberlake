@@ -25,14 +25,11 @@
         }],
         "eqeqeq": "warn",
         "import/no-mutable-exports": "warn",
-        "no-cond-assign": "warn",
-        "no-redeclare": "warn",
         "no-restricted-syntax": "warn",
         "no-return-assign": "warn",
         "no-var": "warn",
         "react/jsx-no-bind": "warn",
         "react/no-array-index-key": "warn",
-        "react/no-find-dom-node": "warn",
-        "vars-on-top": "warn"
+        "react/no-find-dom-node": "warn"
     }
 }
