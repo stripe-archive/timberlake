@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/datadog/datadog-go/statsd"
 	"github.com/zenazn/goji/bind"
 	"github.com/zenazn/goji/web"
 	"github.com/zenazn/goji/web/middleware"
@@ -19,12 +20,14 @@ var resourceManagerURL = flag.String("resource-manager-url", "http://localhost:8
 var historyServerURL = flag.String("history-server-url", "http://localhost:19888", "The HTTP URL to access the history server.")
 var proxyServerURL = flag.String("proxy-server-url", "", "The HTTP URL to access the proxy server, if separate from the resource manager.")
 var namenodeAddress = flag.String("namenode-address", "localhost:9000", "The host:port to access the Namenode metadata service.")
+var statsdAddress = flag.String("statsd-address", "localhost:8200", "The host:port to access the statsd metrics service.")
 var yarnLogDir = flag.String("yarn-logs-dir", "/tmp/logs", "The HDFS path where YARN stores logs. This is the controlled by the hadoop property yarn.nodemanager.remote-app-log-dir.")
 var yarnHistoryDir = flag.String("yarn-history-dir", "/tmp/staging/history/done", "The HDFS path where YARN stores finished job history files. This is the controlled by the hadoop property mapreduce.jobhistory.done-dir.")
 var httpTimeout = flag.Duration("http-timeout", time.Second*2, "The timeout used for connecting to YARN API. Pass values like: 2s")
 var pollInterval = flag.Duration("poll-interval", time.Second*5, "How often should we poll the job APIs. Pass values like: 2s")
 var enableDebug = flag.Bool("pprof", false, "Enable pprof debugging tools at /debug.")
 
+var dogstatsd *statsd.Client
 var jt *jobTracker
 
 var rootPath, staticPath string
@@ -118,11 +121,19 @@ func main() {
 	jt = newJobTracker(*resourceManagerURL, *historyServerURL, *proxyServerURL)
 	go jt.Loop()
 
-	if err := jt.testLogsDir(); err != nil {
+	var err error
+	if err = jt.testLogsDir(); err != nil {
 		log.Printf("WARNING: Could not read yarn logs directory. Error message: `%s`\n", err)
 		log.Println("\tYou can change the path with --yarn-logs-dir=HDFS_PATH.")
 		log.Println("\tTo talk to HDFS, Timberlake needs to be able to access the namenode (--namenode-address) and datanodes.")
 	}
+
+	if dogstatsd, err = statsd.New(*statsdAddress); err != nil {
+		log.Printf("WARNING: Could not initiate statsd client. Error message: `%s`\n", err)
+		log.Println("\tYou can change the path with --statsd-address=STATSD_ADDR.")
+	}
+	dogstatsd.Namespace = os.Getenv("timberlake")
+	dogstatsd.Incr("clientConnection", []string{}, 1)
 
 	sse := newSSE()
 	go sse.Loop()
