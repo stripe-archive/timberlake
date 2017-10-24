@@ -352,12 +352,14 @@ func (jt *jobTracker) saveJob(job *job) {
 func (jt *jobTracker) updateJob(job *job) error {
 	details, err := jt.fetchJobDetails(job.Details.ID)
 	if err != nil {
+		metrics.Incr("updateJob.error", []string{"fetchJobDetails"}, 1)
 		return err
 	}
 	job.Details = details
 
 	conf, err := jt.fetchConf(job.Details.ID)
 	if err != nil {
+		metrics.Incr("updateJob.error", []string{"fetchConf"}, 1)
 		return err
 	}
 	job.Conf.update(conf)
@@ -369,12 +371,14 @@ func (jt *jobTracker) updateJob(job *job) error {
 
 	counters, err := jt.fetchCounters(job.Details.ID)
 	if err != nil {
+		metrics.Incr("updateJob.error", []string{"fetchCounters"}, 1)
 		return err
 	}
 	job.Counters = counters
 
 	tasks, err := jt.fetchTasks(job.Details.ID)
 	if err != nil {
+		metrics.Incr("updateJob.error", []string{"fetchTask"}, 1)
 		return err
 	}
 	job.Details.MapsTotalTime = sumTimes(tasks.Map)
