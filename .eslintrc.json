@@ -30,7 +30,6 @@
         "no-restricted-syntax": "warn",
         "no-return-assign": "warn",
         "no-var": "warn",
-        "react/jsx-handler-names": "warn",
         "react/jsx-no-bind": "warn",
         "react/no-array-index-key": "warn",
         "react/no-find-dom-node": "warn",
