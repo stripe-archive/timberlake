@@ -36,6 +36,9 @@ function bytesFormat(n) {
   }
 }
 
+function relatedJobs(job, allJobs) {
+  return allJobs.filter((d) => d.fullName.indexOf(job.taskFamily) == 1);
+}
 
 export default class extends React.Component {
   constructor(props) {
@@ -68,23 +71,19 @@ export default class extends React.Component {
     return _.find(this.props.jobs, (d) => lolhadoop(d.id) == jobId);
   }
 
-  relatedJobs(job, allJobs) {
-    return allJobs.filter((d) => d.fullName.indexOf(job.taskFamily) == 1);
-  }
-
   inputs(job, allJobs) {
-    var relatives = this.relatedJobs(job, allJobs);
-    var outputs = _.object(_.flatten(relatives.map((j) => (j.conf.output || '').split(/,/g).map((o) => [o, j])), 1));
+    const relatives = relatedJobs(job, allJobs);
+    const outputs = _.object(_.flatten(relatives.map((j) => (j.conf.output || '').split(/,/g).map((o) => [o, j])), 1));
     return (job.conf.input || '').split(/,/g).map((input) => outputs[input] || input);
   }
 
   kill() {
     this.hideKillModal();
     this.setState({killing: true});
-    var job = this.getJob();
+    const job = this.getJob();
     $.post(`/jobs/${job.id}/kill`, (data, status) => {
       console.log(data, status);
-      var result = data.err ? data.stderr : null;
+      const result = data.err ? data.stderr : null;
       this.setState({killResult: result});
     }).then(null, (err) => {
       console.error(err);
@@ -102,10 +101,10 @@ export default class extends React.Component {
 
   render() {
     console.time('Render Job');
-    var job = this.getJob();
+    const job = this.getJob();
     if (!job) return null;
     document.title = job.name;
-    var inputs = (
+    const inputs = (
       <ul className="list-unstyled">
         {this.inputs(job, this.props.jobs).map((input, i) =>
           (
@@ -118,14 +117,14 @@ export default class extends React.Component {
       </ul>
     );
 
-    var similar = this.props.jobs.filter((j) => j.name.indexOf(job.name) != -1);
+    let similar = this.props.jobs.filter((j) => j.name.indexOf(job.name) != -1);
     similar = similar.filter((j) => j.startTime < job.startTime);
-    var prev = _.last(_.sortBy(similar, 'startTime'));
-    var previous = prev ? <Link to={`job/${prev.id}`}>previous: {secondFormat(prev.duration())}</Link> : null;
+    const prev = _.last(_.sortBy(similar, 'startTime'));
+    const previous = prev ? <Link to={`job/${prev.id}`}>previous: {secondFormat(prev.duration())}</Link> : null;
 
-    var state = jobState(job);
+    let state = jobState(job);
     if (_.contains(ACTIVE_STATES, job.state)) {
-      var {killing} = this.state;
+      const {killing} = this.state;
       state = (
         <span>
           {state}
@@ -137,11 +136,11 @@ export default class extends React.Component {
         </span>
       );
     } else if (_.contains(FAILED_STATES, job.state)) {
-      var link = <Link to={`job/${job.id}/logs`} className="logs-link">view logs</Link>;
+      const link = <Link to={`job/${job.id}/logs`} className="logs-link">view logs</Link>;
       state = <div>{state} {link}</div>;
     }
 
-    var pairs = [
+    const pairs = [
       ['User', job.user],
       ['Name', job.name],
       ['ID', job.id],
@@ -152,14 +151,14 @@ export default class extends React.Component {
       ['Output', cleanJobPath(job.conf.output)],
     ];
 
-    var stepsStr = job.conf.scaldingSteps;
+    const stepsStr = job.conf.scaldingSteps;
     if (stepsStr) {
-      var lines = stepsStr.split(',').map((val) => {
-        var trimmed = val.trim();
-        var matches = trimmed.match(/[\w.]+:\d+/i);
+      const lines = stepsStr.split(',').map((val) => {
+        const trimmed = val.trim();
+        const matches = trimmed.match(/[\w.]+:\d+/i);
         return {full: trimmed, short: matches ? matches[0] : trimmed};
       });
-      var steps = (
+      const steps = (
         <ul className="list-unstyled">
           {_.uniq(lines).map((line, i) => <li key={i}><span className="scalding-step-description" title={line.full}>{line.short}</span></li>)}
         </ul>
@@ -167,7 +166,7 @@ export default class extends React.Component {
       pairs.push(['Line Numbers', steps]);
     }
 
-    var bytes = {
+    const bytes = {
       hdfs_read: job.counters.get('FileSystemCounter.HDFS_BYTES_READ').map,
       s3_read: job.counters.get('FileSystemCounter.S3_BYTES_READ').map || 0,
       file_read: job.counters.get('FileSystemCounter.FILE_BYTES_READ').map || 0,
@@ -181,12 +180,12 @@ export default class extends React.Component {
     for (const key of Object.keys(bytes)) {
       bytes[key] = bytesFormat(bytes[key]);
     }
-    var bytesReadTitle = `HDFS: ${bytes.hdfs_read}\nS3: ${bytes.s3_read}\nFile: ${bytes.file_read}`;
-    var bytesWrittenTitle = `HDFS: ${bytes.hdfs_written}\nS3: ${bytes.s3_written}\nFile: ${bytes.file_written}`;
+    const bytesReadTitle = `HDFS: ${bytes.hdfs_read}\nS3: ${bytes.s3_read}\nFile: ${bytes.file_read}`;
+    const bytesWrittenTitle = `HDFS: ${bytes.hdfs_written}\nS3: ${bytes.s3_written}\nFile: ${bytes.file_written}`;
 
-    const relatedJobs = _.sortBy(this.relatedJobs(job, this.props.jobs), (relatedJob) => relatedJob.id);
+    const sortedRelatedJobs = _.sortBy(relatedJobs(job, this.props.jobs), (relatedJob) => relatedJob.id);
 
-    var rv = (
+    const rv = (
       <div>
         <div className="row">
           <div className="col-md-5">
@@ -238,10 +237,10 @@ export default class extends React.Component {
           </div>
         </div>
         <div className="row">
-          <RelatedJobs job={job} relatives={relatedJobs} hover={this.state.hover} />
+          <RelatedJobs job={job} relatives={sortedRelatedJobs} hover={this.state.hover} />
         </div>
         <div className="row">
-          <RelatedDAG job={job} relatives={relatedJobs} hover={(j) => { this.setState({hover: j}); }} />
+          <RelatedDAG job={job} relatives={sortedRelatedJobs} hover={(j) => { this.setState({hover: j}); }} />
         </div>
       </div>
     );
@@ -252,7 +251,7 @@ export default class extends React.Component {
 
 class KillModal extends React.Component {
   render() {
-    var {hideModal, killJob} = this.props;
+    const {hideModal, killJob} = this.props;
     return (
       <div className="modal show" tabIndex="-1" role="dialog">
         <div className="modal-dialog modal-kill">
@@ -277,16 +276,16 @@ class RelatedJobs extends React.Component {
 
     if (relatives.length < 2) return null;
 
-    var data = relatives.map((j) => ({
+    let data = relatives.map((j) => ({
       start: j.startTime,
       finish: j.finishTime || new Date(),
       job: j,
     }));
     data = _.sortBy(data, 'start');
 
-    var fmt = (d) => `${secondFormat(d.job.duration())} ${d.job.name}`;
-    var links = (d) => `#/job/${d.job.id}`;
-    var fs = (d) => {
+    const fmt = (d) => `${secondFormat(d.job.duration())} ${d.job.name}`;
+    const links = (d) => `#/job/${d.job.id}`;
+    const fs = (d) => {
       if (d.job.id == job.id) {
         return COLOUR_SELECTED;
       } else if (hover && d.job.id == hover.id) {
@@ -316,8 +315,8 @@ class RelatedJobs extends React.Component {
 
 class TaskStats extends React.Component {
   render() {
-    var tasks = this.props.tasks.filter((t) => !t.bogus);
-    var durations = sample(tasks.map((x) => x.duration()).sort(), 100, _.identity);
+    const tasks = this.props.tasks.filter((t) => !t.bogus);
+    const durations = sample(tasks.map((x) => x.duration()).sort(), 100, _.identity);
     return (
       <div>
         <h4>{this.props.title} Timing</h4>
@@ -331,10 +330,10 @@ function sample(arr, limit, comparator) {
   // Sample arr down to size limit using comparator to take the largest value at
   // each step. Works best if arr is already sorted.
   if (arr.length <= limit) return arr;
-  var rv = [];
-  var sampleSize = arr.length / limit;
-  for (var i = 0; i < arr.length / sampleSize; i += 1) {
-    var vals = arr.slice(i * sampleSize, (i + 1) * sampleSize);
+  const rv = [];
+  const sampleSize = arr.length / limit;
+  for (let i = 0; i < arr.length / sampleSize; i += 1) {
+    const vals = arr.slice(i * sampleSize, (i + 1) * sampleSize);
     if (vals.length !== 0) {
       rv.push(_.max(vals, comparator));
     }
@@ -345,12 +344,12 @@ function sample(arr, limit, comparator) {
 
 class TaskWaterfall extends React.Component {
   render() {
-    var {tasks} = this.props;
+    let {tasks} = this.props;
     tasks.maps.forEach((d) => d.type = 'map');
     tasks = tasks.maps.concat(tasks.reduces).filter((t) => !t.bogus).map((t) => {
       return {start: t.startTime, finish: t.finishTime || new Date(), type: t.type};
     });
-    var data = sample(_.sortBy(tasks, 'start'), 400, (d) => d.finish - d.start);
+    const data = sample(_.sortBy(tasks, 'start'), 400, (d) => d.finish - d.start);
     return (
       <div>
         <h4>Map <i className="map-label" /> / <i className="reduce-label" /> Reduce Waterfall</h4>
@@ -451,7 +450,7 @@ function boxplot(data, node, tickFormat) {
   const width = 220 - margin.left - margin.right;
   const height = 400 - margin.top - margin.bottom;
 
-  var chart = d3.box()
+  const chart = d3.box()
     .whiskers(iqr(1.5))
     .width(width)
     .height(height)
@@ -486,14 +485,14 @@ function boxplot(data, node, tickFormat) {
 
 class Summarizer extends React.Component {
   render() {
-    var {progress} = this.props;
-    var inputRecords = this.props.input_records;
-    var outputRecords = this.props.output_records;
-    var recordsPerSec = inputRecords != notAvailable ? Math.floor(inputRecords / (progress.totalTime / 1000)) : null;
-    var computeTime = recordsPerSec ?
+    const {progress} = this.props;
+    const inputRecords = this.props.input_records;
+    const outputRecords = this.props.output_records;
+    const recordsPerSec = inputRecords != notAvailable ? Math.floor(inputRecords / (progress.totalTime / 1000)) : null;
+    const computeTime = recordsPerSec ?
       <span>{humanFormat(progress.totalTime)}<br />{numFormat(recordsPerSec)} {plural(recordsPerSec, 'record')}/sec</span>
       : <span>{humanFormat(progress.totalTime)}</span>;
-    var pairs = [
+    const pairs = [
       ['Progress', <ProgressBar value={progress.progress} />],
       ['Total', numFormat(progress.total)],
       ['Completed', numFormat(progress.completed)],

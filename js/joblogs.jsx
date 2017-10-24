@@ -18,17 +18,17 @@ export default class extends React.Component {
   }
 
   getJob() {
-    var jobId = lolhadoop(this.props.params.jobId);
+    const jobId = lolhadoop(this.props.params.jobId);
     return _.find(this.props.jobs, (d) => lolhadoop(d.id) == jobId);
   }
 
   render() {
-    var job = this.getJob();
+    const job = this.getJob();
     if (!job) return null;
-    var logs = _.sortBy(_.pairs(job.tasks.errors), (x) => x[1].length).reverse().map((p) => {
-      var attempts = p[1];
-      var errorMessage = p[0].split('\n')[0];
-      var errorBody = p[0].split('\n').slice(1).join('\n');
+    const logs = _.sortBy(_.pairs(job.tasks.errors), (x) => x[1].length).reverse().map((p) => {
+      const attempts = p[1];
+      const errorMessage = p[0].split('\n')[0];
+      const errorBody = p[0].split('\n').slice(1).join('\n');
       return (
         <dl>
           <dt>{attempts.length} time{attempts.length == 1 ? '' : 's'}</dt>

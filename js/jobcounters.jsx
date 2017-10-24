@@ -18,12 +18,12 @@ export default class extends React.Component {
   }
 
   getJob() {
-    var jobId = lolhadoop(this.props.params.jobId);
+    const jobId = lolhadoop(this.props.params.jobId);
     return _.find(this.props.jobs, (d) => lolhadoop(d.id) == jobId);
   }
 
   render() {
-    var job = this.getJob();
+    const job = this.getJob();
     if (!job) {
       return null;
     }

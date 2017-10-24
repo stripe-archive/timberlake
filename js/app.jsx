@@ -7,8 +7,8 @@ import Job from './job';
 import JobConf from './jobconf';
 import JobLogs from './joblogs';
 import JobCounters from './jobcounters';
+import {NavBar} from './NavBar';
 import {Store} from './store';
-import {numFormat} from './utils';
 
 const {_} = window;
 
@@ -16,33 +16,6 @@ const {_} = window;
  * Number of most recent jobs to keep in the finished tab.
  */
 const JOBS_TO_KEEP = 5000;
-
-
-/**
- * Component responsible for rendering the top navigation bar.
- */
-class NavBar extends React.Component {
-  render() {
-    var running = this.props.jobs.filter((j) => j.state == 'RUNNING');
-    var mappers = running.map((j) => j.maps.running).reduce((x, y) => x + y, 0);
-    var reducers = running.map((j) => j.reduces.running).reduce((x, y) => x + y, 0);
-
-    return (
-      <nav className="navbar navbar-default">
-        <div className="container">
-          <div className="navbar-header">
-            <a className="navbar-brand" href="#">Timberlake</a>
-          </div>
-          <div className="navbar-right">
-            <p className="navbar-text">mappers: {numFormat(mappers)}</p>
-            <p className="navbar-text">reducers: {numFormat(reducers)}</p>
-          </div>
-        </div>
-      </nav>
-    );
-  }
-}
-
 
 /**
  * Component responsible for the application state.
@@ -106,7 +79,7 @@ class App extends React.Component {
   }
 
   render() {
-    var jobs = _.values(this.state.jobs);
+    const jobs = _.values(this.state.jobs);
     return (
       <div>
         <NavBar jobs={jobs} />

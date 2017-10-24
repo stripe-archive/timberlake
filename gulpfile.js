@@ -1,9 +1,8 @@
-var gulp = require('gulp');
-var browserify = require('browserify');
-var babelify = require('babelify');
-var source = require('vinyl-source-stream');
+const gulp = require('gulp');
+const browserify = require('browserify');
+const source = require('vinyl-source-stream');
 
-var paths = {
+const paths = {
   js: ['js/*/*.jsx'],
   copy: ['css/*.css', 'js/libs/*.js', 'img/*'],
 };

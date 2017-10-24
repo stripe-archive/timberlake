@@ -35,6 +35,6 @@
     "test": "test"
   },
   "scripts": {
-    "test": "eslint **/*.js **/*.jsx"
+    "test": "eslint --ext .js --ext .jsx ."
   }
 }
