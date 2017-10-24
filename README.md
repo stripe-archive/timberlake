@@ -1,5 +1,7 @@
 # Timberlake is a Job Tracker for Hadoop.
 
+[![Dependency Status][dependency-img]][dependency-url]
+
 * [Intro](#intro)
 * [Screenshots](#screenshots)
 * [Installation](#installation)
@@ -86,3 +88,6 @@ that's only available in v2.5.x+.
 
 Our cluster has 10-40 jobs running simultaneously and about 2,000 jobs running
 per day. Timberlake's performance has not been tested outside these bounds.
+
+[dependency-img]: https://img.shields.io/david/stripe/timberlake.svg
+[dependency-url]: https://david-dm.org/stripe/timberlake
