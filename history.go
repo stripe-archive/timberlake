@@ -391,6 +391,7 @@ func (jt *jobTracker) updateFromHistoryFile(job *job, full bool) error {
 	}
 
 	log.Println("Read jobConf and history file for", jobID, "in", time.Now().Sub(now))
+	log.Println("jobConf history file contents", conf)
 
 	job.Conf.update(conf)
 	if full {
