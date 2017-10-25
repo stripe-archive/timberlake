@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import {
   COLOUR_MAP,
   COLOUR_REDUCE,
@@ -56,12 +55,12 @@ function waterfall(data, node, optsIn) {
 
 export default class extends React.Component {
   componentDidMount() {
-    waterfall(this.props.data, ReactDOM.findDOMNode(this), this.props);
+    waterfall(this.props.data, this.node, this.props);
   }
 
   shouldComponentUpdate() {
-    d3.select(ReactDOM.findDOMNode(this)).selectAll('svg').remove();
-    waterfall(this.props.data, ReactDOM.findDOMNode(this), this.props);
+    d3.select(this.node).selectAll('svg').remove();
+    waterfall(this.props.data, this.node, this.props);
     return false;
   }
 

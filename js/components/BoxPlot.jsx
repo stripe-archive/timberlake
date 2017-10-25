@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 
 const {d3} = window;
 
@@ -51,12 +50,12 @@ function boxplot(data, node, tickFormat) {
 
 export default class extends React.Component {
   componentDidMount() {
-    boxplot(this.props.data, ReactDOM.findDOMNode(this), this.props.tickFormat);
+    boxplot(this.props.data, this.node, this.props.tickFormat);
   }
 
   shouldComponentUpdate() {
-    d3.select(ReactDOM.findDOMNode(this)).selectAll('svg').remove();
-    boxplot(this.props.data, ReactDOM.findDOMNode(this), this.props.tickFormat);
+    d3.select(this.node).selectAll('svg').remove();
+    boxplot(this.props.data, this.node, this.props.tickFormat);
     return false;
   }
 

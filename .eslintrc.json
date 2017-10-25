@@ -26,7 +26,6 @@
         "eqeqeq": "warn",
         "no-restricted-syntax": "warn",
         "react/jsx-no-bind": "warn",
-        "react/no-array-index-key": "warn",
-        "react/no-find-dom-node": "warn"
+        "react/no-array-index-key": "warn"
     }
 }
