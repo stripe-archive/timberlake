@@ -11,12 +11,14 @@ class JobStore {
   getJob(id) {
     this.lastJob = id;
     $.getJSON(`/jobs/${id}`).then((data) => {
+      console.log(`JOB data for ${id}`, data);
       this.trigger('job', new MRJob(data));
     }).then(null, (error) => console.error(error));
   }
 
   getJobs() {
     $.getJSON('/jobs/').then((data) => {
+      console.log('JOBS data', data);
       this.trigger('jobs', data.map((d) => new MRJob(d)));
     }).then(null, (error) => console.error(error));
   }
