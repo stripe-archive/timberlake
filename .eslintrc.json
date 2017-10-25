@@ -4,6 +4,7 @@
         "es6": true
     },
     "extends": "stripe",
+    "parser": "babel-eslint",
     "parserOptions": {
         "ecmaFeatures": {
             "experimentalObjectRestSpread": true,
@@ -15,26 +16,10 @@
         "react"
     ],
     "rules": {
-        "class-methods-use-this": "warn",
-        "comma-dangle": ["error", {
-            "arrays": "always-multiline",
-            "exports": "always-multiline",
-            "functions": "never",
-            "imports": "always-multiline",
-            "objects": "always-multiline"
-        }],
+        "class-methods-use-this": ["error", {"exceptMethods": ["render"]}],
         "eqeqeq": "warn",
-        "import/no-mutable-exports": "warn",
-        "no-cond-assign": "warn",
-        "no-redeclare": "warn",
         "no-restricted-syntax": "warn",
-        "no-return-assign": "warn",
-        "no-var": "warn",
-        "react/jsx-handler-names": "warn",
         "react/jsx-no-bind": "warn",
-        "react/no-array-index-key": "warn",
-        "react/no-find-dom-node": "warn",
-        "react/no-multi-comp": "warn",
-        "vars-on-top": "warn"
+        "react/no-array-index-key": "warn"
     }
 }

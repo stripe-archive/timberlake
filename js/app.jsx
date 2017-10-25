@@ -93,7 +93,6 @@ class App extends React.Component {
   }
 }
 
-
 render(
   <Router history={hashHistory}>
     <Route path="/" component={App}>
@@ -104,6 +103,6 @@ render(
       <Route name="cnt" path="job/:jobId/counters" component={JobCounters} />
     </Route>
   </Router>
-  , document.getElementById('timberlake')
+  , document.getElementById('timberlake'),
 );
 

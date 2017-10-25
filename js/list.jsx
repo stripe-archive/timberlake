@@ -8,7 +8,7 @@ export default class extends React.Component {
   constructor(props) {
     super(props);
 
-    this.onFilter = this.onFilter.bind(this);
+    this.handleOnFilter = this.handleOnFilter.bind(this);
 
     this.state = {
       filter: '',
@@ -40,7 +40,7 @@ export default class extends React.Component {
     }
   }
 
-  onFilter(e) {
+  handleOnFilter(e) {
     this.updateLocation();
     this.setState({filter: e.target.value, flushed: false});
   }
@@ -51,8 +51,8 @@ export default class extends React.Component {
     const filter = this.state.filter.toLowerCase();
     const rv = (
       <div>
-        <RunningJobs jobs={jobs} query={this.props.location.query} onFilter={this.onFilter} filter={filter} />
-        <FinishedJobs jobs={jobs} query={this.props.location.query} onFilter={this.onFilter} filter={filter} />
+        <RunningJobs jobs={jobs} query={this.props.location.query} onFilter={this.handleOnFilter} filter={filter} />
+        <FinishedJobs jobs={jobs} query={this.props.location.query} onFilter={this.handleOnFilter} filter={filter} />
       </div>
     );
     console.timeEnd('BigData');
