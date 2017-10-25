@@ -17,13 +17,6 @@
     ],
     "rules": {
         "class-methods-use-this": ["error", {"exceptMethods": ["render"]}],
-        "comma-dangle": ["error", {
-            "arrays": "always-multiline",
-            "exports": "always-multiline",
-            "functions": "never",
-            "imports": "always-multiline",
-            "objects": "always-multiline"
-        }],
         "eqeqeq": "warn",
         "no-restricted-syntax": "warn",
         "react/jsx-no-bind": "warn",
