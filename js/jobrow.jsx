@@ -15,10 +15,10 @@ const isModifiedEvent = (event) => event.metaKey || event.altKey || event.ctrlKe
 class JobRow extends React.Component {
   constructor() {
     super();
-    this.onClick = this.onClick.bind(this);
+    this.handleOnClick = this.handleOnClick.bind(this);
   }
 
-  onClick(e) {
+  handleOnClick(e) {
     if (isLeftClickEvent(e) && !isModifiedEvent(e)) {
       hashHistory.push(`/job/${this.props.job.id}`);
     }
@@ -26,7 +26,7 @@ class JobRow extends React.Component {
 
   render() {
     const columns = this.columns();
-    return <tr onClick={this.onClick.bind(this)}>{columns.map((d, i) => <td key={i}>{d}</td>)}</tr>;
+    return <tr onClick={this.handleOnClick}>{columns.map((d, i) => <td key={i}>{d}</td>)}</tr>;
   }
 }
 
