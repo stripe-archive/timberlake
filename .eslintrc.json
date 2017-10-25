@@ -15,7 +15,7 @@
         "react"
     ],
     "rules": {
-        "class-methods-use-this": "warn",
+        "class-methods-use-this": ["error", {"exceptMethods": ["render"]}],
         "comma-dangle": ["error", {
             "arrays": "always-multiline",
             "exports": "always-multiline",

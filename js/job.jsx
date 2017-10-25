@@ -33,6 +33,12 @@ function bytesFormat(n) {
   }
 }
 
+function inputs(job, allJobs) {
+  const relatives = relatedJobs(job, allJobs);
+  const outputs = _.object(_.flatten(relatives.map((j) => (j.conf.output || '').split(/,/g).map((o) => [o, j])), 1));
+  return (job.conf.input || '').split(/,/g).map((input) => outputs[input] || input);
+}
+
 function relatedJobs(job, allJobs) {
   return allJobs.filter((d) => d.fullName.indexOf(job.taskFamily) == 1);
 }
@@ -68,12 +74,6 @@ export default class extends React.Component {
     return _.find(this.props.jobs, (d) => lolhadoop(d.id) == jobId);
   }
 
-  inputs(job, allJobs) {
-    const relatives = relatedJobs(job, allJobs);
-    const outputs = _.object(_.flatten(relatives.map((j) => (j.conf.output || '').split(/,/g).map((o) => [o, j])), 1));
-    return (job.conf.input || '').split(/,/g).map((input) => outputs[input] || input);
-  }
-
   kill() {
     this.handleHideKillModal();
     this.setState({killing: true});
@@ -101,9 +101,9 @@ export default class extends React.Component {
     const job = this.getJob();
     if (!job) return null;
     document.title = job.name;
-    const inputs = (
+    const renderedInputs = (
       <ul className="list-unstyled">
-        {this.inputs(job, this.props.jobs).map((input, i) =>
+        {inputs(job, this.props.jobs).map((input, i) =>
           (
             <li key={i}>
               {_.isString(input) ?
@@ -144,7 +144,7 @@ export default class extends React.Component {
       ['Start', timeFormat(job.startTime)],
       ['Duration', previous ? <span>{secondFormat(job.duration())} ({previous})</span> : secondFormat(job.duration())],
       ['State', state],
-      ['Input', inputs],
+      ['Input', renderedInputs],
       ['Output', cleanJobPath(job.conf.output)],
     ];
 
