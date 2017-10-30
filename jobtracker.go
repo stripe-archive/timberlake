@@ -77,8 +77,11 @@ func getJSON(url string, data interface{}) error {
 	if err != nil {
 		return err
 	}
-
-	return json.Unmarshal(jsonBytes, data)
+	err = json.Unmarshal(jsonBytes, data)
+	if err != nil {
+		log.Printf("Response is not valid JSON:\n%s", string(jsonBytes[:]))
+	}
+	return err
 }
 
 type jobTracker struct {
@@ -135,7 +138,7 @@ func (jt *jobTracker) runningJobLoop() {
 		}()
 	}
 
-	for _ = range time.Tick(*pollInterval) {
+	for range time.Tick(*pollInterval) {
 		running, err := jt.listJobs()
 		if err != nil {
 			log.Println("Error listing running jobs:", err)
