@@ -23,7 +23,7 @@ import {notAvailable} from './mr';
 const {$, _, d3} = window;
 
 function bytesFormat(n) {
-  if (n == notAvailable || !n) return null;
+  if (n === notAvailable || !n) return null;
   const M = 1024.0 * 1024;
   const G = M * 1024;
   if (n < G) {
@@ -40,14 +40,13 @@ function inputs(job, allJobs) {
 }
 
 function relatedJobs(job, allJobs) {
-  return allJobs.filter((d) => d.fullName.indexOf(job.taskFamily) == 1);
+  return allJobs.filter((d) => d.fullName.indexOf(job.taskFamily) === 1);
 }
 
 export default class extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-    };
+    this.state = {};
 
     this.kill = this.kill.bind(this);
     this.handleShowKillModal = this.handleShowKillModal.bind(this);
@@ -60,7 +59,7 @@ export default class extends React.Component {
   }
 
   componentWillReceiveProps(next) {
-    if (this.props.params.jobId != next.params.jobId) {
+    if (this.props.params.jobId !== next.params.jobId) {
       Store.getJob(next.params.jobId);
     }
   }
@@ -71,7 +70,7 @@ export default class extends React.Component {
 
   getJob() {
     const jobId = lolhadoop(this.props.params.jobId);
-    return _.find(this.props.jobs, (d) => lolhadoop(d.id) == jobId);
+    return _.find(this.props.jobs, (d) => lolhadoop(d.id) === jobId);
   }
 
   kill() {
@@ -114,7 +113,7 @@ export default class extends React.Component {
       </ul>
     );
 
-    let similar = this.props.jobs.filter((j) => j.name.indexOf(job.name) != -1);
+    let similar = this.props.jobs.filter((j) => j.name.indexOf(job.name) !== -1);
     similar = similar.filter((j) => j.startTime < job.startTime);
     const prev = _.last(_.sortBy(similar, 'startTime'));
     const previous = prev ? <Link to={`job/${prev.id}`}>previous: {secondFormat(prev.duration())}</Link> : null;
@@ -174,9 +173,9 @@ export default class extends React.Component {
     };
     bytes.total_read = bytes.hdfs_read + bytes.s3_read + bytes.file_read;
     bytes.total_written = bytes.hdfs_written + bytes.s3_written + bytes.file_written;
-    for (const key of Object.keys(bytes)) {
+    Object.keys(bytes).forEach((key) => {
       bytes[key] = bytesFormat(bytes[key]);
-    }
+    });
     const bytesReadTitle = `HDFS: ${bytes.hdfs_read}\nS3: ${bytes.s3_read}\nFile: ${bytes.file_read}`;
     const bytesWrittenTitle = `HDFS: ${bytes.hdfs_written}\nS3: ${bytes.s3_written}\nFile: ${bytes.file_written}`;
 

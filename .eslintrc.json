@@ -18,7 +18,6 @@
     "rules": {
         "class-methods-use-this": ["error", {"exceptMethods": ["render"]}],
         "eqeqeq": "warn",
-        "no-restricted-syntax": "warn",
         "react/jsx-no-bind": "warn",
         "react/no-array-index-key": "warn"
     }

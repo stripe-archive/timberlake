@@ -59,19 +59,19 @@ class App extends React.Component {
     const jobs = _.extend(this.state.jobs, this.updates);
 
     // Drop mapper, reducer & config info of jobs that are not viewed on the detail page.
-    for (const key in jobs) {
-      if (key != Store.lastJob) {
+    Object.keys(jobs).forEach((key) => {
+      if (key !== Store.lastJob) {
         jobs[key].compact();
       }
-    }
+    });
 
     // Drop old finished jobs, keeping only 5000 of them.
-    const ids = Object.keys(jobs).filter((id) => jobs[id].finishTime != null && id != Store.lastJob);
+    const ids = Object.keys(jobs).filter((id) => jobs[id].finishTime !== null && id !== Store.lastJob);
     if (ids.length > JOBS_TO_KEEP) {
       ids.sort((a, b) => jobs[a].finishTime - jobs[b].finishTime);
-      for (const id of _.first(ids, ids.length - JOBS_TO_KEEP)) {
+      _.first(ids, ids.length - JOBS_TO_KEEP).forEach((id) => {
         delete jobs[id];
-      }
+      });
     }
 
     this.setState({jobs});

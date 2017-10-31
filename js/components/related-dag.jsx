@@ -28,18 +28,18 @@ export default class extends React.Component {
     const inputMap = [];
     const outputMap = [];
     const files = new Set();
-    for (const currentJob of jobs) {
+    jobs.forEach((currentJob) => {
       // Find input & output jobs.
       const inputs = currentJob.conf.input ? currentJob.conf.input.split(/,/g) : [];
-      for (const input of inputs) {
+      inputs.forEach((input) => {
         (inputMap[input] = inputMap[input] || []).push(currentJob.id);
         files.add(input);
-      }
+      });
       const outputs = currentJob.conf.output ? currentJob.conf.output.split(/,/g) : [];
-      for (const output of outputs) {
+      outputs.forEach((output) => {
         (outputMap[output] = outputMap[output] || []).push(currentJob.id);
         files.add(output);
-      }
+      });
 
       // Create a graph node.
       g.setNode(currentJob.id, {
@@ -48,16 +48,16 @@ export default class extends React.Component {
         width: size,
         height: size,
       });
-    }
+    });
 
     // Link jobs based on their inputs & outputs.
-    for (const file of files) {
-      for (const input of inputMap[file] || []) {
-        for (const output of outputMap[file] || []) {
+    files.forEach((file) => {
+      (inputMap[file] || []).forEach((input) => {
+        (outputMap[file] || []).forEach((output) => {
           g.setEdge(output, input);
-        }
-      }
-    }
+        });
+      });
+    });
 
     dagre.layout(g);
 
@@ -93,7 +93,7 @@ export default class extends React.Component {
               {g.nodes().map((id, i) => (<DAGNode
                 key={i}
                 node={g.node(id)}
-                selected={id == job.id}
+                selected={id === job.id}
                 hover={this.props.hover}
               />))}
             </g>
