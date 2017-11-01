@@ -8,7 +8,7 @@ import {
 
 const {_} = window;
 
-const HEADERS = ['user', 'name', 'started', 'duration', 'map', 'reduce'];
+const HEADERS = ['user', 'name', 'started', 'duration', 'map', 'reduce', 'cluster'];
 
 class JobTable extends React.Component {
   static sorting(sort) {
@@ -18,7 +18,7 @@ class JobTable extends React.Component {
 
   sort(key) {
     const s = JobTable.sorting(this.props.query[this.sortKey] || this.defaultSortKey);
-    const n = s.key == key && s.dir == -1 ? key : `-${key}`; // eslint-disable-line eqeqeq
+    const n = s.key === key && s.dir === -1 ? key : `-${key}`;
     const q = _.object([[this.sortKey, n]]);
 
     hashHistory.push({
@@ -46,10 +46,11 @@ class JobTable extends React.Component {
         case 'map': return row.maps.progress;
         case 'reduce': return row.reduces.progress;
         case 'state': return row.state;
+        case 'cluster': return row.cluster;
         default: return undefined;
       }
     });
-    if (sort.dir == -1) jobs.reverse(); // eslint-disable-line eqeqeq
+    if (sort.dir === -1) jobs.reverse();
     return [sort, jobs];
   }
 
@@ -74,7 +75,7 @@ class JobTable extends React.Component {
           <thead>
             <tr>
               {this.headers.map((h) => {
-                const cls = sort.key == h ? sortDir : ''; // eslint-disable-line eqeqeq
+                const cls = sort.key === h ? sortDir : '';
                 const click = this.sort.bind(this, h); // eslint-disable-line react/jsx-no-bind
                 return <th key={h} className={cls} onClick={click}>{h}</th>;
               })}

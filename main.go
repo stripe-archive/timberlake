@@ -3,18 +3,20 @@ package main
 import (
 	"encoding/json"
 	"flag"
+	"github.com/zenazn/goji/bind"
+	"github.com/zenazn/goji/web"
+	"github.com/zenazn/goji/web/middleware"
 	"log"
 	"net/http"
 	"net/http/pprof"
 	"os"
 	"path/filepath"
+	"reflect"
+	"strings"
 	"time"
-
-	"github.com/zenazn/goji/bind"
-	"github.com/zenazn/goji/web"
-	"github.com/zenazn/goji/web/middleware"
 )
 
+var clusterNames = flag.String("cluster-name", "default", "The user-visible names for the clusters")
 var resourceManagerURL = flag.String("resource-manager-url", "http://localhost:8088", "The HTTP URL to access the resource manager.")
 var historyServerURL = flag.String("history-server-url", "http://localhost:19888", "The HTTP URL to access the history server.")
 var proxyServerURL = flag.String("proxy-server-url", "", "The HTTP URL to access the proxy server, if separate from the resource manager.")
@@ -25,7 +27,7 @@ var httpTimeout = flag.Duration("http-timeout", time.Second*2, "The timeout used
 var pollInterval = flag.Duration("poll-interval", time.Second*5, "How often should we poll the job APIs. Pass values like: 2s")
 var enableDebug = flag.Bool("pprof", false, "Enable pprof debugging tools at /debug.")
 
-var jt *jobTracker
+var jts map[string]*jobTracker
 
 var rootPath, staticPath string
 
@@ -46,17 +48,28 @@ func index(c web.C, w http.ResponseWriter, r *http.Request) {
 
 func getJobs(c web.C, w http.ResponseWriter, r *http.Request) {
 	// We only need the details for listing pages.
-	var jobs []*job
-	for _, j := range jt.jobs {
-		jobs = append(jobs, &job{Details: j.Details, conf: conf{
-			Input:         j.conf.Input,
-			Output:        j.conf.Output,
-			ScaldingSteps: j.conf.ScaldingSteps,
-			name:          j.conf.name,
-		}})
+	var jobClusters []*jobCluster
+	for clusterName, tracker := range jts {
+		var jobs []*job
+		for _, j := range tracker.jobs {
+			jobs = append(jobs, &job{
+				Details: j.Details,
+				conf: conf{
+					Input:         j.conf.Input,
+					Output:        j.conf.Output,
+					ScaldingSteps: j.conf.ScaldingSteps,
+					name:          j.conf.name,
+				},
+			})
+		}
+		log.Printf("Appending %d jobs for Cluster %s: %s %s\n", len(jobs), clusterName, tracker.hs, tracker.rm)
+		jobClusters = append(jobClusters, &jobCluster{
+			Cluster: clusterName,
+			Jobs: jobs,
+		})
 	}
 
-	jsonBytes, err := json.Marshal(jobs)
+	jsonBytes, err := json.Marshal(jobClusters)
 	if err != nil {
 		log.Println("error:", err)
 		w.WriteHeader(500)
@@ -67,61 +80,72 @@ func getJobs(c web.C, w http.ResponseWriter, r *http.Request) {
 }
 
 func getConf(c web.C, w http.ResponseWriter, r *http.Request) {
-	jobID := c.URLParams["id"]
-	log.Printf("Getting job conf for %s", jobID)
-	if !jt.hasJob(jobID) {
-		w.WriteHeader(404)
-		return
+	id := c.URLParams["id"]
+	log.Printf("Getting job conf for %s", id)
+
+	for _, jt := range jts {
+		if _, ok := jt.jobs[jobID(id)]; ok {
+			job := jt.reifyJob(id)
+			jobConfCounters := jobConf{
+				Conf: job.conf,
+				ID: job.Details.ID,
+				Name: job.Details.Name,
+			}
+			jsonBytes, err := json.Marshal(jobConfCounters)
+			if err != nil {
+				log.Println("could not marshal:", err)
+				w.WriteHeader(500)
+				return
+			}
+
+			w.Write(jsonBytes)
+			return
+		}
 	}
 
-
-	job := jt.reifyJob(jobID)
-	jobConf := jobConf{
-		Conf: job.conf,
-		ID: job.Details.ID,
-		Name: job.Details.Name,
-	}
-
-	jsonBytes, err := json.Marshal(jobConf)
-	if err != nil {
-		log.Println("error:", err)
-		w.WriteHeader(500)
-		return
-	}
-
-	w.Write(jsonBytes)
+	w.WriteHeader(404)
 }
 
 func getJob(c web.C, w http.ResponseWriter, r *http.Request) {
-	if !jt.hasJob(c.URLParams["id"]) {
-		w.WriteHeader(404)
-		return
+	var id = c.URLParams["id"]
+
+	for clusterName, jt := range jts {
+		if _, ok := jt.jobs[jobID(id)]; ok {
+			job := jt.reifyJob(id)
+			job.Cluster = clusterName
+			jsonBytes, err := json.Marshal(job)
+			if err != nil {
+				log.Println("error getting job:", err)
+				w.WriteHeader(500)
+				return
+			}
+
+			w.Write(jsonBytes)
+			return
+		}
 	}
 
-	job := jt.reifyJob(c.URLParams["id"])
-
-	jsonBytes, err := json.Marshal(job)
-	if err != nil {
-		log.Println("error:", err)
-		w.WriteHeader(500)
-		return
-	}
-
-	w.Write(jsonBytes)
+	w.WriteHeader(404)
 }
 
 func killJob(c web.C, w http.ResponseWriter, r *http.Request) {
-	if !jt.hasJob(c.URLParams["id"]) {
-		w.WriteHeader(404)
-		return
+	id := c.URLParams["id"]
+	jobID := jobID(id)
+
+	for _, jt := range jts {
+		if _, ok := jt.jobs[jobID]; ok {
+			err := jt.killJob(id)
+			if err != nil {
+				log.Println("error: ", err)
+				w.WriteHeader(500)
+				return
+			}
+			w.WriteHeader(204)
+			return
+		}
 	}
 
-	id := c.URLParams["id"]
-	err := jt.killJob(id)
-	if err != nil {
-		log.Println("error: ", err)
-		w.WriteHeader(500)
-	}
+	w.WriteHeader(404)
 }
 
 func init() {
@@ -137,17 +161,52 @@ func init() {
 func main() {
 	flag.Parse()
 
-	if *proxyServerURL == "" {
-		proxyServerURL = resourceManagerURL
+	var clusterNames = strings.Split(*clusterNames, ",")
+	var resourceManagerURLs = strings.Split(*resourceManagerURL, ",")
+	var historyServerURLs = strings.Split(*historyServerURL, ",")
+	var proxyServerURLs = strings.Split(*proxyServerURL, ",")
+	var namenodeAddresses = strings.Split(*namenodeAddress, ",")
+
+	if len(resourceManagerURLs) != len(historyServerURLs) {
+		log.Fatal("resource-manager-url and history-server-url are not 1:1")
+	}
+	if !reflect.DeepEqual(proxyServerURLs, []string{""}) && len(proxyServerURLs) != len(resourceManagerURLs) {
+		log.Fatal("proxy-server-url exists and is not 1:1 with resource-manager-url")
+	}
+	if len(resourceManagerURLs) != len(namenodeAddresses) {
+		log.Fatal("resource-manager-url and namenode-address are not 1:1")
+	}
+	if len(resourceManagerURLs) != len(clusterNames) {
+		log.Fatal("cluster-names and resource-manager-url are not 1:1")
 	}
 
-	jt = newJobTracker(*resourceManagerURL, *historyServerURL, *proxyServerURL, *namenodeAddress)
-	go jt.Loop()
+	jts = make(map[string]*jobTracker)
+	for i := range resourceManagerURLs {
+		var proxyServerURL string
+		if reflect.DeepEqual(proxyServerURLs, []string{""}) {
+			proxyServerURL = resourceManagerURLs[i]
+		} else {
+			proxyServerURL = proxyServerURLs[i]
+		}
+		log.Printf("Creating new JT [%d]: %s %s %s\n", i, resourceManagerURLs[i], historyServerURLs[i], proxyServerURL)
+		jts[clusterNames[i]] = newJobTracker(
+			clusterNames[i],
+			resourceManagerURLs[i],
+			historyServerURLs[i],
+			proxyServerURL,
+			namenodeAddresses[i],
+		)
+	}
 
-	if err := jt.testLogsDir(); err != nil {
-		log.Printf("WARNING: Could not read yarn logs directory. Error message: `%s`\n", err)
-		log.Println("\tYou can change the path with --yarn-logs-dir=HDFS_PATH.")
-		log.Println("\tTo talk to HDFS, Timberlake needs to be able to access the namenode (--namenode-address) and datanodes.")
+	log.Println("initiating JT loop")
+
+	for clusterName, jt := range jts {
+		go jt.Loop()
+		if err := jt.testLogsDir(); err != nil {
+			log.Printf("WARNING: Could not read yarn logs directory for cluster %s. Error message: `%s`\n", clusterName, err)
+			log.Println("\tYou can change the path with --yarn-logs-dir=HDFS_PATH.")
+			log.Println("\tTo talk to HDFS, Timberlake needs to be able to access the namenode (--namenode-address) and datanodes.")
+		}
 	}
 
 	sse := newSSE()
@@ -173,12 +232,15 @@ func main() {
 	}
 
 	go func() {
-		for job := range jt.updates {
-			jsonBytes, err := json.Marshal(job)
-			if err != nil {
-				log.Println("json error: ", err)
-			} else {
-				sse.events <- jsonBytes
+		for clusterName, jt := range jts {
+			for job := range jt.updates {
+				job.Cluster = clusterName
+				jsonBytes, err := json.Marshal(job)
+				if err != nil {
+					log.Println("json error: ", err)
+				} else {
+					sse.events <- jsonBytes
+				}
 			}
 		}
 	}()

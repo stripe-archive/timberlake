@@ -69,6 +69,7 @@ func getJSON(url string, data interface{}) (string, error) {
 	resp, err := httpClient.Do(req)
 	if err != nil {
 		if strings.Index(err.Error(), "use of closed network connection") != -1 {
+			log.Println("Could not get JSON due to closed network connection.")
 		}
 		return "", err
 	}
@@ -92,6 +93,7 @@ func getJSON(url string, data interface{}) (string, error) {
 }
 
 type jobTracker struct {
+	clusterName     string
 	jobs     map[jobID]*job
 	jobsLock sync.Mutex
 	rm       string
@@ -104,8 +106,9 @@ type jobTracker struct {
 	updates  chan *job
 }
 
-func newJobTracker(rmHost string, historyHost string, proxyHost string, namenodeAddress string) *jobTracker {
+func newJobTracker(clusterName string, rmHost string, historyHost string, proxyHost string, namenodeAddress string) *jobTracker {
 	return &jobTracker{
+		clusterName:     clusterName,
 		jobs:     make(map[jobID]*job),
 		rm:       rmHost,
 		hs:       historyHost,
@@ -365,12 +368,14 @@ func (jt *jobTracker) saveJob(job *job) {
 func (jt *jobTracker) updateJob(job *job) error {
 	details, err := jt.fetchJobDetails(job.Details.ID)
 	if err != nil {
+		log.Println("An error occurred fetching job details", job.Details.ID, err)
 		return err
 	}
 	job.Details = details
 
 	conf, err := jt.fetchConf(job.Details.ID)
 	if err != nil {
+		log.Println("An error occurred fetching job conf", job.Details.ID, err)
 		return err
 	}
 	job.conf.update(conf)
@@ -382,12 +387,14 @@ func (jt *jobTracker) updateJob(job *job) error {
 
 	counters, err := jt.fetchCounters(job.Details.ID)
 	if err != nil {
+		log.Println("An error occurred fetching job counters", job.Details.ID, err)
 		return err
 	}
 	job.Counters = counters
 
 	tasks, err := jt.fetchTasks(job.Details.ID)
 	if err != nil {
+		log.Println("An error occurred fetching job tasks", job.Details.ID, err)
 		return err
 	}
 	job.Details.MapsTotalTime = sumTimes(tasks.Map)

@@ -7,7 +7,8 @@ const {_} = window;
 export const notAvailable = {};
 
 export class MRJob {
-  constructor(data) {
+  constructor(data, cluster) {
+    this.cluster = cluster;
     const d = data.details;
     this.id = d.id.replace('application_', 'job_');
     this.fullName = d.name;
@@ -81,7 +82,7 @@ export class MRTask {
     this.startTime = start ? new Date(start) : new Date();
     this.startTime.setMilliseconds(0);
     this.finishTime = finish ? new Date(finish) : null;
-    this.bogus = start == -1; // eslint-disable-line eqeqeq
+    this.bogus = start === -1;
   }
 
   duration() {

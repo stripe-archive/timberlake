@@ -40,6 +40,7 @@ export class RunningJobRow extends JobRow {
       secondFormat(job.duration()),
       <ProgressBar value={job.maps.progress} />,
       <ProgressBar value={job.reduces.progress} />,
+      job.cluster,
     ];
   }
 }
@@ -54,6 +55,7 @@ export class FinishedJobRow extends JobRow {
       timeFormat(job.finishTime),
       secondFormat(job.duration()),
       jobState(job),
+      job.cluster,
     ];
   }
 }

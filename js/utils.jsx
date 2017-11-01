@@ -39,6 +39,7 @@ export function humanFormat(ms) {
 export const ACTIVE_STATES = ['RUNNING', 'ACCEPTED'];
 export const FINISHED_STATES = ['SUCCEEDED', 'KILLED', 'FAILED', 'ERROR'];
 export const FAILED_STATES = ['FAILED', 'KILLED', 'ERROR'];
+export const VALID_STATES = ACTIVE_STATES.concat(FINISHED_STATES).concat('GONE');
 
 export function jobState(job) {
   const {state} = job;

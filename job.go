@@ -18,6 +18,12 @@ type job struct {
 	running  bool
 	partial  bool
 	updated  time.Time
+	Cluster  string    `json:"cluster"`
+}
+
+type jobCluster struct {
+	Cluster	string `json:"cluster"`
+	Jobs    []*job  `json:"jobs"`
 }
 
 type jobDetail struct {
