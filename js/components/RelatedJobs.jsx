@@ -26,9 +26,9 @@ export default class extends React.Component {
     const fmt = (d) => `${secondFormat(d.job.duration())} ${d.job.name}`;
     const links = (d) => `#/job/${d.job.id}`;
     const fs = (d) => {
-      if (d.job.id == job.id) {
+      if (d.job.id == job.id) { // eslint-disable-line eqeqeq
         return COLOUR_SELECTED;
-      } else if (hover && d.job.id == hover.id) {
+      } else if (hover && d.job.id == hover.id) { // eslint-disable-line eqeqeq
         return COLOUR_HOVER;
       } else {
         return COLOUR_MAP;

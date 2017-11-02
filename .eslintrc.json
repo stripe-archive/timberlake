@@ -14,11 +14,5 @@
     },
     "plugins": [
         "react"
-    ],
-    "rules": {
-        "class-methods-use-this": ["error", {"exceptMethods": ["render"]}],
-        "eqeqeq": "warn",
-        "react/jsx-no-bind": "warn",
-        "react/no-array-index-key": "warn"
-    }
+    ]
 }

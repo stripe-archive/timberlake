@@ -1,6 +1,6 @@
 {
   "name": "timberlake",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Timberlake is a Job Tracker for Hadoop.",
   "repository": {
     "type": "git",

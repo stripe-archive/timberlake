@@ -14,7 +14,7 @@ function waterfall(data, node, optsIn) {
     textFormat: (t) => '',
     linkFormat: null,
     fillStyle: (d) => {
-      return d.type == 'map' ? COLOUR_MAP : COLOUR_REDUCE;
+      return d.type == 'map' ? COLOUR_MAP : COLOUR_REDUCE; // eslint-disable-line eqeqeq
     },
   };
   const opts = _.extend(defaults, optsIn);
@@ -65,6 +65,6 @@ export default class extends React.Component {
   }
 
   render() {
-    return <div />;
+    return <div ref={(node) => { this.node = node; }} />;
   }
 }

@@ -84,7 +84,7 @@ export class MRTask {
     this.startTime = start ? new Date(start) : new Date();
     this.startTime.setMilliseconds(0);
     this.finishTime = finish ? new Date(finish) : null;
-    this.bogus = start == -1;
+    this.bogus = start == -1; // eslint-disable-line eqeqeq
   }
 
   duration() {
