@@ -12,14 +12,14 @@ export default class extends React.Component {
   }
 
   componentWillReceiveProps(next) {
-    if (this.props.params.jobId != next.params.jobId) {
+    if (this.props.params.jobId != next.params.jobId) { // eslint-disable-line eqeqeq
       Store.getJob(next.params.jobId);
     }
   }
 
   getJob() {
     const jobId = lolhadoop(this.props.params.jobId);
-    return _.find(this.props.jobs, (d) => lolhadoop(d.id) == jobId);
+    return _.find(this.props.jobs, (d) => lolhadoop(d.id) == jobId); // eslint-disable-line eqeqeq
   }
 
   render() {

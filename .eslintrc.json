@@ -14,10 +14,5 @@
     },
     "plugins": [
         "react"
-    ],
-    "rules": {
-        "eqeqeq": "warn",
-        "react/jsx-no-bind": "warn",
-        "react/no-array-index-key": "warn"
-    }
+    ]
 }

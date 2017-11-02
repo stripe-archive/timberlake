@@ -70,6 +70,7 @@ export default class extends React.Component {
       height = Math.max(height, node.y + margin * 2 + size);
     });
 
+    /* eslint-disable react/no-array-index-key */
     return (
       <div>
         <h4>DAG</h4>
@@ -101,5 +102,6 @@ export default class extends React.Component {
         </div>
       </div>
     );
+    /* eslint-enable react/no-array-index-key */
   }
 }

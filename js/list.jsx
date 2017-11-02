@@ -35,7 +35,7 @@ export default class extends React.Component {
   componentWillReceiveProps(nextProps) {
     // A change to the filter when we're flushed indicates a legit transition, probably via browser
     // back button. If we're not flushed then it's just the location bar catching up to our state.
-    if (this.state.flushed && this.state.filter != nextProps.location.query.filter) {
+    if (this.state.flushed && this.state.filter != nextProps.location.query.filter) { // eslint-disable-line eqeqeq
       this.setState({filter: nextProps.location.query.filter || ''});
     }
   }

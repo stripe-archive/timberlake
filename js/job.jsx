@@ -100,6 +100,7 @@ export default class extends React.Component {
     const job = this.getJob();
     if (!job) return null;
     document.title = job.name;
+    /* eslint-disable react/no-array-index-key */
     const renderedInputs = (
       <ul className="list-unstyled">
         {inputs(job, this.props.jobs).map((input, i) =>
@@ -112,6 +113,7 @@ export default class extends React.Component {
           ))}
       </ul>
     );
+    /* eslint-enable react/no-array-index-key */
 
     let similar = this.props.jobs.filter((j) => j.name.indexOf(job.name) !== -1);
     similar = similar.filter((j) => j.startTime < job.startTime);
@@ -154,11 +156,13 @@ export default class extends React.Component {
         const matches = trimmed.match(/[\w.]+:\d+/i);
         return {full: trimmed, short: matches ? matches[0] : trimmed};
       });
+      /* eslint-disable react/no-array-index-key */
       const steps = (
         <ul className="list-unstyled">
           {_.uniq(lines).map((line, i) => <li key={i}><span className="scalding-step-description" title={line.full}>{line.short}</span></li>)}
         </ul>
       );
+      /* eslint-enable react/no-array-index-key */
       pairs.push(['Line Numbers', steps]);
     }
 
@@ -181,6 +185,7 @@ export default class extends React.Component {
 
     const sortedRelatedJobs = _.sortBy(relatedJobs(job, this.props.jobs), (relatedJob) => relatedJob.id);
 
+    /* eslint-disable react/no-array-index-key */
     const rv = (
       <div>
         <div className="row">
@@ -240,6 +245,7 @@ export default class extends React.Component {
         </div>
       </div>
     );
+    /* eslint-enable react/no-array-index-key */
     console.timeEnd('Render Job');
     return rv;
   }
