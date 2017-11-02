@@ -17,6 +17,8 @@ class JobStore {
 
   getJobs() {
     $.getJSON('/jobs/').then((data) => {
+      console.log('GOT DATA', data);
+      debugger; // eslint-disable-line
       this.trigger('jobs', data.map((d) => new MRJob(d)));
     }).then(null, (error) => console.error(error));
   }
