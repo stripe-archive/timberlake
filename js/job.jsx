@@ -96,7 +96,6 @@ export default class extends React.Component {
   }
 
   render() {
-    console.time('Render Job');
     const job = this.getJob();
     if (!job) return null;
     document.title = job.name;
@@ -246,7 +245,6 @@ export default class extends React.Component {
       </div>
     );
     /* eslint-enable react/no-array-index-key */
-    console.timeEnd('Render Job');
     return rv;
   }
 }

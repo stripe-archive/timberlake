@@ -46,16 +46,13 @@ export default class extends React.Component {
   }
 
   render() {
-    console.time('BigData');
     const {jobs} = this.props;
     const filter = this.state.filter.toLowerCase();
-    const rv = (
+    return (
       <div>
         <RunningJobs jobs={jobs} query={this.props.location.query} onFilter={this.handleOnFilter} filter={filter} />
         <FinishedJobs jobs={jobs} query={this.props.location.query} onFilter={this.handleOnFilter} filter={filter} />
       </div>
     );
-    console.timeEnd('BigData');
-    return rv;
   }
 }
