@@ -230,7 +230,7 @@ func (jt *jobTracker) finishedJobLoop() {
 		log.Println("Finished backfilling jobs.")
 	}()
 
-	for _ = range time.Tick(*pollInterval) {
+	for range time.Tick(*pollInterval) {
 		dur := 1 * time.Minute
 		if dur < (*pollInterval * 2) {
 			dur = *pollInterval * 2
@@ -259,7 +259,7 @@ func (jt *jobTracker) finishedJobLoop() {
 }
 
 func (jt *jobTracker) cleanupLoop() {
-	for _ = range time.Tick(time.Second * 60) {
+	for range time.Tick(time.Second * 60) {
 		jt.jobsLock.Lock()
 
 		details := make(jobDetails, 0)
