@@ -358,7 +358,7 @@ func findHistoryAndConfFiles(client *hdfs.Client, jobID jobID, finishTime int64)
 func (jt *jobTracker) updateFromHistoryFile(job *job, full bool) error {
 	now := time.Now()
 
-	client, err := hdfs.New(*namenodeAddress)
+	client, err := hdfs.New(jt.namenodeAddress)
 	if err != nil {
 		return err
 	}
