@@ -6,6 +6,7 @@ all: test build
 
 test: node_modules
 	npm run test
+	golint -set_exit_status
 	go test -race
 
 build: bin/timberlake bin/timberlake-slackbot static

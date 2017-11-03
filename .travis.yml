@@ -3,6 +3,7 @@ language: go
 go: 1.6
 script: make test
 before_deploy: make release
+before_install: go get github.com/golang/lint/golint
 deploy:
   provider: releases
   api_key:

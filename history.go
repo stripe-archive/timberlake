@@ -156,24 +156,24 @@ func (jp *jhistParser) parse() error {
 		case "MAP_ATTEMPT_STARTED":
 			jp.parseTaskStarted(wrapper.Event)
 		case "MAP_ATTEMPT_FINISHED":
-			jp.job.Details.MapsCompleted += 1
+			jp.job.Details.MapsCompleted++
 			jp.parseMapFinished(wrapper.Event)
 		case "MAP_ATTEMPT_FAILED":
-			jp.job.Details.MapsFailed += 1
+			jp.job.Details.MapsFailed++
 			jp.parseTaskFailed(wrapper.Event)
 		case "MAP_ATTEMPT_KILLED":
-			jp.job.Details.MapsKilled += 1
+			jp.job.Details.MapsKilled++
 			jp.parseTaskFailed(wrapper.Event)
 		case "REDUCE_ATTEMPT_STARTED":
 			jp.parseTaskStarted(wrapper.Event)
 		case "REDUCE_ATTEMPT_FINISHED":
-			jp.job.Details.ReducesCompleted += 1
+			jp.job.Details.ReducesCompleted++
 			jp.parseReduceFinished(wrapper.Event)
 		case "REDUCE_ATTEMPT_FAILED":
-			jp.job.Details.ReducesFailed += 1
+			jp.job.Details.ReducesFailed++
 			jp.parseTaskFailed(wrapper.Event)
 		case "REDUCE_ATTEMPT_KILLED":
-			jp.job.Details.ReducesKilled += 1
+			jp.job.Details.ReducesKilled++
 			jp.parseTaskFailed(wrapper.Event)
 		}
 
