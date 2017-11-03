@@ -90,18 +90,20 @@ type jobTracker struct {
 	rm       string
 	hs       string
 	ps       string
+	namenodeAddress string
 	running  chan *job
 	finished chan *job
 	backfill chan *job
 	updates  chan *job
 }
 
-func newJobTracker(rmHost string, historyHost string, proxyHost string) *jobTracker {
+func newJobTracker(rmHost string, historyHost string, proxyHost string, namenodeAddress string) *jobTracker {
 	return &jobTracker{
 		jobs:     make(map[jobID]*job),
 		rm:       rmHost,
 		hs:       historyHost,
 		ps:       proxyHost,
+		namenodeAddress: namenodeAddress,
 		running:  make(chan *job),
 		finished: make(chan *job),
 		backfill: make(chan *job),

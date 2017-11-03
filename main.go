@@ -115,7 +115,7 @@ func main() {
 		proxyServerURL = resourceManagerURL
 	}
 
-	jt = newJobTracker(*resourceManagerURL, *historyServerURL, *proxyServerURL)
+	jt = newJobTracker(*resourceManagerURL, *historyServerURL, *proxyServerURL, *namenodeAddress)
 	go jt.Loop()
 
 	if err := jt.testLogsDir(); err != nil {
