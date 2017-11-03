@@ -8,5 +8,6 @@ RUN if [ -e /usr/stripe/bin/docker/stripe-install-node ]; then /usr/stripe/bin/d
 
 ADD . /go/src/github.com/stripe/timberlake
 RUN mkdir -p /build/
+RUN go get -v github.com/golang/lint/golint
 WORKDIR /go/src/github.com/stripe/timberlake
 CMD /go/src/github.com/stripe/timberlake/jenkins_build.sh
