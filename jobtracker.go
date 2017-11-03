@@ -54,7 +54,7 @@ func hadoopIDs(id string) (string, jobID) {
 var httpClient = http.Client{
 	Timeout: *httpTimeout,
 	CheckRedirect: func(req *http.Request, via []*http.Request) error {
-		return fmt.Errorf("No redirects allowed. Blocked redirect to %s.", req.URL)
+		return fmt.Errorf("no redirects allowed. Blocked redirect to %s", req.URL)
 	},
 }
 
@@ -69,7 +69,7 @@ func getJSON(url string, data interface{}) error {
 	}
 
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("Failed getJSON: %v (%v)", url, resp.Status)
+		return fmt.Errorf("failed getJSON: %v (%v)", url, resp.Status)
 	}
 
 	defer resp.Body.Close()
