@@ -3,28 +3,28 @@
 	"ignore": "test",
 	"package": [
 		{
-			"checksumSHA1": "4Bm/KCKnST99C3glQfNI7HyBDP4=",
+			"checksumSHA1": "VH44QPjPSPnHNXrO1jZYwievEh4=",
 			"path": "github.com/colinmarc/hdfs",
-			"revision": "5e5d664bed7859df0bda87baba3e4c10afc4b75d",
-			"revisionTime": "2016-03-08T16:24:17Z"
+			"revision": "69e5098fa51e208a466aef9a5283b0101e6e4f54",
+			"revisionTime": "2017-10-26T15:29:14Z"
 		},
 		{
-			"checksumSHA1": "ph/DEOyUCFFPe3RrQcOOuNmWxxY=",
+			"checksumSHA1": "OgVPAECpU7iL1R/X33WI0iARwu0=",
 			"path": "github.com/colinmarc/hdfs/protocol/hadoop_common",
-			"revision": "5e5d664bed7859df0bda87baba3e4c10afc4b75d",
-			"revisionTime": "2016-03-08T16:24:17Z"
+			"revision": "69e5098fa51e208a466aef9a5283b0101e6e4f54",
+			"revisionTime": "2017-10-26T15:29:14Z"
 		},
 		{
-			"checksumSHA1": "KXBHoRitLWJav3ZfiFRTXimMTFI=",
+			"checksumSHA1": "+guxSKBBg0D8+toJz53JfdXYolg=",
 			"path": "github.com/colinmarc/hdfs/protocol/hadoop_hdfs",
-			"revision": "5e5d664bed7859df0bda87baba3e4c10afc4b75d",
-			"revisionTime": "2016-03-08T16:24:17Z"
+			"revision": "69e5098fa51e208a466aef9a5283b0101e6e4f54",
+			"revisionTime": "2017-10-26T15:29:14Z"
 		},
 		{
-			"checksumSHA1": "yWQS9SH+Cwq96tzSFposMklX1j0=",
+			"checksumSHA1": "s6CevCSCys21SbTE43kijuVJQqA=",
 			"path": "github.com/colinmarc/hdfs/rpc",
-			"revision": "5e5d664bed7859df0bda87baba3e4c10afc4b75d",
-			"revisionTime": "2016-03-08T16:24:17Z"
+			"revision": "69e5098fa51e208a466aef9a5283b0101e6e4f54",
+			"revisionTime": "2017-10-26T15:29:14Z"
 		},
 		{
 			"checksumSHA1": "5rPfda8jFccr3A6heL+JAmi9K9g=",
@@ -34,10 +34,10 @@
 			"revisionTime": "2016-03-05T16:54:46Z"
 		},
 		{
-			"checksumSHA1": "6bzNfOK5zu5dZXKlKesbNMNnwEU=",
+			"checksumSHA1": "yqF125xVSkmfLpIVGrLlfE05IUk=",
 			"path": "github.com/golang/protobuf/proto",
-			"revision": "c75fbf01dc6cb73649c4cd4326182c3e44aa9dbb",
-			"revisionTime": "2016-03-03T22:17:00Z"
+			"revision": "1643683e1b54a9e88ad26d98f81400c8c9d9f4f9",
+			"revisionTime": "2017-10-21T04:39:52Z"
 		},
 		{
 			"checksumSHA1": "zKKp5SZ3d3ycKe4EKMNT0BqAWBw=",
@@ -83,5 +83,5 @@
 			"revisionTime": "2016-03-04T04:43:53Z"
 		}
 	],
-	"rootPath": "github.com/stripe/timberlake"
+	"rootPath": "github.com/stripe-internal/timberlake"
 }

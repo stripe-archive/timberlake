@@ -57,10 +57,10 @@ func (ae ackError) Error() string {
 
 var ErrInvalidSeqno = errors.New("Invalid ack sequence number")
 
-func newBlockWriteStream(conn io.ReadWriter) *blockWriteStream {
+func newBlockWriteStream(conn io.ReadWriter, offset int64) *blockWriteStream {
 	s := &blockWriteStream{
 		conn:     conn,
-		offset:   0,
+		offset:   offset,
 		seqno:    1,
 		packets:  make(chan outboundPacket, maxPacketsInQueue),
 		acksDone: make(chan struct{}),
@@ -169,6 +169,15 @@ func (s *blockWriteStream) makePacket() outboundPacket {
 		packetLength = s.buf.Len()
 	}
 
+	// If we're starting from a weird offset (usually because of an Append), HDFS
+	// gets unhappy unless we first align to a chunk boundary with a small packet.
+	// Otherwise it yells at us with "a partial chunk must be sent in an
+	// individual packet" or just complains about a corrupted block.
+	alignment := int(s.offset) % outboundChunkSize
+	if alignment > 0 && packetLength > (outboundChunkSize-alignment) {
+		packetLength = outboundChunkSize - alignment
+	}
+
 	numChunks := int(math.Ceil(float64(packetLength) / float64(outboundChunkSize)))
 	packet := outboundPacket{
 		seqno:     s.seqno,
@@ -219,7 +228,7 @@ func (s *blockWriteStream) ackPackets() {
 		}
 
 		seqno := int(ack.GetSeqno())
-		for i, status := range ack.GetStatus() {
+		for i, status := range ack.GetReply() {
 			if status != hdfs.Status_SUCCESS {
 				s.ackError = ackError{status: status, seqno: seqno, pipelineIndex: i}
 				break

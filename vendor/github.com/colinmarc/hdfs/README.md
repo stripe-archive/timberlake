@@ -71,26 +71,32 @@ Since it doesn't have to wait for the JVM to start up, it's also a lot faster
 
 Best of all, it comes with bash tab completion for paths!
 
-Installing
-----------
+Installing the library
+----------------------
 
 To install the library, once you have Go [all set up][2]:
 
-    $ go get github.com/colinmarc/hdfs
+    $ go get -u github.com/colinmarc/hdfs
 
-Or, to install just the commandline client:
+Installing the commandline client
+---------------------------------
 
-    $ go get github.com/colinmarc/hdfs/cmd/hdfs
+Grab a tarball from the [releases page](https://github.com/colinmarc/hdfs/releases)
+and unzip it wherever you like.
 
+You'll want to add the following line to your `.bashrc` or `.profile`:
 
-You'll also want to add two lines to your `.bashrc` or `.profile`:
+    export HADOOP_NAMENODE="namenode:8020"
 
-    source $GOPATH/src/github.com/colinmarc/hdfs/cmd/hdfs/bash_completion
-    HADOOP_NAMENODE="namenode:8020"
+To install tab completion globally on linux, copy or link the `bash_completion`
+file which comes with the tarball into the right place:
 
-Or, to install tab completion globally on linux:
+    ln -sT bash_completion /etc/bash_completion.d/gohdfs
 
-    ln -sT $GOPATH/src/github.com/colinmarc/hdfs/cmd/hdfs/bash_completion /etc/bash_completion.d/gohdfs
+By default, the HDFS user is set to the currently-logged-in user. You can
+override this in your `.bashrc` or `.profile`:
+
+    export HADOOP_USER_NAME=username
 
 Compatibility
 -------------
