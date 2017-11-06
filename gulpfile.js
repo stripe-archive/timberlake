@@ -13,7 +13,7 @@ gulp.task('copy', function() {
 
 gulp.task('babel', function() {
   return browserify({entries: 'js/app.jsx', extensions: ['.jsx'], debug: true})
-    .transform('babelify', {presets: ['es2015', 'react']})
+    .transform('babelify', {presets: ['env', 'react']})
     .bundle()
     .pipe(source('bundle.js'))
     .pipe(gulp.dest('static/js'));
