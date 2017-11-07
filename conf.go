@@ -67,7 +67,7 @@ func (jt *jobTracker) fetchConf(id string) (map[string]string, error) {
 	appID, jobID := hadoopIDs(id)
 	url := fmt.Sprintf("%s/proxy/%s/ws/v1/mapreduce/jobs/%s/conf", jt.rm, appID, jobID)
 	confResp := &confResp{}
-	if err := getJSON(url, confResp); err != nil {
+	if _, err := getJSON(url, confResp); err != nil {
 		return nil, err
 	}
 
