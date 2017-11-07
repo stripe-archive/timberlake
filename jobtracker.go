@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"regexp"
 	"runtime"
 	"sort"
 	"strings"
@@ -58,30 +59,36 @@ var httpClient = http.Client{
 	},
 }
 
-func getJSON(url string, data interface{}) error {
+var redirectRegexp, _ = regexp.Compile("This is standby RM. Redirecting to the current active RM: (https?://[^/]*)")
+
+// if response is not valid JSON, the response string will be returned along
+// with the error
+func getJSON(url string, data interface{}) (string, error) {
 	req, err := http.NewRequest("GET", url, nil)
 	req.Close = true
 	resp, err := httpClient.Do(req)
 	if err != nil {
 		if strings.Index(err.Error(), "use of closed network connection") != -1 {
 		}
-		return err
+		return "", err
 	}
 
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("failed getJSON: %v (%v)", url, resp.Status)
+		return "", fmt.Errorf("failed getJSON: %v (%v)", url, resp.Status)
 	}
 
 	defer resp.Body.Close()
 	jsonBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return err
+		return "", err
 	}
 	err = json.Unmarshal(jsonBytes, data)
 	if err != nil {
-		log.Printf("Response is not valid JSON:\n%s\n", string(jsonBytes[:]))
+		var responseStr = string(jsonBytes[:])
+		log.Printf("Response is not valid JSON:`\n`%s\n", responseStr)
+		return responseStr, err
 	}
-	return err
+	return "", err
 }
 
 type jobTracker struct {
@@ -141,6 +148,7 @@ func (jt *jobTracker) runningJobLoop() {
 	}
 
 	for range time.Tick(*pollInterval) {
+		log.Printf("Listing running jobs on resource manager %s\n", jt.rm)
 		running, err := jt.listJobs()
 		if err != nil {
 			log.Println("Error listing running jobs:", err)
@@ -392,8 +400,15 @@ func (jt *jobTracker) updateJob(job *job) error {
 
 func (jt *jobTracker) listJobs() (*appsResp, error) {
 	url := fmt.Sprintf("%s/ws/v1/cluster/apps/?states=running,submitted,accepted,new", jt.rm)
+	log.Printf("RM URL: %s\n", url)
 	resp := &appsResp{}
-	err := getJSON(url, resp)
+	responseStr, err := getJSON(url, resp)
+	var submatch = redirectRegexp.FindStringSubmatch(responseStr)
+	if len(submatch) == 2 {
+		log.Printf("Response indicated a redirect but it was not followed: `%s`\n", responseStr)
+		log.Printf("Updating jt.rm from %s to %s\n", jt.rm, submatch[1])
+		jt.rm = submatch[1]
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -404,7 +419,7 @@ func (jt *jobTracker) listJobs() (*appsResp, error) {
 func (jt *jobTracker) listFinishedJobs(since time.Time) (*jobsResp, error) {
 	url := fmt.Sprintf("%s/ws/v1/history/mapreduce/jobs?finishedTimeBegin=%d000", jt.hs, since.Unix())
 	resp := &jobsResp{}
-	err := getJSON(url, resp)
+	_, err := getJSON(url, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -417,7 +432,14 @@ func (jt *jobTracker) fetchJobDetails(id string) (jobDetail, error) {
 	url := fmt.Sprintf("%s/proxy/%s/ws/v1/mapreduce/jobs", jt.ps, appID)
 
 	jobs := &jobsResp{}
-	if err := getJSON(url, jobs); err != nil {
+	responseStr, err := getJSON(url, jobs)
+	var submatch = redirectRegexp.FindStringSubmatch(responseStr)
+	if len(submatch) == 2 {
+		log.Printf("Response indicated a redirect but it was not followed: `%s`\n", responseStr)
+		log.Printf("Updating jt.ps from %s to %s\n", jt.ps, submatch[1])
+		jt.ps = submatch[1]
+	}
+	if err != nil {
 		return jobDetail{}, err
 	}
 
@@ -429,7 +451,7 @@ func (jt *jobTracker) fetchTasks(id string) (tasks, error) {
 	url := fmt.Sprintf("%s/proxy/%s/ws/v1/mapreduce/jobs/%s/tasks", jt.ps, appID, jobID)
 
 	taskResp := &tasksResp{}
-	if err := getJSON(url, taskResp); err != nil {
+	if _, err := getJSON(url, taskResp); err != nil {
 		return tasks{}, err
 	}
 
@@ -458,7 +480,7 @@ func (jt *jobTracker) fetchCounters(id string) ([]counter, error) {
 	url := fmt.Sprintf("%s/proxy/%s/ws/v1/mapreduce/jobs/%s/counters", jt.ps, appID, jobID)
 
 	counterResp := &countersResp{}
-	if err := getJSON(url, counterResp); err != nil {
+	if _, err := getJSON(url, counterResp); err != nil {
 		return nil, err
 	}
 
