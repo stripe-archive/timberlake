@@ -41,7 +41,7 @@ class App extends React.Component {
     });
 
     Store.getJobs();
-    Store.startSSE();
+    // Store.startSSE();
 
     // Updates are flushed once per second so that the clocks tick, and because we're not getting
     // updates much faster than that.
