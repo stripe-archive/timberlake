@@ -48,15 +48,42 @@ func getJobs(c web.C, w http.ResponseWriter, r *http.Request) {
 	// We only need the details for listing pages.
 	var jobs []*job
 	for _, j := range jt.jobs {
-		jobs = append(jobs, &job{Details: j.Details, Conf: conf{
-			Input:         j.Conf.Input,
-			Output:        j.Conf.Output,
-			ScaldingSteps: j.Conf.ScaldingSteps,
-			name:          j.Conf.name,
+		jobs = append(jobs, &job{Details: j.Details, conf: conf{
+			Input:         j.conf.Input,
+			Output:        j.conf.Output,
+			ScaldingSteps: j.conf.ScaldingSteps,
+			name:          j.conf.name,
 		}})
 	}
 
 	jsonBytes, err := json.Marshal(jobs)
+	if err != nil {
+		log.Println("error:", err)
+		w.WriteHeader(500)
+		return
+	}
+
+	w.Write(jsonBytes)
+}
+
+func getConfCounters(c web.C, w http.ResponseWriter, r *http.Request) {
+	jobID := c.URLParams["id"]
+	log.Printf("Getting job conf for %s", jobID)
+	if !jt.hasJob(jobID) {
+		w.WriteHeader(404)
+		return
+	}
+
+
+	job := jt.reifyJob(jobID)
+	jobConf := jobConfCounters{
+		Conf: job.conf,
+		Counters: job.counters,
+		ID: job.Details.ID,
+		Name: job.Details.Name,
+	}
+
+	jsonBytes, err := json.Marshal(jobConf)
 	if err != nil {
 		log.Println("error:", err)
 		w.WriteHeader(500)
@@ -135,6 +162,7 @@ func main() {
 	mux.Get("/jobs/", getJobs)
 	mux.Get("/sse", sse)
 	mux.Get("/jobs/:id", getJob)
+	mux.Get("/jobs/:id/confcounters", getConfCounters)
 	mux.Post("/jobs/:id/kill", killJob)
 
 	if *enableDebug {

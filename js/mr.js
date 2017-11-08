@@ -44,10 +44,6 @@ export class MRJob {
       totalTime: d.reducesTotalTime,
     };
 
-    this.conf = data.conf || {};
-
-    this.counters = new MRCounters(data.counters);
-
     const tasks = data.tasks || {};
     this.tasks = {
       maps: (tasks.maps || []).map((taskData) => new MRTask(taskData)),
@@ -63,8 +59,6 @@ export class MRJob {
   compact() {
     this.tasks.maps = [];
     this.tasks.reduces = [];
-    this.conf.flags = {};
-    this.counters = new MRCounters([]);
   }
 }
 

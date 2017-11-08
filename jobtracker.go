@@ -373,18 +373,18 @@ func (jt *jobTracker) updateJob(job *job) error {
 	if err != nil {
 		return err
 	}
-	job.Conf.update(conf)
+	job.conf.update(conf)
 
 	// This is a hack because Brushfire isn't setting the job name properly.
-	if strings.Index(job.Details.Name, "null/") != -1 && job.Conf.name != "" {
-		job.Details.Name = strings.Replace(job.Details.Name, "null/", job.Conf.name+"/", 1)
+	if strings.Index(job.Details.Name, "null/") != -1 && job.conf.name != "" {
+		job.Details.Name = strings.Replace(job.Details.Name, "null/", job.conf.name+"/", 1)
 	}
 
 	counters, err := jt.fetchCounters(job.Details.ID)
 	if err != nil {
 		return err
 	}
-	job.Counters = counters
+	job.counters = counters
 
 	tasks, err := jt.fetchTasks(job.Details.ID)
 	if err != nil {

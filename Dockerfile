@@ -1,9 +1,9 @@
 FROM golang:1.6
 
 # Install node
-RUN if [ -e /usr/stripe/bin/docker/stripe-install-node ]; then /usr/stripe/bin/docker/stripe-install-node 4.3.1; else \
-  curl --silent --location https://nodejs.org/download/release/v4.3.1/node-v4.3.1-linux-x64.tar.gz > /tmp/node.tar.gz \
-  && echo "b3af1ed18a9150af42754e9a0385ecc4b4e9b493fcf32bf6ca0d7239d636254b ?/tmp/node.tar.gz" | shasum -p -a 256 -c \
+RUN if [ -e /usr/stripe/bin/docker/stripe-install-node ]; then /usr/stripe/bin/docker/stripe-install-node 6.9.2; else \
+  curl --silent --location https://nodejs.org/download/release/v6.9.2/node-v6.9.2-linux-x64.tar.gz > /tmp/node.tar.gz \
+  && echo "cbf6a35b035c56f991c2e6a4aedbcd9f09555234ac0dd5b2c15128e2b5f4eb50 ?/tmp/node.tar.gz" | shasum -p -a 256 -c \
   && tar --directory=/usr/local/ --strip-components=1 -xzf /tmp/node.tar.gz; fi
 
 ADD . /go/src/github.com/stripe/timberlake

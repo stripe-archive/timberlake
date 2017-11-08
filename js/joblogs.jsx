@@ -6,20 +6,20 @@ import {lolhadoop} from './utils';
 
 const {_} = window;
 
-export default class extends React.Component {
+export default class JobLogs extends React.Component {
   componentDidMount() {
     Store.getJob(this.props.params.jobId);
   }
 
   componentWillReceiveProps(next) {
-    if (this.props.params.jobId != next.params.jobId) { // eslint-disable-line eqeqeq
+    if (this.props.params.jobId !== next.params.jobId) {
       Store.getJob(next.params.jobId);
     }
   }
 
   getJob() {
     const jobId = lolhadoop(this.props.params.jobId);
-    return _.find(this.props.jobs, (d) => lolhadoop(d.id) == jobId); // eslint-disable-line eqeqeq
+    return _.find(this.props.jobs, (d) => lolhadoop(d.id) === jobId);
   }
 
   render() {
@@ -30,7 +30,7 @@ export default class extends React.Component {
       const errorMessage = p[0].split('\n')[0];
       const errorBody = p[0].split('\n').slice(1).join('\n');
       return (
-        <dl>
+        <dl key={attempts[0].id}>
           <dt>{attempts.length} time{attempts.length === 1 ? '' : 's'}</dt>
           <pre>
             <b>{errorMessage}</b><br />

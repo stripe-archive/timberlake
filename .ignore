@@ -1,4 +1,5 @@
 **.min.css
 **.min.js
+js/libs/underscore-min.js
 test/sleepjob.jhist
 vendor/github.com/

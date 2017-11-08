@@ -14,10 +14,10 @@ func TestLoadConf(t *testing.T) {
 
 	job := job{}
 	conf, err := loadConf(f)
-	job.Conf.update(conf)
+	job.conf.update(conf)
 
 	require.NoError(t, err, "should be able to load conf correctly")
-	assert.Equal(t, "/input/dir", job.Conf.Input, "input should have loaded correctly")
-	assert.Equal(t, "/output/dir", job.Conf.Output, "output should have loaded correctly")
-	assert.Equal(t, "appname", job.Conf.name, "name should have loaded correctly")
+	assert.Equal(t, "/input/dir", job.conf.Input, "input should have loaded correctly")
+	assert.Equal(t, "/output/dir", job.conf.Output, "output should have loaded correctly")
+	assert.Equal(t, "appname", job.conf.name, "name should have loaded correctly")
 }
