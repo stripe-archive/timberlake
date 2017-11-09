@@ -243,7 +243,7 @@ func (jp *jhistParser) parse() error {
 	jp.job.Tasks.Reduce = trimTasks(tasks.Reduce)
 	jp.job.Tasks.Errors = tasks.Errors
 	for _, counter := range counters {
-		jp.job.Counters = append(jp.job.Counters, counter)
+		jp.job.counters = append(jp.job.counters, counter)
 	}
 
 	return nil
@@ -392,7 +392,7 @@ func (jt *jobTracker) updateFromHistoryFile(job *job, full bool) error {
 
 	log.Println("Read jobConf and history file for", jobID, "in", time.Now().Sub(now))
 
-	job.Conf.update(conf)
+	job.conf.update(conf)
 	if full {
 		job.partial = false
 	}

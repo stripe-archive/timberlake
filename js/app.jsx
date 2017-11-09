@@ -4,9 +4,8 @@ import {Router, Route, IndexRoute, hashHistory} from 'react-router';
 
 import BigData from './list';
 import Job from './job';
-import JobConf from './jobconf';
 import JobLogs from './joblogs';
-import JobCounters from './jobcounters';
+import {JobConf, JobCounters} from './components/JobConfCounters';
 import {NavBar} from './NavBar';
 import {Store} from './store';
 

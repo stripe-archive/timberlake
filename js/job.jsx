@@ -8,7 +8,7 @@ import RelatedDAG from './components/related-dag';
 import RelatedJobs from './components/RelatedJobs';
 import TaskStats from './components/TaskStats';
 import TaskWaterfall from './components/TaskWaterfall';
-import {Store} from './store';
+import {ConfCountersStore, Store} from './store';
 import {
   ACTIVE_STATES,
   cleanJobPath,
@@ -33,20 +33,27 @@ function bytesFormat(n) {
   }
 }
 
-function inputs(job, allJobs) {
+function inputs(job, allJobs, conf, jobConfCounters) {
   const relatives = relatedJobs(job, allJobs);
-  const outputs = _.object(_.flatten(relatives.map((j) => (j.conf.output || '').split(/,/g).map((o) => [o, j])), 1));
-  return (job.conf.input || '').split(/,/g).map((input) => outputs[input] || input);
+  const outputs = _.object(_.flatten(relatives.map((j) => {
+    const jcc = jobConfCounters[j.id];
+    const output = jcc ? jcc.conf.output : '';
+    return (output || '').split(/,/g).map((o) => [o, j]);
+  }), 1));
+  return (conf.input || '').split(/,/g).map((input) => outputs[input] || input);
 }
 
 function relatedJobs(job, allJobs) {
-  return allJobs.filter((d) => d.fullName.indexOf(job.taskFamily) === 1);
+  if (job) {
+    return allJobs.filter((d) => d.fullName.indexOf(job.taskFamily) === 1);
+  }
+  return [];
 }
 
-export default class extends React.Component {
+export default class Job extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {jobConfCounters: {}};
 
     this.kill = this.kill.bind(this);
     this.handleShowKillModal = this.handleShowKillModal.bind(this);
@@ -54,14 +61,30 @@ export default class extends React.Component {
   }
 
   componentDidMount() {
-    Store.getJob(this.props.params.jobId);
+    const {jobId} = this.props.params;
+    Store.getJob(jobId);
     $('.scalding-step-description').each(function() { $(this).tooltip(); });
+
+    ConfCountersStore.on('jobConfCounters', (jobConfCounter) => (
+      this.setState({
+        jobConfCounters: _.extend(
+          this.state.jobConfCounters,
+          {[jobConfCounter.id]: jobConfCounter},
+        ),
+      })
+    ));
   }
 
   componentWillReceiveProps(next) {
     if (this.props.params.jobId !== next.params.jobId) {
       Store.getJob(next.params.jobId);
+      ConfCountersStore.getJobConfCounters(next.params.jobId);
     }
+    relatedJobs(this.getJob(), next.jobs).forEach((job) => {
+      if (this.state.jobConfCounters[job.id] === undefined) {
+        ConfCountersStore.getJobConfCounters(job.id);
+      }
+    });
   }
 
   componentWillUnmount() {
@@ -98,11 +121,14 @@ export default class extends React.Component {
   render() {
     const job = this.getJob();
     if (!job) return null;
+    const jobConfCounter = this.state.jobConfCounters[this.props.params.jobId];
+    if (jobConfCounter === undefined) { return null; }
+    const {conf, counters} = this.state.jobConfCounters[this.props.params.jobId];
     document.title = job.name;
     /* eslint-disable react/no-array-index-key */
     const renderedInputs = (
       <ul className="list-unstyled">
-        {inputs(job, this.props.jobs).map((input, i) =>
+        {inputs(job, this.props.jobs, conf, this.state.jobConfCounters).map((input, i) =>
           (
             <li key={i}>
               {_.isString(input) ?
@@ -145,10 +171,10 @@ export default class extends React.Component {
       ['Duration', previous ? <span>{secondFormat(job.duration())} ({previous})</span> : secondFormat(job.duration())],
       ['State', state],
       ['Input', renderedInputs],
-      ['Output', cleanJobPath(job.conf.output)],
+      ['Output', cleanJobPath(conf.output)],
     ];
 
-    const stepsStr = job.conf.scaldingSteps;
+    const stepsStr = conf.scaldingSteps;
     if (stepsStr) {
       const lines = stepsStr.split(',').map((val) => {
         const trimmed = val.trim();
@@ -166,13 +192,13 @@ export default class extends React.Component {
     }
 
     const bytes = {
-      hdfs_read: job.counters.get('FileSystemCounter.HDFS_BYTES_READ').map,
-      s3_read: job.counters.get('FileSystemCounter.S3_BYTES_READ').map || 0,
-      file_read: job.counters.get('FileSystemCounter.FILE_BYTES_READ').map || 0,
-      hdfs_written: job.counters.get('FileSystemCounter.HDFS_BYTES_WRITTEN').total || 0,
-      s3_written: job.counters.get('FileSystemCounter.S3_BYTES_WRITTEN').total || 0,
-      file_written: job.counters.get('FileSystemCounter.FILE_BYTES_WRITTEN').total || 0,
-      shuffled: job.counters.get('TaskCounter.REDUCE_SHUFFLE_BYTES').reduce || 0,
+      hdfs_read: counters.get('FileSystemCounter.HDFS_BYTES_READ').map,
+      s3_read: counters.get('FileSystemCounter.S3_BYTES_READ').map || 0,
+      file_read: counters.get('FileSystemCounter.FILE_BYTES_READ').map || 0,
+      hdfs_written: counters.get('FileSystemCounter.HDFS_BYTES_WRITTEN').total || 0,
+      s3_written: counters.get('FileSystemCounter.S3_BYTES_WRITTEN').total || 0,
+      file_written: counters.get('FileSystemCounter.FILE_BYTES_WRITTEN').total || 0,
+      shuffled: counters.get('TaskCounter.REDUCE_SHUFFLE_BYTES').reduce || 0,
     };
     bytes.total_read = bytes.hdfs_read + bytes.s3_read + bytes.file_read;
     bytes.total_written = bytes.hdfs_written + bytes.s3_written + bytes.file_written;
@@ -184,8 +210,7 @@ export default class extends React.Component {
 
     const sortedRelatedJobs = _.sortBy(relatedJobs(job, this.props.jobs), (relatedJob) => relatedJob.id);
 
-    /* eslint-disable react/no-array-index-key */
-    const rv = (
+    return (
       <div>
         <div className="row">
           <div className="col-md-5">
@@ -194,7 +219,7 @@ export default class extends React.Component {
             </div>
             <table className="table job-details">
               <tbody>
-                {pairs.map((d, i) => <tr key={i}><th>{d[0]}</th><td>{d[1]}</td></tr>)}
+                {pairs.map((d, i) => <tr key={d[0]}><th>{d[0]}</th><td>{d[1]}</td></tr>)}
                 <tr>
                   <th>Details</th>
                   <td>
@@ -218,11 +243,11 @@ export default class extends React.Component {
           </div>
           <div className="col-md-3 col-md-offset-1">
             <h4>Map Jobs</h4>
-            <MapSummary job={job} counters={job.counters} />
+            <MapSummary job={job} counters={counters} />
           </div>
           <div className="col-md-3">
             <h4>Reduce Jobs</h4>
-            <ReduceSummary job={job} counters={job.counters} />
+            <ReduceSummary job={job} counters={counters} />
           </div>
         </div>
         <div className="row" style={{minHeight: 450}}>
@@ -240,11 +265,14 @@ export default class extends React.Component {
           <RelatedJobs job={job} relatives={sortedRelatedJobs} hover={this.state.hover} />
         </div>
         <div className="row">
-          <RelatedDAG job={job} relatives={sortedRelatedJobs} hover={(j) => { this.setState({hover: j}); }} />
+          <RelatedDAG
+            job={job}
+            jobConfCounters={this.state.jobConfCounters}
+            relatives={sortedRelatedJobs}
+            hover={(j) => { this.setState({hover: j}); }}
+          />
         </div>
       </div>
     );
-    /* eslint-enable react/no-array-index-key */
-    return rv;
   }
 }

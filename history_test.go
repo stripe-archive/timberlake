@@ -43,7 +43,7 @@ func TestLoadHistory(t *testing.T) {
 	assert.Equal(t, attempts, job.Tasks.Errors["This is an error."], "the error attempts are correct")
 
 	counters := make(map[string]counter)
-	for _, c := range job.Counters {
+	for _, c := range job.counters {
 		counters[c.Name] = c
 	}
 

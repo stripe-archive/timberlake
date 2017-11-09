@@ -2,10 +2,19 @@ package main
 
 import "time"
 
+type jobConfCounters struct {
+	Conf     conf      `json:"conf"`
+	Counters []counter `json:"counters"`
+	ID       string    `json:"id"`
+	Name     string    `json:"name"`
+}
+
+// Avoid adding additional exported fields
+// as event streaming can overwhelm clients
 type job struct {
 	Details  jobDetail `json:"details"`
-	Counters []counter `json:"counters"`
-	Conf     conf      `json:"conf"`
+	counters []counter
+	conf     conf
 	Tasks    tasks     `json:"tasks"`
 	running  bool
 	partial  bool
