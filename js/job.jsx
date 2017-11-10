@@ -65,14 +65,16 @@ export default class Job extends React.Component {
     Store.getJob(jobId);
     $('.scalding-step-description').each(function() { $(this).tooltip(); });
 
-    ConfCountersStore.on('jobConfCounters', (jobConfCounter) => (
-      this.setState({
-        jobConfCounters: _.extend(
-          this.state.jobConfCounters,
-          {[jobConfCounter.id]: jobConfCounter},
-        ),
-      })
-    ));
+    ConfCountersStore.on('jobConfCounters', (jobConfCounter) => {
+      if (this.state.jobConfCounters[jobConfCounter.id] === undefined) {
+        this.setState({
+          jobConfCounters: _.extend(
+            this.state.jobConfCounters,
+            {[jobConfCounter.id]: jobConfCounter},
+          ),
+        });
+      }
+    });
   }
 
   componentWillReceiveProps(next) {
