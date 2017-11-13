@@ -1,26 +1,25 @@
 import {cleanJobName} from './utils';
-import {MRCounters, MRJob} from './mr';
+import {MRJob} from './mr';
 
 const {$} = window;
 
-class CCStore {
+class JobConfStore {
   constructor() {
     this.pipes = {};
-    this.jobConfCounters = {};
+    this.jobConf = {};
   }
 
-  getJobConfCounters(jobId) {
-    $.getJSON(`/jobs/${jobId}/confcounters`)
+  getJobConf(jobId) {
+    $.getJSON(`/jobs/${jobId}/conf`)
       .then((data) => {
         const id = data.id.replace('application_', 'job_');
-        const jobConfCounter = {
+        const jobConf = {
           id,
           name: cleanJobName(data.name),
           conf: data.conf || {},
-          counters: new MRCounters(data.counters),
         };
-        this.jobConfCounters[id] = jobConfCounter;
-        this.trigger('jobConfCounters', jobConfCounter);
+        this.jobConf[id] = jobConf;
+        this.trigger('jobConf', jobConf);
       })
       .then(null, (error) => console.error(error));
   }
@@ -34,7 +33,7 @@ class CCStore {
   }
 }
 
-export const ConfCountersStore = new CCStore();
+export const ConfStore = new JobConfStore();
 
 class JobStore {
   constructor() {

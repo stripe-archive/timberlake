@@ -19,7 +19,7 @@ type confProperty struct {
 	Value string `xml:"value"`
 }
 
-type jobConf struct {
+type parsedJobConf struct {
 	XMLName    xml.Name       `xml:"configuration"`
 	Properties []confProperty `xml:"property"`
 }
@@ -48,7 +48,7 @@ func (conf *conf) update(c map[string]string) {
 func loadConf(r io.Reader) (map[string]string, error) {
 	decoder := xml.NewDecoder(r)
 
-	parsed := jobConf{}
+	parsed := parsedJobConf{}
 	err := decoder.Decode(&parsed)
 	if err != nil {
 		return nil, err

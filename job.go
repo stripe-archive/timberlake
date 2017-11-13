@@ -2,9 +2,8 @@ package main
 
 import "time"
 
-type jobConfCounters struct {
+type jobConf struct {
 	Conf     conf      `json:"conf"`
-	Counters []counter `json:"counters"`
 	ID       string    `json:"id"`
 	Name     string    `json:"name"`
 }
@@ -13,7 +12,7 @@ type jobConfCounters struct {
 // as event streaming can overwhelm clients
 type job struct {
 	Details  jobDetail `json:"details"`
-	counters []counter
+	Counters []counter `json:"counters"`
 	conf     conf
 	Tasks    tasks     `json:"tasks"`
 	running  bool

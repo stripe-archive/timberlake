@@ -9,7 +9,7 @@ const {dagre} = window;
  */
 export default class RelatedDAG extends React.Component {
   render() {
-    const {job, jobConfCounters} = this.props;
+    const {job, jobConfs} = this.props;
     const jobs = this.props.relatives;
 
     // Graph settings.
@@ -30,9 +30,9 @@ export default class RelatedDAG extends React.Component {
     const files = new Set();
     jobs.forEach((currentJob) => {
       // Find input & output jobs.
-      const jobConfCounter = jobConfCounters[currentJob.id];
-      if (jobConfCounter === undefined) { return null; }
-      const {conf} = jobConfCounter;
+      const jobConf = jobConfs[currentJob.id];
+      if (jobConf === undefined) { return null; }
+      const {conf} = jobConf;
       const inputs = conf.input ? conf.input.split(/,/g) : [];
       inputs.forEach((input) => {
         (inputMap[input] = inputMap[input] || []).push(currentJob.id);

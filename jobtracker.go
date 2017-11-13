@@ -384,7 +384,7 @@ func (jt *jobTracker) updateJob(job *job) error {
 	if err != nil {
 		return err
 	}
-	job.counters = counters
+	job.Counters = counters
 
 	tasks, err := jt.fetchTasks(job.Details.ID)
 	if err != nil {
