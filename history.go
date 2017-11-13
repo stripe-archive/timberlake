@@ -243,7 +243,7 @@ func (jp *jhistParser) parse() error {
 	jp.job.Tasks.Reduce = trimTasks(tasks.Reduce)
 	jp.job.Tasks.Errors = tasks.Errors
 	for _, counter := range counters {
-		jp.job.counters = append(jp.job.counters, counter)
+		jp.job.Counters = append(jp.job.Counters, counter)
 	}
 
 	return nil

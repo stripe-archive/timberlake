@@ -66,7 +66,7 @@ func getJobs(c web.C, w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonBytes)
 }
 
-func getConfCounters(c web.C, w http.ResponseWriter, r *http.Request) {
+func getConf(c web.C, w http.ResponseWriter, r *http.Request) {
 	jobID := c.URLParams["id"]
 	log.Printf("Getting job conf for %s", jobID)
 	if !jt.hasJob(jobID) {
@@ -76,9 +76,8 @@ func getConfCounters(c web.C, w http.ResponseWriter, r *http.Request) {
 
 
 	job := jt.reifyJob(jobID)
-	jobConf := jobConfCounters{
+	jobConf := jobConf{
 		Conf: job.conf,
-		Counters: job.counters,
 		ID: job.Details.ID,
 		Name: job.Details.Name,
 	}
@@ -162,7 +161,7 @@ func main() {
 	mux.Get("/jobs/", getJobs)
 	mux.Get("/sse", sse)
 	mux.Get("/jobs/:id", getJob)
-	mux.Get("/jobs/:id/confcounters", getConfCounters)
+	mux.Get("/jobs/:id/conf", getConf)
 	mux.Post("/jobs/:id/kill", killJob)
 
 	if *enableDebug {
