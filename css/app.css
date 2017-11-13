@@ -242,3 +242,7 @@ a:hover,
 .modal-kill {
   width: 400px;
 }
+
+.__react_component_tooltip.type-dark {
+  background-color: #07A4DD !important;
+}
