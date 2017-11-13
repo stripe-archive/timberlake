@@ -90,12 +90,6 @@ export default class Job extends React.Component {
     });
   }
 
-  componentWillUnmount() {
-    console.log('ComponentWillUnmount, clearing job interval', this.interval);
-    // this should be a no-op, adding logging to be sure
-    clearInterval(this.interval);
-  }
-
   getJob() {
     const jobId = lolhadoop(this.props.params.jobId);
     return _.find(this.props.jobs, (d) => lolhadoop(d.id) === jobId);
