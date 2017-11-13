@@ -53,6 +53,7 @@ function relatedJobs(job, allJobs) {
 export default class Job extends React.Component {
   constructor(props) {
     super(props);
+    console.log('Initializing Job component');
     this.state = {jobConfs: {}};
 
     this.kill = this.kill.bind(this);
@@ -61,6 +62,7 @@ export default class Job extends React.Component {
   }
 
   componentDidMount() {
+    console.log('componentDidMount');
     const {jobId} = this.props.params;
     Store.getJob(jobId);
     $('.scalding-step-description').each(function() { $(this).tooltip(); });
@@ -76,6 +78,7 @@ export default class Job extends React.Component {
   }
 
   componentWillReceiveProps(next) {
+    console.log('componentWillReceiveProps', this.props, this.next);
     if (this.props.params.jobId !== next.params.jobId) {
       Store.getJob(next.params.jobId);
       ConfStore.getJobConf(next.params.jobId);
@@ -88,6 +91,8 @@ export default class Job extends React.Component {
   }
 
   componentWillUnmount() {
+    console.log('ComponentWillUnmount, clearing job interval', this.interval);
+    // this should be a no-op, adding logging to be sure
     clearInterval(this.interval);
   }
 
@@ -119,6 +124,7 @@ export default class Job extends React.Component {
   }
 
   render() {
+    console.log('Beginning render()');
     const job = this.getJob();
     if (!job) return null;
     const jobConfCounter = this.state.jobConfs[this.props.params.jobId];
@@ -209,6 +215,7 @@ export default class Job extends React.Component {
     const bytesWrittenTitle = `HDFS: ${bytes.hdfs_written}\nS3: ${bytes.s3_written}\nFile: ${bytes.file_written}`;
 
     const sortedRelatedJobs = _.sortBy(relatedJobs(job, this.props.jobs), (relatedJob) => relatedJob.id);
+    console.log('Actually rendering');
 
     return (
       <div>
