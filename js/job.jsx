@@ -53,7 +53,6 @@ function relatedJobs(job, allJobs) {
 export default class Job extends React.Component {
   constructor(props) {
     super(props);
-    console.log('Initializing Job component');
     this.state = {jobConfs: {}};
 
     this.kill = this.kill.bind(this);
@@ -62,7 +61,6 @@ export default class Job extends React.Component {
   }
 
   componentDidMount() {
-    console.log('componentDidMount');
     const {jobId} = this.props.params;
     Store.getJob(jobId);
     $('.scalding-step-description').each(function() { $(this).tooltip(); });
@@ -78,7 +76,6 @@ export default class Job extends React.Component {
   }
 
   componentWillReceiveProps(next) {
-    console.log('componentWillReceiveProps', this.props, this.next);
     if (this.props.params.jobId !== next.params.jobId) {
       Store.getJob(next.params.jobId);
       ConfStore.getJobConf(next.params.jobId);
@@ -120,11 +117,18 @@ export default class Job extends React.Component {
   render() {
     console.log('Beginning render()');
     const job = this.getJob();
-    if (!job) return null;
-    const jobConfCounter = this.state.jobConfs[this.props.params.jobId];
-    if (jobConfCounter === undefined) { return null; }
-    const {conf} = this.state.jobConfs[this.props.params.jobId];
+    if (!job) {
+      console.error('Could not get job');
+      return null;
+    }
     document.title = job.name;
+    const jobConf = this.state.jobConfs[this.props.params.jobId];
+    if (jobConf === undefined) {
+      console.error('No jobConf available');
+      return null;
+    }
+    const {conf} = jobConf;
+    console.log('got conf');
     /* eslint-disable react/no-array-index-key */
     const renderedInputs = (
       <ul className="list-unstyled">
@@ -139,11 +143,13 @@ export default class Job extends React.Component {
       </ul>
     );
     /* eslint-enable react/no-array-index-key */
+    console.log('rendered inputs. counts:', renderedInputs.length);
 
     let similar = this.props.jobs.filter((j) => j.name.indexOf(job.name) !== -1);
     similar = similar.filter((j) => j.startTime < job.startTime);
     const prev = _.last(_.sortBy(similar, 'startTime'));
     const previous = prev ? <Link to={`job/${prev.id}`}>previous: {secondFormat(prev.duration())}</Link> : null;
+    console.log('rendered previous', previous);
 
     let state = jobState(job);
     if (_.contains(ACTIVE_STATES, job.state)) {
@@ -162,6 +168,7 @@ export default class Job extends React.Component {
       const link = <Link to={`job/${job.id}/logs`} className="logs-link">view logs</Link>;
       state = <div>{state} {link}</div>;
     }
+    console.log('rendered state', state);
 
     const pairs = [
       ['User', job.user],
@@ -173,6 +180,7 @@ export default class Job extends React.Component {
       ['Input', renderedInputs],
       ['Output', cleanJobPath(conf.output)],
     ];
+    console.log('rendered pairs', pairs);
 
     const stepsStr = conf.scaldingSteps;
     if (stepsStr) {
@@ -190,6 +198,7 @@ export default class Job extends React.Component {
       /* eslint-enable react/no-array-index-key */
       pairs.push(['Line Numbers', steps]);
     }
+    console.log('rendered scalding steps', stepsStr);
 
     const bytes = {
       hdfs_read: job.counters.get('FileSystemCounter.HDFS_BYTES_READ').map,
