@@ -39,7 +39,6 @@ class JobStore {
   constructor() {
     this.pipes = {};
     this.lastJob = null;
-    this.eventLogs = 0;
   }
 
   getJob(id) {
@@ -61,11 +60,6 @@ class JobStore {
     const sse = new EventSource('/sse');
     sse.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      if (this.eventLogs < 5) {
-        debugger; // eslint-disable-line no-debugger
-        console.log('GOT EVENT', event, data);
-        this.eventLogs += 1;
-      }
       this.trigger('job', new MRJob(data, data.cluster));
     };
   }
