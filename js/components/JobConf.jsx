@@ -19,6 +19,12 @@ export default class JobConf extends React.Component {
     ConfStore.getJobConf(this.props.params.jobId);
   }
 
+  componentWillReceiveProps(next) {
+    if (this.props.params.jobId !== next.params.jobId) {
+      ConfStore.getJobConf(next.params.jobId);
+    }
+  }
+
   render() {
     const {jobConf} = this.state;
     if (jobConf === undefined) { return null; }

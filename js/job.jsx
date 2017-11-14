@@ -74,17 +74,26 @@ export default class Job extends React.Component {
       })
     ));
 
-    ConfStore.getJobConf(this.props.params.jobId);
-    relatedJobs(this.getJob(), this.props.jobs).forEach((job) => {
-      if (this.state.jobConfs[job.id] === undefined) {
-        ConfStore.getJobConf(job.id);
-      }
-    });
+    this.handleNewJobID(this.props.params.jobId);
+  }
+
+  componentWillReceiveProps(next) {
+    if (this.props.params.jobId !== next.params.jobId) {
+      this.handleNewJobID(next.params.jobId);
+    }
   }
 
   getJob() {
     const jobId = lolhadoop(this.props.params.jobId);
     return _.find(this.props.jobs, (d) => lolhadoop(d.id) === jobId);
+  }
+
+  handleNewJobID(jobId) {
+    Store.getJob(jobId);
+    ConfStore.getJobConf(jobId);
+    relatedJobs(this.getJob(), this.props.jobs).forEach((job) => {
+      ConfStore.getJobConf(job.id);
+    });
   }
 
   kill() {
@@ -116,12 +125,8 @@ export default class Job extends React.Component {
       return null;
     }
     document.title = job.name;
-    const jobConf = this.state.jobConfs[this.props.params.jobId];
-    if (jobConf === undefined) {
-      console.log('No jobConf found');
-      return null;
-    }
-    const {conf} = jobConf;
+    const jobConf = this.state.jobConfs[this.props.params.jobId] || {};
+    const conf = jobConf.conf || {};
     /* eslint-disable react/no-array-index-key */
     const renderedInputs = (
       <ul className="list-unstyled">
