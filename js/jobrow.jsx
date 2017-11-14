@@ -2,6 +2,7 @@ import React from 'react';
 import {Link, hashHistory} from 'react-router';
 
 import {
+  HEADERS,
   timeFormat,
   secondFormat,
   jobState,
@@ -26,7 +27,11 @@ class JobRow extends React.Component {
 
   render() {
     const columns = this.columns();
-    return <tr onClick={this.handleOnClick}>{columns.map((d, i) => <td key={i}>{d}</td>)}</tr>; // eslint-disable-line react/no-array-index-key
+    return (
+      <tr onClick={this.handleOnClick}>
+        {columns.map((d, i) => <td key={HEADERS[i]}>{d}</td>)}
+      </tr>
+    );
   }
 }
 
