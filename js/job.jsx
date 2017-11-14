@@ -53,7 +53,6 @@ function relatedJobs(job, allJobs) {
 export default class Job extends React.Component {
   constructor(props) {
     super(props);
-    console.log('Initializing Job component');
     this.state = {jobConfs: {}};
 
     this.kill = this.kill.bind(this);
@@ -62,7 +61,6 @@ export default class Job extends React.Component {
   }
 
   componentDidMount() {
-    console.log('componentDidMount');
     const {jobId} = this.props.params;
     Store.getJob(jobId);
     $('.scalding-step-description').each(function() { $(this).tooltip(); });
@@ -75,24 +73,27 @@ export default class Job extends React.Component {
         ),
       })
     ));
+
+    this.handleNewJobID(this.props.params.jobId);
   }
 
   componentWillReceiveProps(next) {
-    console.log('componentWillReceiveProps', this.props, this.next);
     if (this.props.params.jobId !== next.params.jobId) {
-      Store.getJob(next.params.jobId);
-      ConfStore.getJobConf(next.params.jobId);
+      this.handleNewJobID(next.params.jobId);
     }
-    relatedJobs(this.getJob(), next.jobs).forEach((job) => {
-      if (this.state.jobConfs[job.id] === undefined) {
-        ConfStore.getJobConf(job.id);
-      }
-    });
   }
 
   getJob() {
     const jobId = lolhadoop(this.props.params.jobId);
     return _.find(this.props.jobs, (d) => lolhadoop(d.id) === jobId);
+  }
+
+  handleNewJobID(jobId) {
+    Store.getJob(jobId);
+    ConfStore.getJobConf(jobId);
+    relatedJobs(this.getJob(), this.props.jobs).forEach((job) => {
+      ConfStore.getJobConf(job.id);
+    });
   }
 
   kill() {
@@ -118,13 +119,14 @@ export default class Job extends React.Component {
   }
 
   render() {
-    console.log('Beginning render()');
     const job = this.getJob();
-    if (!job) return null;
-    const jobConfCounter = this.state.jobConfs[this.props.params.jobId];
-    if (jobConfCounter === undefined) { return null; }
-    const {conf} = this.state.jobConfs[this.props.params.jobId];
+    if (!job) {
+      console.log('No job found');
+      return null;
+    }
     document.title = job.name;
+    const jobConf = this.state.jobConfs[this.props.params.jobId] || {};
+    const conf = jobConf.conf || {};
     /* eslint-disable react/no-array-index-key */
     const renderedInputs = (
       <ul className="list-unstyled">
@@ -209,7 +211,6 @@ export default class Job extends React.Component {
     const bytesWrittenTitle = `HDFS: ${bytes.hdfs_written}\nS3: ${bytes.s3_written}\nFile: ${bytes.file_written}`;
 
     const sortedRelatedJobs = _.sortBy(relatedJobs(job, this.props.jobs), (relatedJob) => relatedJob.id);
-    console.log('Actually rendering');
 
     return (
       <div>
