@@ -61,8 +61,6 @@ export default class Job extends React.Component {
   }
 
   componentDidMount() {
-    const {jobId} = this.props.params;
-    Store.getJob(jobId);
     $('.scalding-step-description').each(function() { $(this).tooltip(); });
 
     ConfStore.on('jobConf', (jobConf) => (
@@ -73,18 +71,28 @@ export default class Job extends React.Component {
         ),
       })
     ));
-  }
 
-  componentWillReceiveProps(next) {
-    if (this.props.params.jobId !== next.params.jobId) {
-      Store.getJob(next.params.jobId);
-      ConfStore.getJobConf(next.params.jobId);
-    }
-    relatedJobs(this.getJob(), next.jobs).forEach((job) => {
+    ConfStore.getJobConf(this.props.params.jobId);
+    relatedJobs(this.getJob(), this.props.jobs).forEach((job) => {
       if (this.state.jobConfs[job.id] === undefined) {
         ConfStore.getJobConf(job.id);
       }
     });
+  }
+
+  componentWillReceiveProps(next) {
+    const nextJobId = next.params.jobId;
+    if (this.props.params.jobId !== nextJobId) {
+      // is this necessary? let's log and find out
+      console.log('new jobId param:', this.props.params.jobId, nextJobId);
+      Store.getJob(nextJobId);
+      ConfStore.getJobConf(nextJobId);
+      relatedJobs(this.getJob(), next.jobs).forEach((job) => {
+        if (this.state.jobConfs[job.id] === undefined) {
+          ConfStore.getJobConf(job.id);
+        }
+      });
+    }
   }
 
   getJob() {
@@ -118,17 +126,16 @@ export default class Job extends React.Component {
     console.log('Beginning render()');
     const job = this.getJob();
     if (!job) {
-      console.error('Could not get job');
+      console.log('No job found');
       return null;
     }
     document.title = job.name;
     const jobConf = this.state.jobConfs[this.props.params.jobId];
     if (jobConf === undefined) {
-      console.error('No jobConf available');
+      console.log('No jobConf found');
       return null;
     }
     const {conf} = jobConf;
-    console.log('got conf');
     /* eslint-disable react/no-array-index-key */
     const renderedInputs = (
       <ul className="list-unstyled">
@@ -143,13 +150,11 @@ export default class Job extends React.Component {
       </ul>
     );
     /* eslint-enable react/no-array-index-key */
-    console.log('rendered inputs. counts:', renderedInputs.length);
 
     let similar = this.props.jobs.filter((j) => j.name.indexOf(job.name) !== -1);
     similar = similar.filter((j) => j.startTime < job.startTime);
     const prev = _.last(_.sortBy(similar, 'startTime'));
     const previous = prev ? <Link to={`job/${prev.id}`}>previous: {secondFormat(prev.duration())}</Link> : null;
-    console.log('rendered previous', previous);
 
     let state = jobState(job);
     if (_.contains(ACTIVE_STATES, job.state)) {
@@ -168,7 +173,6 @@ export default class Job extends React.Component {
       const link = <Link to={`job/${job.id}/logs`} className="logs-link">view logs</Link>;
       state = <div>{state} {link}</div>;
     }
-    console.log('rendered state', state);
 
     const pairs = [
       ['User', job.user],
@@ -180,7 +184,6 @@ export default class Job extends React.Component {
       ['Input', renderedInputs],
       ['Output', cleanJobPath(conf.output)],
     ];
-    console.log('rendered pairs', pairs);
 
     const stepsStr = conf.scaldingSteps;
     if (stepsStr) {
@@ -198,7 +201,6 @@ export default class Job extends React.Component {
       /* eslint-enable react/no-array-index-key */
       pairs.push(['Line Numbers', steps]);
     }
-    console.log('rendered scalding steps', stepsStr);
 
     const bytes = {
       hdfs_read: job.counters.get('FileSystemCounter.HDFS_BYTES_READ').map,
