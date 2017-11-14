@@ -22,6 +22,7 @@
     "eslint": "^4.9.0",
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-config-stripe": "^1.2.0",
+    "flow-bin": "^0.59.0",
     "gulp": "^3.9.1",
     "vinyl-source-stream": "^1.1.0"
   },
@@ -37,6 +38,7 @@
     "bin": "./bin"
   },
   "scripts": {
-    "test": "eslint --ext .js --ext .jsx ."
+    "flow": "flow",
+    "test": "flow && eslint --ext .js --ext .jsx ."
   }
 }
