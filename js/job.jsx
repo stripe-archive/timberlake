@@ -1,5 +1,6 @@
 import React from 'react';
 import {Link} from 'react-router';
+import ReactTooltip from 'react-tooltip';
 
 import KillModal from './components/KillModal';
 import MapSummary from './components/MapSummary';
@@ -63,7 +64,6 @@ export default class Job extends React.Component {
   componentDidMount() {
     const {jobId} = this.props.params;
     Store.getJob(jobId);
-    $('.scalding-step-description').each(function() { $(this).tooltip(); });
 
     ConfStore.on('jobConf', (jobConf) => (
       this.setState({
@@ -183,13 +183,20 @@ export default class Job extends React.Component {
         const matches = trimmed.match(/[\w.]+:\d+/i);
         return {full: trimmed, short: matches ? matches[0] : trimmed};
       });
-      /* eslint-disable react/no-array-index-key */
       const steps = (
         <ul className="list-unstyled">
-          {_.uniq(lines).map((line, i) => <li key={i}><span className="scalding-step-description" title={line.full}>{line.short}</span></li>)}
+          {_.uniq(lines).map((line, i) => (
+            <li key={line.short}>
+              <span data-tip data-for={line.short} title={line.full}>
+                {line.short}
+              </span>
+              <ReactTooltip effect="solid" id={line.short} >
+                <span>{line.full}</span>
+              </ReactTooltip>
+            </li>
+          ))}
         </ul>
       );
-      /* eslint-enable react/no-array-index-key */
       pairs.push(['Line Numbers', steps]);
     }
 
