@@ -231,21 +231,9 @@ func main() {
 		mux.Get("/debug/pprof/trace", pprof.Trace)
 	}
 
-	go func() {
-		for clusterName, jt := range jts {
-			for job := range jt.updates {
-				job.Cluster = clusterName
-				log.Printf("%s: marshalling job %s", clusterName, job.Details.ID)
-				jsonBytes, err := json.Marshal(job)
-				if err != nil {
-					log.Println("json error: ", err)
-				} else {
-					log.Printf("%s: sending marshalled job %s", clusterName, job.Details.ID)
-					sse.events <- jsonBytes
-				}
-			}
-		}
-	}()
+	for _, jt := range jts {
+		go jt.sendUpdates(sse)
+	}
 
 	http.Serve(bind.Default(), mux)
 }
