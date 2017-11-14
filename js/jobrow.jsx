@@ -1,6 +1,8 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import {Link, hashHistory} from 'react-router';
 
+import {JOB_PROP_TYPES} from './job';
 import {
   HEADERS,
   timeFormat,
@@ -34,6 +36,10 @@ class JobRow extends React.Component {
     );
   }
 }
+
+JobRow.propTypes = {
+  job: PropTypes.shape(JOB_PROP_TYPES).isRequired,
+};
 
 export class RunningJobRow extends JobRow {
   columns() {

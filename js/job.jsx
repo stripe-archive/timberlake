@@ -288,28 +288,30 @@ export default class Job extends React.Component {
   }
 }
 
+export const JOB_PROP_TYPES = {
+  cluster: PropTypes.string.isRequired,
+  conf: PropTypes.object.isRequired,
+  counters: PropTypes.object.isRequired,
+  finishTime: PropTypes.instanceOf(Date),
+  fullName: PropTypes.string.isRequired,
+  id: PropTypes.string.isRequired,
+  maps: PropTypes.object.isRequired,
+  name: PropTypes.string.isRequired,
+  reduces: PropTypes.object.isRequired,
+  searchstring: PropTypes.string,
+  startTime: PropTypes.instanceOf(Date).isRequired,
+  state: PropTypes.oneOf(VALID_STATES).isRequired,
+  taskFamily: PropTypes.string,
+  tasks: PropTypes.object.isRequired,
+  user: PropTypes.string.isRequired,
+};
+
 Job.defaultProps = {
   jobs: [],
 };
 
 Job.propTypes = {
-  jobs: PropTypes.arrayOf(PropTypes.shape({
-    cluster: PropTypes.string.isRequired,
-    conf: PropTypes.object.isRequired,
-    counters: PropTypes.object.isRequired,
-    finishTime: PropTypes.instanceOf(Date),
-    fullName: PropTypes.string.isRequired,
-    id: PropTypes.string.isRequired,
-    maps: PropTypes.object.isRequired,
-    name: PropTypes.string.isRequired,
-    reduces: PropTypes.object.isRequired,
-    searchstring: PropTypes.string,
-    startTime: PropTypes.instanceOf(Date).isRequired,
-    state: PropTypes.oneOf(VALID_STATES).isRequired,
-    taskFamily: PropTypes.string,
-    tasks: PropTypes.object.isRequired,
-    user: PropTypes.string.isRequired,
-  }).isRequired),
+  jobs: PropTypes.arrayOf(PropTypes.shape(JOB_PROP_TYPES).isRequired),
   params: PropTypes.shape({
     jobId: PropTypes.string.isRequired,
   }).isRequired,
