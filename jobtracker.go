@@ -24,7 +24,7 @@ const (
 
 	// Maximum number of jobs to keep track of. All data is retained in memory
 	// on the server, and the details for each job are sent to the browser.
-	jobLimit = 5000
+	jobLimit = 10000
 
 	// How many hours of history should we ask for from the job server?
 	jobHistoryDuration = time.Hour * 24 * 7

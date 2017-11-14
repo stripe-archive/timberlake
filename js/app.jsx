@@ -15,7 +15,7 @@ const {_} = window;
 /**
  * Number of most recent jobs to keep in the finished tab.
  */
-const JOBS_TO_KEEP = 5000;
+const JOBS_TO_KEEP = 10000;
 
 /**
  * Component responsible for the application state.
