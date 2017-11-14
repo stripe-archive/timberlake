@@ -22,7 +22,7 @@ export class MRJob {
     this.startTime.setMilliseconds(0);
     this.finishTime = d.finishTime ? new Date(d.finishTime) : null;
     this.user = d.user;
-    this.searchString = (`${this.name} ${this.user} ${this.id}`).toLowerCase();
+    this.searchString = (`${this.name} ${this.user} ${this.id} ${this.cluster}`).toLowerCase();
 
     this.maps = {
       progress: d.mapProgress || (d.mapsTotal === 0 ? notAvailable : 100 * (d.mapsCompleted / d.mapsTotal)),
