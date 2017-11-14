@@ -11,12 +11,6 @@ export default class JobCounters extends React.Component {
     Store.getJob(this.props.params.jobId);
   }
 
-  componentWillReceiveProps(next) {
-    if (this.props.params.jobId !== next.params.jobId) {
-      Store.getJob(next.params.jobId);
-    }
-  }
-
   getJob() {
     const jobId = lolhadoop(this.props.params.jobId);
     return _.find(this.props.jobs, (d) => lolhadoop(d.id) === jobId);

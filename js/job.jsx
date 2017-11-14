@@ -61,6 +61,8 @@ export default class Job extends React.Component {
   }
 
   componentDidMount() {
+    const {jobId} = this.props.params;
+    Store.getJob(jobId);
     $('.scalding-step-description').each(function() { $(this).tooltip(); });
 
     ConfStore.on('jobConf', (jobConf) => (
@@ -78,21 +80,6 @@ export default class Job extends React.Component {
         ConfStore.getJobConf(job.id);
       }
     });
-  }
-
-  componentWillReceiveProps(next) {
-    const nextJobId = next.params.jobId;
-    if (this.props.params.jobId !== nextJobId) {
-      // is this necessary? let's log and find out
-      console.log('new jobId param:', this.props.params.jobId, nextJobId);
-      Store.getJob(nextJobId);
-      ConfStore.getJobConf(nextJobId);
-      relatedJobs(this.getJob(), next.jobs).forEach((job) => {
-        if (this.state.jobConfs[job.id] === undefined) {
-          ConfStore.getJobConf(job.id);
-        }
-      });
-    }
   }
 
   getJob() {
@@ -123,7 +110,6 @@ export default class Job extends React.Component {
   }
 
   render() {
-    console.log('Beginning render()');
     const job = this.getJob();
     if (!job) {
       console.log('No job found');
@@ -220,7 +206,6 @@ export default class Job extends React.Component {
     const bytesWrittenTitle = `HDFS: ${bytes.hdfs_written}\nS3: ${bytes.s3_written}\nFile: ${bytes.file_written}`;
 
     const sortedRelatedJobs = _.sortBy(relatedJobs(job, this.props.jobs), (relatedJob) => relatedJob.id);
-    console.log('Actually rendering');
 
     return (
       <div>
