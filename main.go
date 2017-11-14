@@ -235,10 +235,12 @@ func main() {
 		for clusterName, jt := range jts {
 			for job := range jt.updates {
 				job.Cluster = clusterName
+				log.Printf("%s: marshalling job %s", clusterName, job.Details.ID)
 				jsonBytes, err := json.Marshal(job)
 				if err != nil {
 					log.Println("json error: ", err)
 				} else {
+					log.Printf("%s: sending marshalled job %s", clusterName, job.Details.ID)
 					sse.events <- jsonBytes
 				}
 			}

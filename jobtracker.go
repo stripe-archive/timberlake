@@ -128,6 +128,7 @@ func (jt *jobTracker) Loop() {
 }
 
 func (jt *jobTracker) runningJobLoop() {
+	log.Println("Initiating runningJobLoop for cluster:", jt.clusterName)
 	for x := 1; x <= runningJobWorkers; x++ {
 		go func() {
 			for job := range jt.running {
@@ -140,25 +141,29 @@ func (jt *jobTracker) runningJobLoop() {
 					// why we're here and let the mostly-empty job data
 					// propagate anyways.
 					if jt.hasJob(job.Details.ID) {
+						log.Printf("%s has job %s, continuing", jt.clusterName, job.Details.ID)
 						continue
 					}
 				}
 
+				log.Printf("%s: saving job %s", jt.clusterName, job.Details.ID)
 				jt.saveJob(job)
+				log.Printf("%s: saved job %s", jt.clusterName, job.Details.ID)
 				jt.updates <- job
+				log.Printf("%s: sent job %s to updated channel", jt.clusterName, job.Details.ID)
 			}
 		}()
 	}
 
 	for range time.Tick(*pollInterval) {
-		log.Printf("Listing running jobs on resource manager %s\n", jt.rm)
+		log.Printf("Begin listing running jobs in cluster %s on resource manager %s\n", jt.clusterName, jt.rm)
 		running, err := jt.listJobs()
 		if err != nil {
 			log.Println("Error listing running jobs:", err)
 			continue
 		}
 
-		log.Println("Running jobs:", len(running.Apps.App))
+		log.Printf("Running jobs in cluster %s: %d\n", jt.clusterName, len(running.Apps.App))
 		log.Println("Jobs in cache:", len(jt.jobs))
 		log.Println("Goroutines:", runtime.NumGoroutine())
 
@@ -168,17 +173,21 @@ func (jt *jobTracker) runningJobLoop() {
 		// doesn't know what GONE means so it ignores the job.
 		for jobID, job := range jt.jobs {
 			if job.running && time.Now().Sub(job.updated).Seconds() > 30*pollInterval.Seconds() {
-				log.Printf("%s has not been updated in thirty ticks. Removing.", jobID)
+				log.Printf("%s in cluster %s has not been updated in thirty ticks. Removing.\n", jobID, jt.clusterName)
 				job.Details.State = "GONE"
 				jt.updates <- job
 				jt.deleteJob(job.Details.ID)
 			}
 		}
-
+		log.Printf("%s: appending running jobs\n", jt.clusterName)
 		for i := range running.Apps.App {
+			log.Printf("%s: will append running job %s\n", jt.clusterName, running.Apps.App[i].ID)
 			job := &job{Details: running.Apps.App[i], running: true, updated: time.Now()}
+			log.Printf("%s: appending running job %s\n", jt.clusterName, job.Details.ID)
 			jt.running <- job
+			log.Printf("%s: appended running job %s\n", jt.clusterName, job.Details.ID)
 		}
+		log.Printf("Done listing running jobs in cluster %s on resource manager %s\n", jt.clusterName, jt.rm)
 	}
 
 }
