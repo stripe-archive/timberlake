@@ -3,6 +3,12 @@
 	"ignore": "test",
 	"package": [
 		{
+			"checksumSHA1": "mYXO8s/vu7+guTlxQxhDHsh/E/c=",
+			"path": "github.com/DataDog/datadog-go/statsd",
+			"revision": "c74bd0589c83817c93e4eff39ccae69d6c46df9b",
+			"revisionTime": "2017-09-05T09:56:32Z"
+		},
+		{
 			"checksumSHA1": "4Bm/KCKnST99C3glQfNI7HyBDP4=",
 			"path": "github.com/colinmarc/hdfs",
 			"revision": "5e5d664bed7859df0bda87baba3e4c10afc4b75d",
