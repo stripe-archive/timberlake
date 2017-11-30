@@ -60,6 +60,7 @@ class JobTable extends React.Component {
     const sortDir = `sort-${sort.dir > 0 ? 'asc' : 'desc'}`;
     const Row = this.rowClass();
     const rows = jobs.slice(0, 150).map((job) => <Row key={job.id} job={job} />);
+    /* eslint-disable react/jsx-no-bind */
     return (
       <div>
         <h3>
@@ -77,7 +78,7 @@ class JobTable extends React.Component {
             <tr>
               {this.headers.map((h) => {
                 const cls = sort.key === h ? sortDir : '';
-                const click = this.sort.bind(this, h); // eslint-disable-line react/jsx-no-bind
+                const click = this.sort.bind(this, h);
                 return <th key={h} className={cls} onClick={click}>{h}</th>;
               })}
             </tr>
@@ -86,6 +87,7 @@ class JobTable extends React.Component {
         </table>
       </div>
     );
+    /* eslint-enable react/njsx-no-bind */
   }
 }
 

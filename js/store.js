@@ -44,23 +44,20 @@ class JobStore {
   getJob(id) {
     this.lastJob = id;
     $.getJSON(`/jobs/${id}`).then((data) => {
-      this.trigger('job', new MRJob(data, data.cluster));
+      this.trigger('job', new MRJob(data));
     }).then(null, (error) => console.error(error));
   }
 
   getJobs() {
     $.getJSON('/jobs/').then((data) => {
-      data.forEach((datum) => {
-        this.trigger('jobs', (datum.jobs || []).map((d) => new MRJob(d, datum.cluster)));
-      });
+      this.trigger('jobs', data.map((d) => new MRJob(d)));
     }).then(null, (error) => console.error(error));
   }
 
   startSSE() {
     const sse = new EventSource('/sse');
-    sse.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      this.trigger('job', new MRJob(data, data.cluster));
+    sse.onmessage = (e) => {
+      this.trigger('job', new MRJob(JSON.parse(e.data)));
     };
   }
 

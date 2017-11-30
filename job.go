@@ -21,11 +21,6 @@ type job struct {
 	Cluster  string    `json:"cluster"`
 }
 
-type jobCluster struct {
-	Cluster	string `json:"cluster"`
-	Jobs    []*job  `json:"jobs"`
-}
-
 type jobDetail struct {
 	ID         string `json:"id"`
 	Name       string `json:"name"`

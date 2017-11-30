@@ -7,8 +7,8 @@ const {_} = window;
 export const notAvailable = {};
 
 export class MRJob {
-  constructor(data, cluster) {
-    this.cluster = cluster;
+  constructor(data) {
+    this.cluster = data.cluster;
     const d = data.details;
     this.id = d.id.replace('application_', 'job_');
     this.fullName = d.name;

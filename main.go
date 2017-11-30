@@ -48,11 +48,11 @@ func index(c web.C, w http.ResponseWriter, r *http.Request) {
 
 func getJobs(c web.C, w http.ResponseWriter, r *http.Request) {
 	// We only need the details for listing pages.
-	var jobClusters []*jobCluster
+	var jobs []*job
 	for clusterName, tracker := range jts {
-		var jobs []*job
 		for _, j := range tracker.jobs {
 			jobs = append(jobs, &job{
+				Cluster: tracker.clusterName,
 				Details: j.Details,
 				conf: conf{
 					Input:         j.conf.Input,
@@ -63,13 +63,9 @@ func getJobs(c web.C, w http.ResponseWriter, r *http.Request) {
 			})
 		}
 		log.Printf("Appending %d jobs for Cluster %s: %s %s\n", len(jobs), clusterName, tracker.hs, tracker.rm)
-		jobClusters = append(jobClusters, &jobCluster{
-			Cluster: clusterName,
-			Jobs: jobs,
-		})
 	}
 
-	jsonBytes, err := json.Marshal(jobClusters)
+	jsonBytes, err := json.Marshal(jobs)
 	if err != nil {
 		log.Println("error:", err)
 		w.WriteHeader(500)

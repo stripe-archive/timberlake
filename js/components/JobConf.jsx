@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import React from 'react';
 import {Link} from 'react-router';
 
@@ -55,7 +54,3 @@ export default class JobConf extends React.Component {
     );
   }
 }
-
-JobConf.propTypes = {
-  params: PropTypes.shape({jobId: PropTypes.string.isRequired}).isRequired,
-};

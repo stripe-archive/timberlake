@@ -14,7 +14,7 @@ function waterfall(data, node, optsIn) {
     textFormat: (t) => '',
     linkFormat: null,
     fillStyle: (d) => {
-      return d.type == 'map' ? COLOUR_MAP : COLOUR_REDUCE; // eslint-disable-line eqeqeq
+      return d.type === 'map' ? COLOUR_MAP : COLOUR_REDUCE;
     },
   };
   const opts = _.extend(defaults, optsIn);
