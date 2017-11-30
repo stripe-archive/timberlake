@@ -8,7 +8,6 @@ import {
 
 const {_} = window;
 
-// TODO: only display the cluster column when there are multiple clusters
 const HEADERS = ['user', 'name', 'started', 'duration', 'map', 'reduce', 'cluster'];
 
 class JobTable extends React.Component {
@@ -56,10 +55,13 @@ class JobTable extends React.Component {
   }
 
   render() {
+    const {isMulticluster} = this.props;
     const [sort, jobs] = this.sortedJobs();
     const sortDir = `sort-${sort.dir > 0 ? 'asc' : 'desc'}`;
     const Row = this.rowClass();
-    const rows = jobs.slice(0, 150).map((job) => <Row key={job.id} job={job} />);
+    const rows = jobs.slice(0, 150).map((job) =>
+      <Row isMulticluster={isMulticluster} key={job.id} job={job} />);
+    const headers = isMulticluster ? this.headers : this.headers.slice(0, -1);
     /* eslint-disable react/jsx-no-bind */
     return (
       <div>
@@ -76,7 +78,7 @@ class JobTable extends React.Component {
         <table className="table sortable list-view">
           <thead>
             <tr>
-              {this.headers.map((h) => {
+              {headers.map((h) => {
                 const cls = sort.key === h ? sortDir : '';
                 const click = this.sort.bind(this, h);
                 return <th key={h} className={cls} onClick={click}>{h}</th>;

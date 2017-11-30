@@ -35,7 +35,7 @@ export default class extends React.Component {
   componentWillReceiveProps(nextProps) {
     // A change to the filter when we're flushed indicates a legit transition, probably via browser
     // back button. If we're not flushed then it's just the location bar catching up to our state.
-    if (this.state.flushed && this.state.filter != nextProps.location.query.filter) { // eslint-disable-line eqeqeq
+    if (this.state.flushed && this.state.filter !== nextProps.location.query.filter) {
       this.setState({filter: nextProps.location.query.filter || ''});
     }
   }
@@ -48,10 +48,18 @@ export default class extends React.Component {
   render() {
     const {jobs} = this.props;
     const filter = this.state.filter.toLowerCase();
+    const isMulticluster = (new Set(jobs.map((job) => job.cluster))).size > 1;
+    const props = {
+      filter,
+      isMulticluster,
+      jobs,
+      onFilter: this.handleOnFilter,
+      query: this.props.location.query,
+    };
     return (
       <div>
-        <RunningJobs jobs={jobs} query={this.props.location.query} onFilter={this.handleOnFilter} filter={filter} />
-        <FinishedJobs jobs={jobs} query={this.props.location.query} onFilter={this.handleOnFilter} filter={filter} />
+        <RunningJobs {...props} />
+        <FinishedJobs {...props} />
       </div>
     );
   }
