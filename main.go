@@ -75,6 +75,16 @@ func getJobs(c web.C, w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonBytes)
 }
 
+func getNumClusters(c web.C, w http.ResponseWriter, r *http.Request) {
+	jsonBytes, err := json.Marshal(len(jts))
+	if err != nil {
+		log.Println("error:", err)
+		w.WriteHeader(500)
+		return
+	}
+	w.Write(jsonBytes)
+}
+
 func getConf(c web.C, w http.ResponseWriter, r *http.Request) {
 	id := c.URLParams["id"]
 	log.Printf("Getting job conf for %s", id)
@@ -214,6 +224,7 @@ func main() {
 	mux.Get("/static/*", static)
 	mux.Get("/", index)
 	mux.Get("/jobs/", getJobs)
+	mux.Get("/numClusters/", getNumClusters)
 	mux.Get("/sse", sse)
 	mux.Get("/jobs/:id", getJob)
 	mux.Get("/jobs/:id/conf", getConf)

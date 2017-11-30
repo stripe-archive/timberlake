@@ -4,7 +4,7 @@ import {FinishedJobs, RunningJobs} from './JobTable';
 
 const {_} = window;
 
-export default class extends React.Component {
+export default class List extends React.Component {
   constructor(props) {
     super(props);
 
@@ -46,9 +46,8 @@ export default class extends React.Component {
   }
 
   render() {
-    const {jobs} = this.props;
+    const {isMulticluster, jobs} = this.props;
     const filter = this.state.filter.toLowerCase();
-    const isMulticluster = (new Set(jobs.map((job) => job.cluster))).size > 1;
     const props = {
       filter,
       isMulticluster,

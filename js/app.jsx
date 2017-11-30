@@ -2,7 +2,7 @@ import React from 'react';
 import {render} from 'react-dom';
 import {Router, Route, IndexRoute, hashHistory} from 'react-router';
 
-import BigData from './list';
+import List from './list';
 import Job from './job';
 import JobLogs from './joblogs';
 import JobConf from './components/JobConf';
@@ -25,11 +25,17 @@ class App extends React.Component {
     super(props);
 
     this.state = {
+      isMulticluster: false,
       jobs: {},
     };
   }
 
   componentDidMount() {
+    Store.on('numClusters', (numClusters) => {
+      this.setState({isMulticluster: numClusters > 1});
+    });
+    Store.getNumClusters();
+
     Store.on('job', (job) => {
       this.updates[job.id] = job;
     });
@@ -79,12 +85,14 @@ class App extends React.Component {
   }
 
   render() {
+    const {isMulticluster} = this.state;
     const jobs = _.values(this.state.jobs);
     return (
       <div>
         <NavBar jobs={jobs} />
         <div id="main" className="container">
           {this.props.children && React.cloneElement(this.props.children, {
+            isMulticluster,
             jobs,
           })}
         </div>
@@ -96,7 +104,7 @@ class App extends React.Component {
 render(
   <Router history={hashHistory}>
     <Route path="/" component={App}>
-      <IndexRoute component={BigData} />
+      <IndexRoute component={List} />
       <Route name="job" path="job/:jobId" component={Job} />
       <Route name="log" path="job/:jobId/logs" component={JobLogs} />
       <Route name="cfg" path="job/:jobId/conf" component={JobConf} />
