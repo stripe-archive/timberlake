@@ -4,7 +4,7 @@ import {FinishedJobs, RunningJobs} from './JobTable';
 
 const {_} = window;
 
-export default class List extends React.Component {
+export default class extends React.Component {
   constructor(props) {
     super(props);
 

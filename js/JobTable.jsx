@@ -4,10 +4,12 @@ import {FinishedJobRow, RunningJobRow} from './jobrow';
 import {
   ACTIVE_STATES,
   FINISHED_STATES,
-  HEADERS,
 } from './utils';
 
 const {_} = window;
+
+// TODO: only display the cluster column when there are multiple clusters
+const HEADERS = ['user', 'name', 'started', 'duration', 'map', 'reduce', 'cluster'];
 
 class JobTable extends React.Component {
   static sorting(sort) {
@@ -73,7 +75,7 @@ class JobTable extends React.Component {
         <table className="table sortable list-view">
           <thead>
             <tr>
-              {HEADERS.map((h) => {
+              {this.headers.map((h) => {
                 const cls = sort.key === h ? sortDir : '';
                 const click = this.sort.bind(this, h); // eslint-disable-line react/jsx-no-bind
                 return <th key={h} className={cls} onClick={click}>{h}</th>;
@@ -95,6 +97,7 @@ export class FinishedJobs extends JobTable {
     this.states = FINISHED_STATES;
     this.defaultSortKey = '-finished';
     this.title = 'Finished';
+    this.headers = HEADERS;
     this.rowClass = () => FinishedJobRow;
   }
 }
@@ -107,6 +110,7 @@ export class RunningJobs extends JobTable {
     this.states = ACTIVE_STATES;
     this.defaultSortKey = '-started';
     this.title = 'Running';
+    this.headers = HEADERS;
     this.rowClass = () => RunningJobRow;
     this.autoFocus = true;
   }

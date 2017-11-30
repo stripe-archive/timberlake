@@ -22,9 +22,10 @@ const (
 	// primarily useful during the initial data backfill.
 	finishedJobWorkers = 3
 
-	// Maximum number of jobs to keep track of. All data is retained in memory
-	// on the server, and the details for each job are sent to the browser.
-	jobLimit = 10000
+	// Maximum number of jobs to keep track of per cluster. All data is retained
+	// in memory on the server, and the details for each job are sent to the
+	// browser.
+	jobLimit = 5000
 
 	// How many hours of history should we ask for from the job server?
 	jobHistoryDuration = time.Hour * 24 * 7
@@ -511,6 +512,7 @@ func (jt *jobTracker) fetchCounters(id string) ([]counter, error) {
 
 func (jt *jobTracker) sendUpdates(sse *sse) {
 	for job := range jt.updates {
+		// FIXME: set the cluster in a more intuitive place, not JIT
 		job.Cluster = jt.clusterName
 		jsonBytes, err := json.Marshal(job)
 		if err != nil {

@@ -1,10 +1,7 @@
-import PropTypes from 'prop-types';
 import React from 'react';
 import {Link, hashHistory} from 'react-router';
 
-import {JOB_PROP_TYPES} from './job';
 import {
-  HEADERS,
   timeFormat,
   secondFormat,
   jobState,
@@ -29,17 +26,9 @@ class JobRow extends React.Component {
 
   render() {
     const columns = this.columns();
-    return (
-      <tr onClick={this.handleOnClick}>
-        {columns.map((d, i) => <td key={HEADERS[i]}>{d}</td>)}
-      </tr>
-    );
+    return <tr onClick={this.handleOnClick}>{columns.map((d, i) => <td key={i}>{d}</td>)}</tr>; // eslint-disable-line react/no-array-index-key
   }
 }
-
-JobRow.propTypes = {
-  job: PropTypes.shape(JOB_PROP_TYPES).isRequired,
-};
 
 export class RunningJobRow extends JobRow {
   columns() {
