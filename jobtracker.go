@@ -22,8 +22,9 @@ const (
 	// primarily useful during the initial data backfill.
 	finishedJobWorkers = 3
 
-	// Maximum number of jobs to keep track of. All data is retained in memory
-	// on the server, and the details for each job are sent to the browser.
+	// Maximum number of jobs to keep track of per cluster. All data is retained
+	// in memory on the server, and the details for each job are sent to the
+	// browser.
 	jobLimit = 5000
 
 	// How many hours of history should we ask for from the job server?
@@ -69,6 +70,7 @@ func getJSON(url string, data interface{}) (string, error) {
 	resp, err := httpClient.Do(req)
 	if err != nil {
 		if strings.Index(err.Error(), "use of closed network connection") != -1 {
+			log.Println("Could not get JSON due to closed network connection.")
 		}
 		return "", err
 	}
@@ -92,6 +94,7 @@ func getJSON(url string, data interface{}) (string, error) {
 }
 
 type jobTracker struct {
+	clusterName     string
 	jobs     map[jobID]*job
 	jobsLock sync.Mutex
 	rm       string
@@ -104,8 +107,9 @@ type jobTracker struct {
 	updates  chan *job
 }
 
-func newJobTracker(rmHost string, historyHost string, proxyHost string, namenodeAddress string) *jobTracker {
+func newJobTracker(clusterName string, rmHost string, historyHost string, proxyHost string, namenodeAddress string) *jobTracker {
 	return &jobTracker{
+		clusterName:     clusterName,
 		jobs:     make(map[jobID]*job),
 		rm:       rmHost,
 		hs:       historyHost,
@@ -148,14 +152,14 @@ func (jt *jobTracker) runningJobLoop() {
 	}
 
 	for range time.Tick(*pollInterval) {
-		log.Printf("Listing running jobs on resource manager %s\n", jt.rm)
+		log.Printf("Listing running jobs in cluster %s on resource manager %s\n", jt.clusterName, jt.rm)
 		running, err := jt.listJobs()
 		if err != nil {
 			log.Println("Error listing running jobs:", err)
 			continue
 		}
 
-		log.Println("Running jobs:", len(running.Apps.App))
+		log.Printf("Running jobs in cluster %s: %d\n", jt.clusterName, len(running.Apps.App))
 		log.Println("Jobs in cache:", len(jt.jobs))
 		log.Println("Goroutines:", runtime.NumGoroutine())
 
@@ -165,7 +169,7 @@ func (jt *jobTracker) runningJobLoop() {
 		// doesn't know what GONE means so it ignores the job.
 		for jobID, job := range jt.jobs {
 			if job.running && time.Now().Sub(job.updated).Seconds() > 30*pollInterval.Seconds() {
-				log.Printf("%s has not been updated in thirty ticks. Removing.", jobID)
+				log.Printf("%s in cluster %s has not been updated in thirty ticks. Removing.\n", jobID, jt.clusterName)
 				job.Details.State = "GONE"
 				jt.updates <- job
 				jt.deleteJob(job.Details.ID)
@@ -365,12 +369,14 @@ func (jt *jobTracker) saveJob(job *job) {
 func (jt *jobTracker) updateJob(job *job) error {
 	details, err := jt.fetchJobDetails(job.Details.ID)
 	if err != nil {
+		log.Println("An error occurred fetching job details", job.Details.ID, err)
 		return err
 	}
 	job.Details = details
 
 	conf, err := jt.fetchConf(job.Details.ID)
 	if err != nil {
+		log.Println("An error occurred fetching job conf", job.Details.ID, err)
 		return err
 	}
 	job.conf.update(conf)
@@ -382,12 +388,14 @@ func (jt *jobTracker) updateJob(job *job) error {
 
 	counters, err := jt.fetchCounters(job.Details.ID)
 	if err != nil {
+		log.Println("An error occurred fetching job counters", job.Details.ID, err)
 		return err
 	}
 	job.Counters = counters
 
 	tasks, err := jt.fetchTasks(job.Details.ID)
 	if err != nil {
+		log.Println("An error occurred fetching job tasks", job.Details.ID, err)
 		return err
 	}
 	job.Details.MapsTotalTime = sumTimes(tasks.Map)
@@ -500,4 +508,17 @@ func (jt *jobTracker) fetchCounters(id string) ([]counter, error) {
 	}
 
 	return counters, nil
+}
+
+func (jt *jobTracker) sendUpdates(sse *sse) {
+	for job := range jt.updates {
+		// FIXME: set the cluster in a more intuitive place, not JIT
+		job.Cluster = jt.clusterName
+		jsonBytes, err := json.Marshal(job)
+		if err != nil {
+			log.Println("json error: ", err)
+		} else {
+			sse.events <- jsonBytes
+		}
+	}
 }

@@ -367,7 +367,7 @@ func (jt *jobTracker) updateFromHistoryFile(job *job, full bool) error {
 	_, jobID := hadoopIDs(job.Details.ID)
 	confFile, histFile, err := findHistoryAndConfFiles(client, jobID, job.Details.FinishTime)
 	if err != nil {
-		return fmt.Errorf("couldn't find history file for %s: %s", jobID, err)
+		return fmt.Errorf("couldn't find history file for %s in cluster %s: %s", jobID, jt.clusterName, err)
 	}
 
 	histFileReader, err := client.Open(histFile)

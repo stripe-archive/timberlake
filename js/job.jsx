@@ -1,4 +1,5 @@
-import React from 'react';
+// @flow
+import * as React from 'react';
 import {Link} from 'react-router';
 import ReactTooltip from 'react-tooltip';
 
@@ -51,10 +52,28 @@ function relatedJobs(job, allJobs) {
   return [];
 }
 
-export default class Job extends React.Component {
-  constructor(props) {
+type Props = {
+  jobs: any,
+  params: Object,
+};
+
+type State = {
+  hover: boolean,
+  jobConfs: Object,
+  killing: boolean,
+  killResult?: any,
+  showKillModal: boolean,
+}
+
+export default class Job extends React.Component<Props, State> {
+  constructor(props: any) {
     super(props);
-    this.state = {jobConfs: {}};
+    this.state = {
+      hover: false,
+      jobConfs: {},
+      killing: false,
+      showKillModal: false,
+    };
 
     this.kill = this.kill.bind(this);
     this.handleShowKillModal = this.handleShowKillModal.bind(this);
@@ -77,7 +96,7 @@ export default class Job extends React.Component {
     this.handleNewJobID(this.props.params.jobId);
   }
 
-  componentWillReceiveProps(next) {
+  componentWillReceiveProps(next: any) {
     if (this.props.params.jobId !== next.params.jobId) {
       this.handleNewJobID(next.params.jobId);
     }
@@ -88,7 +107,11 @@ export default class Job extends React.Component {
     return _.find(this.props.jobs, (d) => lolhadoop(d.id) === jobId);
   }
 
-  handleNewJobID(jobId) {
+  kill: Function;
+  handleShowKillModal: Function;
+  handleHideKillModal: Function;
+
+  handleNewJobID(jobId: string) {
     Store.getJob(jobId);
     ConfStore.getJobConf(jobId);
     relatedJobs(this.getJob(), this.props.jobs).forEach((job) => {
@@ -130,7 +153,7 @@ export default class Job extends React.Component {
     /* eslint-disable react/no-array-index-key */
     const renderedInputs = (
       <ul className="list-unstyled">
-        {inputs(job, this.props.jobs, conf, this.state.jobConfs).map((input, i) =>
+        {inputs(job, this.props.jobs, conf, this.state.jobConfs).map((input: any, i) =>
           (
             <li key={i}>
               {_.isString(input) ?
@@ -200,7 +223,17 @@ export default class Job extends React.Component {
       pairs.push(['Line Numbers', steps]);
     }
 
-    const bytes = {
+    const bytes: {
+      file_read: any,
+      file_written: any,
+      hdfs_read: any,
+      hdfs_written: any,
+      s3_read: any,
+      s3_written: any,
+      shuffled: any,
+      total_read?: any,
+      total_written?: any,
+    } = {
       hdfs_read: job.counters.get('FileSystemCounter.HDFS_BYTES_READ').map,
       s3_read: job.counters.get('FileSystemCounter.S3_BYTES_READ').map || 0,
       file_read: job.counters.get('FileSystemCounter.FILE_BYTES_READ').map || 0,

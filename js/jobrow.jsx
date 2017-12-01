@@ -32,8 +32,8 @@ class JobRow extends React.Component {
 
 export class RunningJobRow extends JobRow {
   columns() {
-    const {job} = this.props;
-    return [
+    const {isMulticluster, job} = this.props;
+    const row = [
       job.user,
       <Link to={`/job/${job.id}`}>{job.name}</Link>,
       timeFormat(job.startTime),
@@ -41,13 +41,15 @@ export class RunningJobRow extends JobRow {
       <ProgressBar value={job.maps.progress} />,
       <ProgressBar value={job.reduces.progress} />,
     ];
+    if (isMulticluster) { row.push(job.cluster); }
+    return row;
   }
 }
 
 export class FinishedJobRow extends JobRow {
   columns() {
-    const {job} = this.props;
-    return [
+    const {isMulticluster, job} = this.props;
+    const row = [
       job.user,
       <Link to={`/job/${job.id}`}>{job.name}</Link>,
       timeFormat(job.startTime),
@@ -55,5 +57,7 @@ export class FinishedJobRow extends JobRow {
       secondFormat(job.duration()),
       jobState(job),
     ];
+    if (isMulticluster) { row.push(job.cluster); }
+    return row;
   }
 }

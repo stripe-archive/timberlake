@@ -41,6 +41,12 @@ class JobStore {
     this.lastJob = null;
   }
 
+  getNumClusters() {
+    $.getJSON('/numClusters/').then((numClusters) => {
+      this.trigger('numClusters', numClusters);
+    }).then(null, (error) => console.error(error));
+  }
+
   getJob(id) {
     this.lastJob = id;
     $.getJSON(`/jobs/${id}`).then((data) => {
