@@ -87,7 +87,7 @@ func getJSON(url string, data interface{}) (string, error) {
 	err = json.Unmarshal(jsonBytes, data)
 	if err != nil {
 		var responseStr = string(jsonBytes[:])
-		log.Printf("Response is not valid JSON:`\n`%s\n", responseStr)
+		log.Printf("Response from %s is not valid JSON:`\n`%s\n", url, responseStr)
 		return responseStr, err
 	}
 	return "", err
