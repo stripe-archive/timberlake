@@ -53,7 +53,7 @@ class JobTable extends React.Component {
     if (sort.dir === -1) jobs.reverse();
     return [sort, jobs];
   }
-
+  debugger; // eslint-disable-line no-debugger
   render() {
     const {isMulticluster} = this.props;
     const [sort, jobs] = this.sortedJobs();
