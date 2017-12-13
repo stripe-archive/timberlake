@@ -251,7 +251,8 @@ export default class Job extends React.Component<Props, State> {
     const bytesWrittenTitle = `HDFS: ${bytes.hdfs_written}\nS3: ${bytes.s3_written}\nFile: ${bytes.file_written}`;
 
     const sortedRelatedJobs = _.sortBy(relatedJobs(job, this.props.jobs), (relatedJob) => relatedJob.id);
-
+    // for debugging total/completed count discrepancy
+    console.log('job', job);
     return (
       <div>
         <div className="row">
