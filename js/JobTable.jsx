@@ -8,8 +8,6 @@ import {
 
 const {_} = window;
 
-const HEADERS = ['user', 'name', 'started', 'duration', 'map', 'reduce', 'cluster'];
-
 class JobTable extends React.Component {
   static sorting(sort) {
     const s = sort.split('-');
@@ -101,7 +99,7 @@ export class FinishedJobs extends JobTable {
     this.states = FINISHED_STATES;
     this.defaultSortKey = '-finished';
     this.title = 'Finished';
-    this.headers = HEADERS;
+    this.headers = ['user', 'name', 'started', 'finished', 'map', 'reduce', 'cluster'];
     this.rowClass = () => FinishedJobRow;
   }
 }
@@ -114,7 +112,7 @@ export class RunningJobs extends JobTable {
     this.states = ACTIVE_STATES;
     this.defaultSortKey = '-started';
     this.title = 'Running';
-    this.headers = HEADERS;
+    this.headers = ['user', 'name', 'started', 'duration', 'map', 'reduce', 'cluster'];
     this.rowClass = () => RunningJobRow;
     this.autoFocus = true;
   }
