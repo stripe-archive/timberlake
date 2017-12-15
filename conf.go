@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/xml"
-	"fmt"
 	"io"
 )
 
@@ -57,23 +56,6 @@ func loadConf(r io.Reader) (map[string]string, error) {
 	conf := make(map[string]string, len(parsed.Properties))
 	for _, prop := range parsed.Properties {
 		conf[prop.Name] = prop.Value
-	}
-
-	return conf, nil
-}
-
-// fetchConf pulls a job's hadoop conf from the RM.
-func (jt *jobTracker) fetchConf(id string) (map[string]string, error) {
-	appID, jobID := hadoopIDs(id)
-	url := fmt.Sprintf("%s/proxy/%s/ws/v1/mapreduce/jobs/%s/conf", jt.rm, appID, jobID)
-	confResp := &confResp{}
-	if _, err := getJSON(url, confResp); err != nil {
-		return nil, err
-	}
-
-	conf := make(map[string]string, len(confResp.Conf.Property))
-	for _, property := range confResp.Conf.Property {
-		conf[property.Name] = property.Value
 	}
 
 	return conf, nil

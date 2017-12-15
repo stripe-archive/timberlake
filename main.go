@@ -112,23 +112,32 @@ func getConf(c web.C, w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(404)
 }
 
-func getJob(c web.C, w http.ResponseWriter, r *http.Request) {
-	var id = c.URLParams["id"]
-
+func getJob(rawJobId string) (*job, error) {
+	// check if we have it in memory
 	for clusterName, jt := range jts {
-		if _, ok := jt.jobs[jobID(id)]; ok {
-			job := jt.reifyJob(id)
+		if _, ok := jt.jobs[jobID(rawJobId)]; ok {
+			job := jt.reifyJob(rawJobId)
 			job.Cluster = clusterName
-			jsonBytes, err := json.Marshal(job)
-			if err != nil {
-				log.Println("error getting job:", err)
-				w.WriteHeader(500)
-				return
-			}
-
-			w.Write(jsonBytes)
-			return
+			return job, nil
 		}
+	}
+
+	return nil, nil
+}
+
+func getJobApiHandler(c web.C, w http.ResponseWriter, r *http.Request) {
+	job, err := getJob(c.URLParams["id"])
+
+	if err != nil {
+		log.Println("error getting job:", err)
+		w.WriteHeader(500)
+		return
+	}
+
+	if job != nil {
+		jsonBytes, _ := json.Marshal(job)
+		w.Write(jsonBytes)
+		return
 	}
 
 	w.WriteHeader(404)
@@ -197,10 +206,12 @@ func main() {
 		log.Printf("Creating new JT [%d]: %s %s %s\n", i, resourceManagerURLs[i], historyServerURLs[i], proxyServerURL)
 		jts[clusterNames[i]] = newJobTracker(
 			clusterNames[i],
-			resourceManagerURLs[i],
-			historyServerURLs[i],
-			proxyServerURL,
-			namenodeAddresses[i],
+			newJobFetchClient(
+				resourceManagerURLs[i],
+				historyServerURLs[i],
+				proxyServerURL,
+				namenodeAddresses[i],
+			),
 		)
 	}
 
@@ -226,7 +237,7 @@ func main() {
 	mux.Get("/jobs/", getJobs)
 	mux.Get("/numClusters/", getNumClusters)
 	mux.Get("/sse", sse)
-	mux.Get("/jobs/:id", getJob)
+	mux.Get("/jobs/:id", getJobApiHandler)
 	mux.Get("/jobs/:id/conf", getConf)
 	mux.Post("/jobs/:id/kill", killJob)
 
