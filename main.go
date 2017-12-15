@@ -122,6 +122,14 @@ func getJob(rawJobId string) (*job, error) {
 		}
 	}
 
+	// try to find it in jobhistory server
+	for _, jt := range jts {
+		jobDetails, err := jt.jobClient.fetchJobDetails(rawJobId)
+		if err == nil {
+				return &job{Details: jobDetails, running: false}, nil
+		}
+	}
+
 	return nil, nil
 }
 

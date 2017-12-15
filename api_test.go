@@ -13,6 +13,11 @@ type mockJobClient struct {
 	mock.Mock
 }
 
+func (m *mockJobClient) fetchJobDetails(foo string) (jobDetail, error) {
+  args := m.Called(foo)
+  return args.Get(0).(jobDetail), args.Error(1)
+}
+
 /**
  * sets a jobTracker to main.jts
  */
@@ -45,4 +50,18 @@ func TestGetJobFromMemory(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.Equal(t, res, job)
+}
+
+func TestGetJobFromServer(t *testing.T) {
+	var jobId = "imajobid"
+	var jobDetailsFromServer = jobDetail{}
+	jc := new(mockJobClient)
+	jc.On("fetchJobDetails", jobId).Return(jobDetailsFromServer, nil)
+	setJobTracker(jc)
+
+	res, err := getJob(jobId)
+
+	jc.AssertExpectations(t)
+	assert.Equal(t, res.Details, jobDetailsFromServer)
+	assert.Nil(t, err)
 }
