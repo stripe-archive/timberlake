@@ -3,9 +3,9 @@ package main
 import "time"
 
 type jobConf struct {
-	Conf     conf      `json:"conf"`
-	ID       string    `json:"id"`
-	Name     string    `json:"name"`
+	Conf conf   `json:"conf"`
+	ID   string `json:"id"`
+	Name string `json:"name"`
 }
 
 // Avoid adding additional exported fields
@@ -14,11 +14,11 @@ type job struct {
 	Details  jobDetail `json:"details"`
 	Counters []counter `json:"counters"`
 	conf     conf
-	Tasks    tasks     `json:"tasks"`
+	Tasks    tasks `json:"tasks"`
 	running  bool
 	partial  bool
 	updated  time.Time
-	Cluster  string    `json:"cluster"`
+	Cluster  string `json:"cluster"`
 }
 
 type jobDetail struct {
