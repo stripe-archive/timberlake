@@ -17,7 +17,7 @@ type JobFetchClient interface {
 	listFinishedJobs(since time.Time) (*jobsResp, error)
 	fetchJobDetails(id string) (jobDetail, error)
 	fetchTasks(id string) (tasks, error)
-	fetchCounters(id string) ([]counter, error)
+	listCounters(id string) ([]counter, error)
 	fetchConf(id string) (map[string]string, error)
 	getNamenodeAddress() string
 }
@@ -134,6 +134,9 @@ func (jt *jobFetchClient) fetchJobDetails(id string) (jobDetail, error) {
 	return jobs.Jobs.Job[0], nil
 }
 
+/**
+ * TODO: consider renaming this to listTasks for consistency?
+ */
 func (jt *jobFetchClient) fetchTasks(id string) (tasks, error) {
 	appID, jobID := hadoopIDs(id)
 	url := fmt.Sprintf("%s/proxy/%s/ws/v1/mapreduce/jobs/%s/tasks", jt.proxyHost, appID, jobID)
@@ -163,7 +166,7 @@ func (jt *jobFetchClient) fetchTasks(id string) (tasks, error) {
 	return tasks, nil
 }
 
-func (jt *jobFetchClient) fetchCounters(id string) ([]counter, error) {
+func (jt *jobFetchClient) listCounters(id string) ([]counter, error) {
 	appID, jobID := hadoopIDs(id)
 	url := fmt.Sprintf("%s/proxy/%s/ws/v1/mapreduce/jobs/%s/counters", jt.proxyHost, appID, jobID)
 

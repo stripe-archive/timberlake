@@ -336,7 +336,7 @@ func (jt *jobTracker) updateJob(job *job) error {
 		job.Details.Name = strings.Replace(job.Details.Name, "null/", job.conf.name+"/", 1)
 	}
 
-	counters, err := jt.jobClient.fetchCounters(job.Details.ID)
+	counters, err := jt.jobClient.listCounters(job.Details.ID)
 	if err != nil {
 		log.Println("An error occurred fetching job counters", job.Details.ID, err)
 		return err
