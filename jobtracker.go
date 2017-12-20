@@ -2,11 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
-	"io/ioutil"
 	"log"
-	"net/http"
-	"regexp"
 	"runtime"
 	"sort"
 	"strings"
@@ -49,76 +45,30 @@ func hadoopIDs(id string) (string, jobID) {
 	return app, jobID(job)
 }
 
-// Redirects are banned for two reasons:
-// 1. When a job is in the accepted state the JSON API redirects to an HTML page.
-// 2. When a job is finished The RM redirects to the history server over an
-//    address we may not be able to follow.
-var httpClient = http.Client{
-	Timeout: *httpTimeout,
-	CheckRedirect: func(req *http.Request, via []*http.Request) error {
-		return fmt.Errorf("no redirects allowed. Blocked redirect to %s", req.URL)
-	},
-}
-
-var redirectRegexp, _ = regexp.Compile("This is standby RM. Redirecting to the current active RM: (https?://[^/]*)")
-
-// if response is not valid JSON, the response string will be returned along
-// with the error
-func getJSON(url string, data interface{}) (string, error) {
-	req, err := http.NewRequest("GET", url, nil)
-	req.Close = true
-	resp, err := httpClient.Do(req)
-	if err != nil {
-		if strings.Index(err.Error(), "use of closed network connection") != -1 {
-			log.Println("Could not get JSON due to closed network connection.")
-		}
-		return "", err
-	}
-
-	if resp.StatusCode != 200 {
-		return "", fmt.Errorf("failed getJSON: %v (%v)", url, resp.Status)
-	}
-
-	defer resp.Body.Close()
-	jsonBytes, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return "", err
-	}
-	err = json.Unmarshal(jsonBytes, data)
-	if err != nil {
-		var responseStr = string(jsonBytes[:])
-		log.Printf("Response is not valid JSON:`\n`%s\n", responseStr)
-		return responseStr, err
-	}
-	return "", err
-}
-
 type jobTracker struct {
+	jobClient       JobFetchClient
 	clusterName     string
-	jobs     map[jobID]*job
-	jobsLock sync.Mutex
-	rm       string
-	hs       string
-	ps       string
+	jobs            map[jobID]*job
+	jobsLock        sync.Mutex
+	rm              string
+	hs              string
+	ps              string
 	namenodeAddress string
-	running  chan *job
-	finished chan *job
-	backfill chan *job
-	updates  chan *job
+	running         chan *job
+	finished        chan *job
+	backfill        chan *job
+	updates         chan *job
 }
 
-func newJobTracker(clusterName string, rmHost string, historyHost string, proxyHost string, namenodeAddress string) *jobTracker {
+func newJobTracker(clusterName string, jobClient JobFetchClient) *jobTracker {
 	return &jobTracker{
-		clusterName:     clusterName,
-		jobs:     make(map[jobID]*job),
-		rm:       rmHost,
-		hs:       historyHost,
-		ps:       proxyHost,
-		namenodeAddress: namenodeAddress,
-		running:  make(chan *job),
-		finished: make(chan *job),
-		backfill: make(chan *job),
-		updates:  make(chan *job),
+		clusterName: clusterName,
+		jobClient:   jobClient,
+		jobs:        make(map[jobID]*job),
+		running:     make(chan *job),
+		finished:    make(chan *job),
+		backfill:    make(chan *job),
+		updates:     make(chan *job),
 	}
 }
 
@@ -153,7 +103,7 @@ func (jt *jobTracker) runningJobLoop() {
 
 	for range time.Tick(*pollInterval) {
 		log.Printf("Listing running jobs in cluster %s on resource manager %s\n", jt.clusterName, jt.rm)
-		running, err := jt.listJobs()
+		running, err := jt.jobClient.listJobs()
 		if err != nil {
 			log.Println("Error listing running jobs:", err)
 			continue
@@ -213,7 +163,7 @@ func (jt *jobTracker) finishedJobLoop() {
 		var backfill *jobsResp
 		var err error
 		for {
-			backfill, err = jt.listFinishedJobs(time.Now().Add(-jobHistoryDuration))
+			backfill, err = jt.jobClient.listFinishedJobs(time.Now().Add(-jobHistoryDuration))
 			if err != nil {
 				log.Println("Error listing backfill jobs:", err)
 				time.Sleep(time.Second * 5)
@@ -248,7 +198,7 @@ func (jt *jobTracker) finishedJobLoop() {
 			dur = *pollInterval * 2
 		}
 
-		finished, err := jt.listFinishedJobs(time.Now().Add(-dur))
+		finished, err := jt.jobClient.listFinishedJobs(time.Now().Add(-dur))
 		if err != nil {
 			log.Println("Error loading finished jobs from the history server:", err)
 			continue
@@ -367,14 +317,14 @@ func (jt *jobTracker) saveJob(job *job) {
 
 // updateJob reads the latest state from the resourcemanager.
 func (jt *jobTracker) updateJob(job *job) error {
-	details, err := jt.fetchJobDetails(job.Details.ID)
+	details, err := jt.jobClient.fetchJobDetails(job.Details.ID)
 	if err != nil {
 		log.Println("An error occurred fetching job details", job.Details.ID, err)
 		return err
 	}
 	job.Details = details
 
-	conf, err := jt.fetchConf(job.Details.ID)
+	conf, err := jt.jobClient.fetchConf(job.Details.ID)
 	if err != nil {
 		log.Println("An error occurred fetching job conf", job.Details.ID, err)
 		return err
@@ -386,14 +336,14 @@ func (jt *jobTracker) updateJob(job *job) error {
 		job.Details.Name = strings.Replace(job.Details.Name, "null/", job.conf.name+"/", 1)
 	}
 
-	counters, err := jt.fetchCounters(job.Details.ID)
+	counters, err := jt.jobClient.listCounters(job.Details.ID)
 	if err != nil {
 		log.Println("An error occurred fetching job counters", job.Details.ID, err)
 		return err
 	}
 	job.Counters = counters
 
-	tasks, err := jt.fetchTasks(job.Details.ID)
+	tasks, err := jt.jobClient.fetchTasks(job.Details.ID)
 	if err != nil {
 		log.Println("An error occurred fetching job tasks", job.Details.ID, err)
 		return err
@@ -404,110 +354,6 @@ func (jt *jobTracker) updateJob(job *job) error {
 	job.Tasks.Reduce = trimTasks(tasks.Reduce)
 
 	return nil
-}
-
-func (jt *jobTracker) listJobs() (*appsResp, error) {
-	url := fmt.Sprintf("%s/ws/v1/cluster/apps/?states=running,submitted,accepted,new", jt.rm)
-	log.Printf("RM URL: %s\n", url)
-	resp := &appsResp{}
-	responseStr, err := getJSON(url, resp)
-	var submatch = redirectRegexp.FindStringSubmatch(responseStr)
-	if len(submatch) == 2 {
-		log.Printf("Response indicated a redirect but it was not followed: `%s`\n", responseStr)
-		log.Printf("Updating jt.rm from %s to %s\n", jt.rm, submatch[1])
-		jt.rm = submatch[1]
-	}
-	if err != nil {
-		return nil, err
-	}
-
-	return resp, nil
-}
-
-func (jt *jobTracker) listFinishedJobs(since time.Time) (*jobsResp, error) {
-	url := fmt.Sprintf("%s/ws/v1/history/mapreduce/jobs?finishedTimeBegin=%d000", jt.hs, since.Unix())
-	resp := &jobsResp{}
-	_, err := getJSON(url, resp)
-	if err != nil {
-		return nil, err
-	}
-
-	return resp, nil
-}
-
-func (jt *jobTracker) fetchJobDetails(id string) (jobDetail, error) {
-	appID, _ := hadoopIDs(id)
-	url := fmt.Sprintf("%s/proxy/%s/ws/v1/mapreduce/jobs", jt.ps, appID)
-
-	jobs := &jobsResp{}
-	responseStr, err := getJSON(url, jobs)
-	var submatch = redirectRegexp.FindStringSubmatch(responseStr)
-	if len(submatch) == 2 {
-		log.Printf("Response indicated a redirect but it was not followed: `%s`\n", responseStr)
-		log.Printf("Updating jt.ps from %s to %s\n", jt.ps, submatch[1])
-		jt.ps = submatch[1]
-	}
-	if err != nil {
-		return jobDetail{}, err
-	}
-
-	return jobs.Jobs.Job[0], nil
-}
-
-func (jt *jobTracker) fetchTasks(id string) (tasks, error) {
-	appID, jobID := hadoopIDs(id)
-	url := fmt.Sprintf("%s/proxy/%s/ws/v1/mapreduce/jobs/%s/tasks", jt.ps, appID, jobID)
-
-	taskResp := &tasksResp{}
-	if _, err := getJSON(url, taskResp); err != nil {
-		return tasks{}, err
-	}
-
-	tasks := tasks{Map: make([][]int64, 0), Reduce: make([][]int64, 0)}
-
-	for _, task := range taskResp.Tasks.Task {
-		// The API reports the start time of scheduled tasks as the start time
-		// of the job. They haven't actually started though.
-		startTime := task.StartTime
-		if task.State == "SCHEDULED" {
-			startTime = -1
-		}
-
-		if task.Type == "MAP" {
-			tasks.Map = append(tasks.Map, []int64{startTime, task.FinishTime})
-		} else if task.Type == "REDUCE" {
-			tasks.Reduce = append(tasks.Reduce, []int64{startTime, task.FinishTime})
-		}
-	}
-
-	return tasks, nil
-}
-
-func (jt *jobTracker) fetchCounters(id string) ([]counter, error) {
-	appID, jobID := hadoopIDs(id)
-	url := fmt.Sprintf("%s/proxy/%s/ws/v1/mapreduce/jobs/%s/counters", jt.ps, appID, jobID)
-
-	counterResp := &countersResp{}
-	if _, err := getJSON(url, counterResp); err != nil {
-		return nil, err
-	}
-
-	var counters []counter
-
-	for _, group := range counterResp.JobCounters.CounterGroups {
-		splits := strings.Split(group.Name, ".")
-		groupName := splits[len(splits)-1]
-		for _, c := range group.Counters {
-			counters = append(counters, counter{
-				Name:   groupName + "." + c.Name,
-				Total:  c.Total,
-				Map:    c.Map,
-				Reduce: c.Reduce,
-			})
-		}
-	}
-
-	return counters, nil
 }
 
 func (jt *jobTracker) sendUpdates(sse *sse) {

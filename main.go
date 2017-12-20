@@ -94,7 +94,7 @@ func getConf(c web.C, w http.ResponseWriter, r *http.Request) {
 			job := jt.reifyJob(id)
 			jobConfCounters := jobConf{
 				Conf: job.conf,
-				ID: job.Details.ID,
+				ID:   job.Details.ID,
 				Name: job.Details.Name,
 			}
 			jsonBytes, err := json.Marshal(jobConfCounters)
@@ -112,26 +112,35 @@ func getConf(c web.C, w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(404)
 }
 
-func getJob(c web.C, w http.ResponseWriter, r *http.Request) {
-	var id = c.URLParams["id"]
-
+func getJob(rawJobID string) *job {
+	// check if we have it in memory
 	for clusterName, jt := range jts {
-		if _, ok := jt.jobs[jobID(id)]; ok {
-			job := jt.reifyJob(id)
+		if _, ok := jt.jobs[jobID(rawJobID)]; ok {
+			job := jt.reifyJob(rawJobID)
 			job.Cluster = clusterName
-			jsonBytes, err := json.Marshal(job)
-			if err != nil {
-				log.Println("error getting job:", err)
-				w.WriteHeader(500)
-				return
-			}
-
-			w.Write(jsonBytes)
-			return
+			return job
 		}
 	}
 
-	w.WriteHeader(404)
+	return nil
+}
+
+func getJobAPIHandler(c web.C, w http.ResponseWriter, r *http.Request) {
+	job := getJob(c.URLParams["id"])
+
+	if job == nil {
+		w.WriteHeader(404)
+		return
+	}
+
+	jsonBytes, err := json.Marshal(job)
+	if err != nil {
+		log.Println("error serializing job:", err)
+		w.WriteHeader(500)
+		return
+	}
+
+	w.Write(jsonBytes)
 }
 
 func killJob(c web.C, w http.ResponseWriter, r *http.Request) {
@@ -197,10 +206,12 @@ func main() {
 		log.Printf("Creating new JT [%d]: %s %s %s\n", i, resourceManagerURLs[i], historyServerURLs[i], proxyServerURL)
 		jts[clusterNames[i]] = newJobTracker(
 			clusterNames[i],
-			resourceManagerURLs[i],
-			historyServerURLs[i],
-			proxyServerURL,
-			namenodeAddresses[i],
+			newJobFetchClient(
+				resourceManagerURLs[i],
+				historyServerURLs[i],
+				proxyServerURL,
+				namenodeAddresses[i],
+			),
 		)
 	}
 
@@ -226,7 +237,7 @@ func main() {
 	mux.Get("/jobs/", getJobs)
 	mux.Get("/numClusters/", getNumClusters)
 	mux.Get("/sse", sse)
-	mux.Get("/jobs/:id", getJob)
+	mux.Get("/jobs/:id", getJobAPIHandler)
 	mux.Get("/jobs/:id/conf", getConf)
 	mux.Post("/jobs/:id/kill", killJob)
 
