@@ -81,9 +81,6 @@ export default class Job extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    const {jobId} = this.props.params;
-    Store.getJob(jobId);
-
     ConfStore.on('jobConf', (jobConf) => (
       this.setState({
         jobConfs: _.extend(
@@ -112,7 +109,8 @@ export default class Job extends React.Component<Props, State> {
   handleHideKillModal: Function;
 
   handleNewJobID(jobId: string) {
-    Store.getJob(jobId);
+    Store.getJob(jobId)
+      .then((job) => Store.getRelatedJobs(job.flowId));
     ConfStore.getJobConf(jobId);
     relatedJobs(this.getJob(), this.props.jobs).forEach((job) => {
       ConfStore.getJobConf(job.id);

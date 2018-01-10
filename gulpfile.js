@@ -3,7 +3,7 @@ const browserify = require('browserify');
 const source = require('vinyl-source-stream');
 
 const paths = {
-  js: ['js/*/*.jsx'],
+  js: ['js/**/*.jsx', 'js/**/*.js'],
   copy: ['css/*.css', 'js/libs/*.js', 'img/*'],
 };
 

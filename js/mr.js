@@ -9,6 +9,7 @@ export const notAvailable = {};
 export class MRJob {
   constructor(data) {
     this.cluster = data.cluster;
+    this.flowId = data.flowID;
     const d = data.details;
     this.id = d.id.replace('application_', 'job_');
     this.fullName = d.name;
