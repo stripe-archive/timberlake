@@ -11,8 +11,9 @@ import (
 	"time"
 )
 
-// JobFetchClient fetches jobs from servers
-type JobFetchClient interface {
+// RecentJobClient fetches info about live jobs + recently finished jobs,
+// usually directly from the hadoop cluster's job history server
+type RecentJobClient interface {
 	listJobs() (*appsResp, error)
 	listFinishedJobs(since time.Time) (*jobsResp, error)
 	fetchJobDetails(id string) (jobDetail, error)
@@ -22,7 +23,7 @@ type JobFetchClient interface {
 	getNamenodeAddress() string
 }
 
-type jobFetchClient struct {
+type hadoopJobClient struct {
 	resourceManagerHost string
 	jobHistoryHost      string
 	proxyHost           string
@@ -42,8 +43,8 @@ var httpClient = http.Client{
 
 var redirectRegexp, _ = regexp.Compile("This is standby RM. Redirecting to the current active RM: (https?://[^/]*)")
 
-func newJobFetchClient(resourceManagerHost string, jobHistoryHost string, proxyHost string, namenodeAddresses string) JobFetchClient {
-	return &jobFetchClient{
+func newRecentJobClient(resourceManagerHost string, jobHistoryHost string, proxyHost string, namenodeAddresses string) RecentJobClient {
+	return &hadoopJobClient{
 		resourceManagerHost: resourceManagerHost,
 		jobHistoryHost:      jobHistoryHost,
 		proxyHost:           proxyHost,
@@ -82,11 +83,11 @@ func getJSON(url string, data interface{}) (string, error) {
 	return "", err
 }
 
-func (jt *jobFetchClient) getNamenodeAddress() string {
+func (jt *hadoopJobClient) getNamenodeAddress() string {
 	return jt.namenodeAddresses
 }
 
-func (jt *jobFetchClient) listJobs() (*appsResp, error) {
+func (jt *hadoopJobClient) listJobs() (*appsResp, error) {
 	url := fmt.Sprintf("%s/ws/v1/cluster/apps/?states=running,submitted,accepted,new", jt.resourceManagerHost)
 	log.Printf("RM URL: %s\n", url)
 	resp := &appsResp{}
@@ -104,7 +105,7 @@ func (jt *jobFetchClient) listJobs() (*appsResp, error) {
 	return resp, nil
 }
 
-func (jt *jobFetchClient) listFinishedJobs(since time.Time) (*jobsResp, error) {
+func (jt *hadoopJobClient) listFinishedJobs(since time.Time) (*jobsResp, error) {
 	url := fmt.Sprintf("%s/ws/v1/history/mapreduce/jobs?finishedTimeBegin=%d000", jt.jobHistoryHost, since.Unix())
 	resp := &jobsResp{}
 	_, err := getJSON(url, resp)
@@ -115,7 +116,7 @@ func (jt *jobFetchClient) listFinishedJobs(since time.Time) (*jobsResp, error) {
 	return resp, nil
 }
 
-func (jt *jobFetchClient) fetchJobDetails(id string) (jobDetail, error) {
+func (jt *hadoopJobClient) fetchJobDetails(id string) (jobDetail, error) {
 	appID, _ := hadoopIDs(id)
 	url := fmt.Sprintf("%s/proxy/%s/ws/v1/mapreduce/jobs", jt.proxyHost, appID)
 
@@ -134,10 +135,7 @@ func (jt *jobFetchClient) fetchJobDetails(id string) (jobDetail, error) {
 	return jobs.Jobs.Job[0], nil
 }
 
-/**
- * TODO: consider renaming this to listTasks for consistency?
- */
-func (jt *jobFetchClient) fetchTasks(id string) (tasks, error) {
+func (jt *hadoopJobClient) fetchTasks(id string) (tasks, error) {
 	appID, jobID := hadoopIDs(id)
 	url := fmt.Sprintf("%s/proxy/%s/ws/v1/mapreduce/jobs/%s/tasks", jt.proxyHost, appID, jobID)
 
@@ -166,7 +164,7 @@ func (jt *jobFetchClient) fetchTasks(id string) (tasks, error) {
 	return tasks, nil
 }
 
-func (jt *jobFetchClient) listCounters(id string) ([]counter, error) {
+func (jt *hadoopJobClient) listCounters(id string) ([]counter, error) {
 	appID, jobID := hadoopIDs(id)
 	url := fmt.Sprintf("%s/proxy/%s/ws/v1/mapreduce/jobs/%s/counters", jt.proxyHost, appID, jobID)
 
@@ -194,7 +192,7 @@ func (jt *jobFetchClient) listCounters(id string) ([]counter, error) {
 }
 
 // fetchConf pulls a job's hadoop conf from the RM.
-func (jt *jobFetchClient) fetchConf(id string) (map[string]string, error) {
+func (jt *hadoopJobClient) fetchConf(id string) (map[string]string, error) {
 	appID, jobID := hadoopIDs(id)
 	url := fmt.Sprintf("%s/proxy/%s/ws/v1/mapreduce/jobs/%s/conf", jt.resourceManagerHost, appID, jobID)
 	confResp := &confResp{}

@@ -26,8 +26,13 @@ var yarnHistoryDir = flag.String("yarn-history-dir", "/tmp/staging/history/done"
 var httpTimeout = flag.Duration("http-timeout", time.Second*2, "The timeout used for connecting to YARN API. Pass values like: 2s")
 var pollInterval = flag.Duration("poll-interval", time.Second*5, "How often should we poll the job APIs. Pass values like: 2s")
 var enableDebug = flag.Bool("pprof", false, "Enable pprof debugging tools at /debug.")
+var s3BucketName = flag.String("s3-bucket", "", "S3 bucket to fetch old jobs from")
+var s3Region = flag.String("s3-region", "", "AWS region for the job storage S3 bucket")
+var s3JobsPrefix = flag.String("s3-jobs-prefix", "", "S3 key prefix (\"folder\") where jobs are stored")
+var s3FlowPrefix = flag.String("s3-flow-prefix", "", "S3 key prefix (\"folder\") where cascading flows are stored")
 
 var jts map[string]*jobTracker
+var persistedJobClient PersistedJobClient
 
 var rootPath, staticPath string
 
@@ -89,27 +94,24 @@ func getConf(c web.C, w http.ResponseWriter, r *http.Request) {
 	id := c.URLParams["id"]
 	log.Printf("Getting job conf for %s", id)
 
-	for _, jt := range jts {
-		if _, ok := jt.jobs[jobID(id)]; ok {
-			job := jt.reifyJob(id)
-			jobConfCounters := jobConf{
-				Conf: job.conf,
-				ID:   job.Details.ID,
-				Name: job.Details.Name,
-			}
-			jsonBytes, err := json.Marshal(jobConfCounters)
-			if err != nil {
-				log.Println("could not marshal:", err)
-				w.WriteHeader(500)
-				return
-			}
-
-			w.Write(jsonBytes)
-			return
-		}
+	job := getJob(id)
+	if job == nil {
+		w.WriteHeader(404)
+		return
 	}
 
-	w.WriteHeader(404)
+	jsonBytes, err := json.Marshal(jobConf{
+		Conf: job.conf,
+		ID:   job.Details.ID,
+		Name: job.Details.Name,
+	})
+	if err != nil {
+		log.Println("could not marshal:", err)
+		w.WriteHeader(500)
+		return
+	}
+
+	w.Write(jsonBytes)
 }
 
 func getJob(rawJobID string) *job {
@@ -122,7 +124,10 @@ func getJob(rawJobID string) *job {
 		}
 	}
 
-	return nil
+	// check if we have it in long-term storage
+	job, _ := persistedJobClient.FetchJob(rawJobID)
+
+	return job
 }
 
 func getJobAPIHandler(c web.C, w http.ResponseWriter, r *http.Request) {
@@ -136,6 +141,24 @@ func getJobAPIHandler(c web.C, w http.ResponseWriter, r *http.Request) {
 	jsonBytes, err := json.Marshal(job)
 	if err != nil {
 		log.Println("error serializing job:", err)
+		w.WriteHeader(500)
+		return
+	}
+
+	w.Write(jsonBytes)
+}
+
+func getJobIdsAPIHandler(c web.C, w http.ResponseWriter, r *http.Request) {
+	jobIds, err := persistedJobClient.FetchFlowJobIds(c.URLParams["flowID"])
+	if err != nil {
+		log.Println("FetchFlowJobIds error:", err)
+		w.WriteHeader(500)
+		return
+	}
+
+	jsonBytes, err := json.Marshal(jobIds)
+	if err != nil {
+		log.Println("JSON marshal error:", err)
 		w.WriteHeader(500)
 		return
 	}
@@ -195,6 +218,7 @@ func main() {
 		log.Fatal("cluster-names and resource-manager-url are not 1:1")
 	}
 
+	persistedJobClient = NewS3JobClient(*s3Region, *s3BucketName, *s3JobsPrefix, *s3FlowPrefix)
 	jts = make(map[string]*jobTracker)
 	for i := range resourceManagerURLs {
 		var proxyServerURL string
@@ -206,7 +230,7 @@ func main() {
 		log.Printf("Creating new JT [%d]: %s %s %s\n", i, resourceManagerURLs[i], historyServerURLs[i], proxyServerURL)
 		jts[clusterNames[i]] = newJobTracker(
 			clusterNames[i],
-			newJobFetchClient(
+			newRecentJobClient(
 				resourceManagerURLs[i],
 				historyServerURLs[i],
 				proxyServerURL,
@@ -237,6 +261,7 @@ func main() {
 	mux.Get("/jobs/", getJobs)
 	mux.Get("/numClusters/", getNumClusters)
 	mux.Get("/sse", sse)
+	mux.Get("/jobIds/:flowID", getJobIdsAPIHandler)
 	mux.Get("/jobs/:id", getJobAPIHandler)
 	mux.Get("/jobs/:id/conf", getConf)
 	mux.Post("/jobs/:id/kill", killJob)

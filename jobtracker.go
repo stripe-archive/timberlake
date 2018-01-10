@@ -46,7 +46,7 @@ func hadoopIDs(id string) (string, jobID) {
 }
 
 type jobTracker struct {
-	jobClient       JobFetchClient
+	jobClient       RecentJobClient
 	clusterName     string
 	jobs            map[jobID]*job
 	jobsLock        sync.Mutex
@@ -60,7 +60,7 @@ type jobTracker struct {
 	updates         chan *job
 }
 
-func newJobTracker(clusterName string, jobClient JobFetchClient) *jobTracker {
+func newJobTracker(clusterName string, jobClient RecentJobClient) *jobTracker {
 	return &jobTracker{
 		clusterName: clusterName,
 		jobClient:   jobClient,
