@@ -72,7 +72,7 @@ func getJobs(c web.C, w http.ResponseWriter, r *http.Request) {
 
 	jsonBytes, err := json.Marshal(jobs)
 	if err != nil {
-		log.Println("error:", err)
+		log.Println("getJobs error:", err)
 		w.WriteHeader(500)
 		return
 	}
@@ -83,7 +83,7 @@ func getJobs(c web.C, w http.ResponseWriter, r *http.Request) {
 func getNumClusters(c web.C, w http.ResponseWriter, r *http.Request) {
 	jsonBytes, err := json.Marshal(len(jts))
 	if err != nil {
-		log.Println("error:", err)
+		log.Println("getNumbClusters error:", err)
 		w.WriteHeader(500)
 		return
 	}
@@ -174,7 +174,7 @@ func killJob(c web.C, w http.ResponseWriter, r *http.Request) {
 		if _, ok := jt.jobs[jobID]; ok {
 			err := jt.killJob(id)
 			if err != nil {
-				log.Println("error: ", err)
+				log.Println("killJob error: ", err)
 				w.WriteHeader(500)
 				return
 			}
