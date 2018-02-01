@@ -1,4 +1,4 @@
-FROM golang:1.6
+FROM golang:1.9
 
 # Install node
 RUN if [ -e /usr/stripe/bin/docker/stripe-install-node ]; then /usr/stripe/bin/docker/stripe-install-node 6.9.2; else \
