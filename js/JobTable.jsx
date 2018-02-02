@@ -99,7 +99,7 @@ export class FinishedJobs extends JobTable {
     this.states = FINISHED_STATES;
     this.defaultSortKey = '-finished';
     this.title = 'Finished';
-    this.headers = ['user', 'name', 'started', 'finished', 'map', 'reduce', 'cluster'];
+    this.headers = ['user', 'name', 'started', 'finished', 'duration', 'state', 'cluster'];
     this.rowClass = () => FinishedJobRow;
   }
 }
