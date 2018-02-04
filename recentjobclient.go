@@ -21,6 +21,7 @@ type RecentJobClient interface {
 	listCounters(id string) ([]counter, error)
 	fetchConf(id string) (map[string]string, error)
 	getNamenodeAddress() string
+	getRMAddress() string
 }
 
 type hadoopJobClient struct {
@@ -85,6 +86,10 @@ func getJSON(url string, data interface{}) (string, error) {
 
 func (jt *hadoopJobClient) getNamenodeAddress() string {
 	return jt.namenodeAddresses
+}
+
+func (jt *hadoopJobClient) getRMAddress() string {
+	return jt.resourceManagerHost
 }
 
 func (jt *hadoopJobClient) listJobs() (*appsResp, error) {

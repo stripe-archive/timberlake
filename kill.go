@@ -9,7 +9,7 @@ import (
 )
 
 func (jt *jobTracker) killJob(id string) error {
-	url := fmt.Sprintf("%s/ws/v1/cluster/apps/%s/state", jt.rm, id)
+	url := fmt.Sprintf("%s/ws/v1/cluster/apps/%s/state", jt.jobClient.getRMAddress(), id)
 	payload := strings.NewReader(`{"state":"KILLED"}`) //cheating
 	req, err := http.NewRequest("PUT", url, payload)
 	if err != nil {
