@@ -197,11 +197,23 @@
 			"revisionTime": "2016-03-03T22:17:00Z"
 		},
 		{
+			"checksumSHA1": "p/8vSviYF91gFflhrt5vkyksroo=",
+			"path": "github.com/golang/snappy",
+			"revision": "553a641470496b2327abcac10b36396bd98e45c9",
+			"revisionTime": "2017-02-15T23:32:05Z"
+		},
+		{
 			"checksumSHA1": "0ZrwvB6KoGPj2PoDNSEJwxQ6Mog=",
 			"origin": "github.com/aws/aws-sdk-go/vendor/github.com/jmespath/go-jmespath",
 			"path": "github.com/jmespath/go-jmespath",
 			"revision": "637cf7628131c159e01b0d7eec05d5cf76c1dddb",
 			"revisionTime": "2017-12-19T06:12:00Z"
+		},
+		{
+			"checksumSHA1": "sPmvXv/k7SxUXi1GqXEhdBBRBPg=",
+			"path": "github.com/linkedin/goavro",
+			"revision": "c57c0f2fdb8d0058584e6a59e895bd3c35233eb3",
+			"revisionTime": "2018-01-31T23:02:12Z"
 		},
 		{
 			"checksumSHA1": "zKKp5SZ3d3ycKe4EKMNT0BqAWBw=",
@@ -257,7 +269,11 @@
 			"path": "github.com/zenazn/goji/web/mutil",
 			"revision": "e9a3f0275121c2439e2bd4b5dc6a9eb3fbe88451",
 			"revisionTime": "2016-03-04T04:43:53Z"
+		},
+		{
+			"path": "https://github.com/linkedin/goavro",
+			"revision": ""
 		}
 	],
-	"rootPath": "github.com/stripe/timberlake"
+	"rootPath": "github.com/stripe-internal/timberlake"
 }
