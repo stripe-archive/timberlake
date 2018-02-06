@@ -123,7 +123,7 @@ export default class Job extends React.Component<Props, State> {
     const job = this.getJob();
     $.post(`/jobs/${job.id}/kill`, (data, status) => {
       console.log(data, status);
-      const result = (data && data.err) ? data.stderr : null;
+      const result = data.err ? data.stderr : null;
       this.setState({killResult: result});
     }).then(null, (err) => {
       console.error(err);
