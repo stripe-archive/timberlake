@@ -172,7 +172,7 @@ func killJob(c web.C, w http.ResponseWriter, r *http.Request) {
 
 	for _, jt := range jts {
 		if _, ok := jt.jobs[jobID]; ok {
-			err := jt.killJob(id)
+			err := jt.killJob(id, jt.jobs[jobID].Details.User)
 			if err != nil {
 				log.Println("killJob error: ", err)
 				w.WriteHeader(500)
