@@ -3,9 +3,6 @@ package main
 import (
 	"encoding/json"
 	"flag"
-	"github.com/zenazn/goji/bind"
-	"github.com/zenazn/goji/web"
-	"github.com/zenazn/goji/web/middleware"
 	"log"
 	"net/http"
 	"net/http/pprof"
@@ -14,6 +11,10 @@ import (
 	"reflect"
 	"strings"
 	"time"
+
+	"github.com/zenazn/goji/bind"
+	"github.com/zenazn/goji/web"
+	"github.com/zenazn/goji/web/middleware"
 )
 
 var clusterNames = flag.String("cluster-name", "default", "The user-visible names for the clusters")
@@ -67,7 +68,7 @@ func getJobs(c web.C, w http.ResponseWriter, r *http.Request) {
 				},
 			})
 		}
-		log.Printf("Appending %d jobs for Cluster %s: %s %s\n", len(jobs), clusterName, tracker.hs, tracker.rm)
+		log.Printf("Appending %d jobs for Cluster %s\n", len(jobs), clusterName)
 	}
 
 	jsonBytes, err := json.Marshal(jobs)

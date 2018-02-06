@@ -5,7 +5,7 @@ import (
 )
 
 func (jt *jobTracker) testLogsDir() error {
-	client, err := hdfs.New(jt.namenodeAddress)
+	client, err := hdfs.New(jt.jobClient.getNamenodeAddress())
 	if err != nil {
 		return err
 	}
