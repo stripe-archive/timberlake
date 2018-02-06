@@ -19,7 +19,6 @@ func (jt *jobTracker) killJob(id string, user string) error {
 	log.Println("Killing", id, req)
 
 	res, err := http.DefaultClient.Do(req)
-    log.Println("Whole status:", res)
 	log.Println("Kill status:", res.Status)
 
 	if res.StatusCode == 202 {

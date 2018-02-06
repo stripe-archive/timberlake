@@ -168,11 +168,10 @@ func getJobIdsAPIHandler(c web.C, w http.ResponseWriter, r *http.Request) {
 
 func killJob(c web.C, w http.ResponseWriter, r *http.Request) {
 	id := c.URLParams["id"]
-	jobID := jobID(id)
+	app, jobID := hadoopIDs(id)
 
 	for _, jt := range jts {
 		if _, ok := jt.jobs[jobID]; ok {
-			app, _ := hadoopIDs(id)
 			err := jt.killJob(app, jt.jobs[jobID].Details.User)
 			if err != nil {
 				log.Println("killJob error: ", err)
