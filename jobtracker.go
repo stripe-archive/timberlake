@@ -46,18 +46,14 @@ func hadoopIDs(id string) (string, jobID) {
 }
 
 type jobTracker struct {
-	jobClient       RecentJobClient
-	clusterName     string
-	jobs            map[jobID]*job
-	jobsLock        sync.Mutex
-	rm              string
-	hs              string
-	ps              string
-	namenodeAddress string
-	running         chan *job
-	finished        chan *job
-	backfill        chan *job
-	updates         chan *job
+	jobClient   RecentJobClient
+	clusterName string
+	jobs        map[jobID]*job
+	jobsLock    sync.Mutex
+	running     chan *job
+	finished    chan *job
+	backfill    chan *job
+	updates     chan *job
 }
 
 func newJobTracker(clusterName string, jobClient RecentJobClient) *jobTracker {
@@ -102,7 +98,7 @@ func (jt *jobTracker) runningJobLoop() {
 	}
 
 	for range time.Tick(*pollInterval) {
-		log.Printf("Listing running jobs in cluster %s on resource manager %s\n", jt.clusterName, jt.rm)
+		log.Printf("Listing running jobs in cluster %s\n", jt.clusterName)
 		running, err := jt.jobClient.listJobs()
 		if err != nil {
 			log.Println("Error listing running jobs:", err)
@@ -165,7 +161,7 @@ func (jt *jobTracker) finishedJobLoop() {
 		for {
 			backfill, err = jt.jobClient.listFinishedJobs(time.Now().Add(-jobHistoryDuration))
 			if err != nil {
-				log.Println("Error listing backfill jobs:", err)
+				log.Println(jt.clusterName, "Error listing backfill jobs:", err)
 				time.Sleep(time.Second * 5)
 			} else {
 				break
@@ -176,20 +172,20 @@ func (jt *jobTracker) finishedJobLoop() {
 		// details for the newest jobs first.
 		sort.Sort(sort.Reverse(jobDetails(backfill.Jobs.Job)))
 		total := len(backfill.Jobs.Job)
-		log.Println("Jobs to backfill:", total)
+		log.Println(jt.clusterName, "Jobs to backfill:", total)
 		for i := range backfill.Jobs.Job {
 			if i > jobLimit {
 				break
 			}
 
 			if i%100 == 0 {
-				log.Printf("Backfilled %d/%d jobs", i, total)
+				log.Printf(jt.clusterName, "Backfilled %d/%d jobs", i, total)
 			}
 
 			jt.backfill <- &job{Details: backfill.Jobs.Job[i], running: false}
 		}
 
-		log.Println("Finished backfilling jobs.")
+		log.Println(jt.clusterName, "Finished backfilling jobs.")
 	}()
 
 	for range time.Tick(*pollInterval) {
@@ -200,11 +196,11 @@ func (jt *jobTracker) finishedJobLoop() {
 
 		finished, err := jt.jobClient.listFinishedJobs(time.Now().Add(-dur))
 		if err != nil {
-			log.Println("Error loading finished jobs from the history server:", err)
+			log.Println(jt.clusterName, "Error loading finished jobs from the history server:", err)
 			continue
 		}
 
-		log.Println("Finished jobs:", len(finished.Jobs.Job))
+		log.Println(jt.clusterName, "Finished jobs:", len(finished.Jobs.Job))
 
 		for i, details := range finished.Jobs.Job {
 			// Only fill in details for jobs we don't already have.
