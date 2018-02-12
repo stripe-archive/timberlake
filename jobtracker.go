@@ -148,7 +148,7 @@ func (jt *jobTracker) finishedJobLoop() {
 				full := job.Details.FinishTime/1000 > time.Now().Add(-fullDataDuration).Unix()
 				err := jt.updateFromHistoryFile(job, full)
 				if err != nil {
-					log.Println("An error occurred updating from history file", job.Details.ID, err)
+					log.Println(jt.clusterName, "An error occurred updating from history file", job.Details.ID, err)
 					continue
 				}
 
