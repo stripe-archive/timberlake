@@ -1,8 +1,6 @@
 import React from 'react';
 import Waterfall from './Waterfall';
-import {
-  sample,
-} from '../utils';
+import {sample} from '../utils';
 
 const {_} = window;
 
