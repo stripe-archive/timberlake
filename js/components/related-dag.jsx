@@ -43,7 +43,7 @@ export default class RelatedDAG extends React.Component {
         (outputMap[output] = outputMap[output] || []).push(currentJob.id);
         files.add(output);
       });
-
+      console.log('currentJob name', currentJob.name);
       // Create a graph node.
       g.setNode(currentJob.id, {
         label: /^[^(]+\(([0-9]+)/.exec(currentJob.name)[1],
