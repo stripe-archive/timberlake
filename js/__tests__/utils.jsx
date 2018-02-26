@@ -1,3 +1,4 @@
+// @flow
 import {jobLabel} from '../utils';
 
 test('label', () => {
