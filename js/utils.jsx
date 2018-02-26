@@ -1,6 +1,6 @@
+import _ from 'underscore';
+import d3 from 'd3';
 import React from 'react';
-
-const {_, d3} = window;
 
 export const paddedInt = d3.format('02d');
 export const timeFormat = d3.time.format.utc('%a %H:%M:%S');
@@ -62,6 +62,10 @@ export function cleanJobPath(path) {
   return path
     .replace(/hdfs:\/\/\w+(\.\w+)*:\d+/g, '')
     .replace(/,/, ', ');
+}
+
+export function jobLabel(jobName) {
+  return /\(([0-9]+)/.exec(jobName)[1];
 }
 
 export function sample(arr, limit, comparator) {

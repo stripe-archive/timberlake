@@ -1,6 +1,7 @@
 import React from 'react';
 import DAGEdge from './DAGEdge';
 import DAGNode from './DAGNode';
+import {jobLabel} from '../utils';
 
 const {dagre} = window;
 
@@ -11,7 +12,6 @@ export default class RelatedDAG extends React.Component {
   render() {
     const {job, jobConfs} = this.props;
     const jobs = this.props.relatives;
-    console.log('job & relatives', job, jobs);
 
     // Graph settings.
     const margin = 20;
@@ -29,7 +29,6 @@ export default class RelatedDAG extends React.Component {
     const inputMap = [];
     const outputMap = [];
     const files = new Set();
-    console.log('job name', job.name);
     jobs.forEach((currentJob) => {
       // Find input & output jobs.
       const jobConf = jobConfs[currentJob.id];
@@ -45,11 +44,19 @@ export default class RelatedDAG extends React.Component {
         (outputMap[output] = outputMap[output] || []).push(currentJob.id);
         files.add(output);
       });
-      // "job.FilterSnapshotJob$ (execution-step 0)/(1/1) ...180223/filtered_snapshots"
-      console.log('currentJob name', currentJob.name);
+
+      // this regex breaks sometimes, but we still use it by default for
+      // backcompat
+      const oldLabel = /^[^(]+\(([0-9]+)/.exec(currentJob.name);
+      let label;
+      if (oldLabel === null) {
+        label = jobLabel(currentJob.name);
+      } else {
+        [, label] = oldLabel;
+      }
       // Create a graph node.
       g.setNode(currentJob.id, {
-        label: /^[^(]+\(([0-9]+)/.exec(currentJob.name)[1],
+        label,
         job: currentJob,
         width: size,
         height: size,
