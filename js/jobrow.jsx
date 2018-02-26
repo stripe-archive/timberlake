@@ -1,11 +1,11 @@
 import React from 'react';
 import {Link, hashHistory} from 'react-router';
 
+import {jobState} from './utils/utils';
 import {
-  timeFormat,
   secondFormat,
-  jobState,
-} from './utils';
+  timeFormat,
+} from './utils/d3';
 import ProgressBar from './components/progress-bar';
 
 // Lifted from react-router.

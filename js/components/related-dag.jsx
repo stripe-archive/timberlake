@@ -1,7 +1,7 @@
 import React from 'react';
 import DAGEdge from './DAGEdge';
 import DAGNode from './DAGNode';
-import {jobLabel} from '../utils';
+import {jobLabel} from '../utils/utils';
 
 const {dagre} = window;
 

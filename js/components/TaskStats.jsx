@@ -1,10 +1,8 @@
 import React from 'react';
 
 import BoxPlot from './BoxPlot';
-import {
-  sample,
-  secondFormat,
-} from '../utils';
+import {sample} from '../utils/utils';
+import {secondFormat} from '../utils/d3';
 
 const {_} = window;
 

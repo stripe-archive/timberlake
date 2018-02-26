@@ -1,11 +1,11 @@
 import React from 'react';
 
 import {
-  secondFormat,
   COLOUR_MAP,
   COLOUR_SELECTED,
   COLOUR_HOVER,
-} from '../utils';
+} from '../utils/utils';
+import {secondFormat} from '../utils/d3';
 import Waterfall from './Waterfall';
 
 const {_} = window;

@@ -3,7 +3,7 @@ import {
   COLOUR_MAP,
   COLOUR_SELECTED,
   COLOUR_HOVER,
-} from '../utils';
+} from '../utils/utils';
 
 /**
  * Renders a node in the DAG view.

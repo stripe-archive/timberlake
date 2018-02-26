@@ -1,5 +1,5 @@
 import React from 'react';
-import {numFormat} from './utils';
+import {numFormat} from './utils/d3';
 
 /**
  * Component responsible for rendering the top navigation bar.
