@@ -68,7 +68,7 @@ type State = {
 }
 
 export default class Job extends React.Component<Props, State> {
-  constructor(props: any) {
+  constructor(props: Props) {
     super(props);
     this.state = {
       hover: false,

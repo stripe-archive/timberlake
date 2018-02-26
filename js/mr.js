@@ -1,4 +1,4 @@
-import {cleanJobName} from './utils';
+import {cleanJobName} from './utils/utils';
 
 const {_} = window;
 
