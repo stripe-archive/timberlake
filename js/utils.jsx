@@ -1,16 +1,17 @@
+// @flow
 import _ from 'underscore';
 import d3 from 'd3';
 import React from 'react';
 
 export const paddedInt = d3.format('02d');
 export const timeFormat = d3.time.format.utc('%a %H:%M:%S');
-export const lolhadoop = (s) => s.replace(/application|job/, '');
+export const lolhadoop = (s: string) => s.replace(/application|job/, '');
 
-export function numFormat(n) {
+export function numFormat(n: number) {
   return d3.format(',d')(n || 0);
 }
 
-export function secondFormat(ms) {
+export function secondFormat(ms: number) {
   const n = ms / 1000;
   const hour = Math.floor(n / 3600);
   const minute = Math.floor(n % 3600 / 60);
@@ -18,11 +19,11 @@ export function secondFormat(ms) {
   return `${numFormat(hour)}:${paddedInt(minute)}:${paddedInt(second)}`;
 }
 
-export function plural(n, s) {
+export function plural(n: number, s: string) {
   return n === 1 ? s : `${s}s`;
 }
 
-export function humanFormat(ms) {
+export function humanFormat(ms: number) {
   const n = ms / 1000;
   const hour = Math.floor(n / 3600);
   const minute = Math.floor(n % 3600 / 60);
@@ -40,7 +41,7 @@ export const ACTIVE_STATES = ['RUNNING', 'ACCEPTED'];
 export const FINISHED_STATES = ['SUCCEEDED', 'KILLED', 'FAILED', 'ERROR'];
 export const FAILED_STATES = ['FAILED', 'KILLED', 'ERROR'];
 
-export function jobState(job) {
+export function jobState(job: {state: string}) {
   const {state} = job;
   const label = {
     accepted: 'success',
@@ -53,22 +54,29 @@ export function jobState(job) {
   return <span className={`label label-${label[state.toLowerCase()]}`}>{state}</span>;
 }
 
-export function cleanJobName(name) {
+export function cleanJobName(name: string) {
   return name.replace(/\[[A-Z0-9/]+]\s+/, '').replace(/(\w+\.)+(\w+)/, '$1$2');
 }
 
-export function cleanJobPath(path) {
+export function cleanJobPath(path: ?string) {
   if (!path) return path;
   return path
     .replace(/hdfs:\/\/\w+(\.\w+)*:\d+/g, '')
     .replace(/,/, ', ');
 }
 
-export function jobLabel(jobName) {
-  return /\(([0-9]+)/.exec(jobName)[1];
+export function jobLabel(jobName: string) {
+  // this regex breaks sometimes, but we still use it by default for
+  // backcompat
+  const oldLabel = /^[^(]+\(([0-9]+)/.exec(jobName);
+  if (oldLabel === null) {
+    return /\(([0-9]+)/.exec(jobName)[1];
+  } else {
+    return oldLabel[1];
+  }
 }
 
-export function sample(arr, limit, comparator) {
+export function sample(arr: Array<any>, limit: number, comparator: () => number) {
   // Sample arr down to size limit using comparator to take the largest value at
   // each step. Works best if arr is already sorted.
   if (arr.length <= limit) return arr;

@@ -44,16 +44,7 @@ export default class RelatedDAG extends React.Component {
         (outputMap[output] = outputMap[output] || []).push(currentJob.id);
         files.add(output);
       });
-
-      // this regex breaks sometimes, but we still use it by default for
-      // backcompat
-      const oldLabel = /^[^(]+\(([0-9]+)/.exec(currentJob.name);
-      let label;
-      if (oldLabel === null) {
-        label = jobLabel(currentJob.name);
-      } else {
-        [, label] = oldLabel;
-      }
+      const label = jobLabel(currentJob.name);
       // Create a graph node.
       g.setNode(currentJob.id, {
         label,
