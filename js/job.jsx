@@ -17,9 +17,11 @@ import {
   FAILED_STATES,
   jobState,
   lolhadoop,
+} from './utils/utils';
+import {
   secondFormat,
   timeFormat,
-} from './utils';
+} from './utils/d3';
 import {notAvailable} from './mr';
 
 const {$, _, d3} = window;
@@ -66,7 +68,7 @@ type State = {
 }
 
 export default class Job extends React.Component<Props, State> {
-  constructor(props: any) {
+  constructor(props: Props) {
     super(props);
     this.state = {
       hover: false,

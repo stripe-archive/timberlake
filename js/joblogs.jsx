@@ -2,7 +2,7 @@ import React from 'react';
 import {Link} from 'react-router';
 
 import {Store} from './store';
-import {lolhadoop} from './utils';
+import {lolhadoop} from './utils/utils';
 
 const {_} = window;
 

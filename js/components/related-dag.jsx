@@ -1,8 +1,8 @@
+import dagre from 'dagre';
 import React from 'react';
 import DAGEdge from './DAGEdge';
 import DAGNode from './DAGNode';
-
-const {dagre} = window;
+import {jobLabel} from '../utils/utils';
 
 /**
  * View rendering the DAG of related scalding steps.
@@ -43,10 +43,10 @@ export default class RelatedDAG extends React.Component {
         (outputMap[output] = outputMap[output] || []).push(currentJob.id);
         files.add(output);
       });
-
+      const label = jobLabel(currentJob.name);
       // Create a graph node.
       g.setNode(currentJob.id, {
-        label: /^[^(]+\(([0-9]+)/.exec(currentJob.name)[1],
+        label,
         job: currentJob,
         width: size,
         height: size,

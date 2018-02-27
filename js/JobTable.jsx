@@ -4,7 +4,7 @@ import {FinishedJobRow, RunningJobRow} from './jobrow';
 import {
   ACTIVE_STATES,
   FINISHED_STATES,
-} from './utils';
+} from './utils/utils';
 
 const {_} = window;
 

@@ -1,12 +1,9 @@
 import React from 'react';
 import ProgressBar from './progress-bar';
 
-import {
-  humanFormat,
-  numFormat,
-  plural,
-} from '../utils';
+import {humanFormat, numFormat} from '../utils/d3';
 import {notAvailable} from '../mr';
+import {plural} from '../utils/utils';
 
 export default class extends React.Component {
   render() {

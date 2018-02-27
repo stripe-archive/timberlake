@@ -2,7 +2,7 @@ import React from 'react';
 import {
   COLOUR_MAP,
   COLOUR_REDUCE,
-} from '../utils';
+} from '../utils/utils';
 
 const {_, d3} = window;
 

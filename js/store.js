@@ -1,4 +1,4 @@
-import {cleanJobName} from './utils';
+import {cleanJobName} from './utils/utils';
 import {MRJob} from './mr';
 
 const {$} = window;
