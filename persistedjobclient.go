@@ -39,35 +39,6 @@ type s3JobClient struct {
 	s3Client   *s3.S3
 }
 
-/**
- * The stored job format is a little different from what we get from the
- * job history server
- */
-type s3JobDetail struct {
-	ID         string            `json:"job_id"`
-	Name       string            `json:"job_name"`
-	User       string            `json:"user"`
-	StartTime  int64             `json:"submit_date"`
-	FinishTime int64             `json:"finish_date"`
-	State      string            `json:"outcome"`
-	Conf       map[string]string `json:"job_properties"`
-
-	MapTasks []struct {
-		StartTime int64 `json:"launch_date"`
-		EndTime   int64 `json:"finish_date"`
-	} `json:"map_tasks"`
-	ReduceTasks []struct {
-		StartTime int64 `json:"launch_date"`
-		EndTime   int64 `json:"finish_date"`
-	} `json:"reduce_tasks"`
-
-	MapCounters    map[string]int `json:"map_counters"`
-	ReduceCounters map[string]int `json:"reduce_counters"`
-
-	MapsTotal    int `json:"total_maps"`
-	ReducesTotal int `json:"total_reduces"`
-}
-
 // NewS3JobClient creates a storage client
 func NewS3JobClient(awsRegion string, bucketName string, jobsPrefix string, flowPrefix string) PersistedJobClient {
 	config := &aws.Config{
@@ -137,92 +108,12 @@ func (client *s3JobClient) FetchJob(id string) (*job, error) {
 	}
 
 	// deserialize JSON
-	data := &s3JobDetail{}
+	data := &S3JobDetail{}
 	err = json.Unmarshal(jsonBytes, data)
 	if err != nil {
 		return nil, err
 	}
 
-	flowID, _ := data.Conf["cascading.flow.id"]
-
 	// handle the translating to be consistent with job history server
-	return &job{
-		Details:  s3jobdetailToJobDetail(data),
-		conf:     s3responseToJobConf(data),
-		Tasks:    s3responseToTasks(data),
-		Counters: s3responseToCounters(data),
-		FlowID:   &flowID,
-	}, nil
-}
-
-/**
- * Translates counter names
- */
-func getCounterName(s3name string) string {
-	if strings.Contains(s3name, "BYTES_READ") || strings.Contains(s3name, "BYTES_WRITTEN") {
-		return "FileSystemCounter." + s3name
-	} else if s3name == "REDUCE_SHUFFLE_BYTES" {
-		return "TaskCounter." + s3name
-	}
-	return s3name
-}
-
-func s3responseToCounters(s *s3JobDetail) []counter {
-	counters := make([]counter, 0)
-
-	for key := range s.ReduceCounters {
-		counters = append(counters, counter{
-			Name:   getCounterName(key),
-			Total:  s.MapCounters[key] + s.ReduceCounters[key],
-			Map:    s.MapCounters[key],
-			Reduce: s.ReduceCounters[key],
-		})
-	}
-
-	return counters
-}
-
-func s3responseToTasks(s *s3JobDetail) tasks {
-	tasks := tasks{Map: make([][]int64, len(s.MapTasks)), Reduce: make([][]int64, len(s.ReduceTasks))}
-
-	for i, task := range s.MapTasks {
-		tasks.Map[i] = []int64{task.StartTime, task.EndTime}
-	}
-	for i, task := range s.ReduceTasks {
-		tasks.Reduce[i] = []int64{task.StartTime, task.EndTime}
-	}
-
-	return tasks
-}
-
-func s3responseToJobConf(s *s3JobDetail) conf {
-	return conf{
-		Flags:  s.Conf,
-		Input:  s.Conf["mapreduce.input.fileinputformat.inputdir"],
-		Output: s.Conf["mapreduce.output.fileoutputformat.outputdir"],
-	}
-}
-
-func s3jobdetailToJobDetail(s *s3JobDetail) jobDetail {
-	state := s.State
-	if state == "success" {
-		state = "succeeded" // for consistency with job history server
-	}
-
-	return jobDetail{
-		ID:         s.ID,
-		Name:       s.Name,
-		User:       s.User,
-		State:      state,
-		StartTime:  s.StartTime,
-		FinishTime: s.FinishTime,
-
-		MapsTotal:     s.MapsTotal,
-		MapProgress:   100,
-		MapsTotalTime: int64(s.MapCounters["CPU_MILLISECONDS"]),
-
-		ReducesTotal:     s.ReducesTotal,
-		ReduceProgress:   100,
-		ReducesTotalTime: int64(s.ReduceCounters["CPU_MILLISECONDS"]),
-	}
+	return s3responseToJob(data), nil
 }
