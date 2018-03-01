@@ -112,7 +112,11 @@ export default class Job extends React.Component<Props, State> {
 
   handleNewJobID(jobId: string) {
     Store.getJob(jobId)
-      .then((job) => Store.getRelatedJobs(job.flowId));
+      .then((job) => {
+        if (job.flowId) {
+          Store.getRelatedJobs(job.flowId);
+        }
+      });
     ConfStore.getJobConf(jobId);
     relatedJobs(this.getJob(), this.props.jobs).forEach((job) => {
       ConfStore.getJobConf(job.id);
