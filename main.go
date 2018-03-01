@@ -6,7 +6,6 @@ import (
 	"github.com/zenazn/goji/bind"
 	"github.com/zenazn/goji/web"
 	"github.com/zenazn/goji/web/middleware"
-	"fmt"
 	"log"
 	"net/http"
 	"net/http/pprof"
@@ -20,6 +19,8 @@ import (
 var clusterNames = flag.String("cluster-name", "default", "The user-visible names for the clusters")
 var resourceManagerURL = flag.String("resource-manager-url", "http://localhost:8088", "The HTTP URL to access the resource manager.")
 var historyServerURL = flag.String("history-server-url", "http://localhost:19888", "The HTTP URL to access the history server.")
+var publicResourceManagerURL = flag.String("public-resource-manager-url", "", "The HTTP URL to access the resource manager.")
+var publicHistoryServerURL = flag.String("public-history-server-url", "", "The HTTP URL to access the history server.")
 var proxyServerURL = flag.String("proxy-server-url", "", "The HTTP URL to access the proxy server, if separate from the resource manager.")
 var namenodeAddress = flag.String("namenode-address", "localhost:9000", "The host:port to access the Namenode metadata service.")
 var yarnLogDir = flag.String("yarn-logs-dir", "/tmp/logs", "The HDFS path where YARN stores logs. This is the controlled by the hadoop property yarn.nodemanager.remote-app-log-dir.")
@@ -117,22 +118,16 @@ func getConf(c web.C, w http.ResponseWriter, r *http.Request) {
 
 func getJob(rawJobID string) *job {
 	// check if we have it in memory
-	for clusterName, jt := range jts {
+	for _, jt := range jts {
 		if _, ok := jt.jobs[jobID(rawJobID)]; ok {
-			job := jt.reifyJob(rawJobID)
-			job.Cluster = clusterName
-
-			appID, _jobID := hadoopIDs(rawJobID)
-			job.ResourceManagerURL = fmt.Sprintf("%s/cluster/app/%s", jt.jobClient.getRMAddress(), appID)
-			job.JobHistoryURL = fmt.Sprintf("%s/jobhistory/job/%s", jt.jobClient.getJobHistoryAddress(), _jobID)
-
+			job := jt.getJob(rawJobID)
+			jt.reifyJob(job)
 			return job
 		}
 	}
 
 	// check if we have it in long-term storage
 	job, _ := persistedJobClient.FetchJob(rawJobID)
-
 	return job
 }
 
@@ -208,8 +203,17 @@ func main() {
 	var clusterNames = strings.Split(*clusterNames, ",")
 	var resourceManagerURLs = strings.Split(*resourceManagerURL, ",")
 	var historyServerURLs = strings.Split(*historyServerURL, ",")
+	var publicResourceManagerURLs = strings.Split(*publicResourceManagerURL, ",")
+	var publicHistoryServerURLs = strings.Split(*publicHistoryServerURL, ",")
 	var proxyServerURLs = strings.Split(*proxyServerURL, ",")
 	var namenodeAddresses = strings.Split(*namenodeAddress, ",")
+
+	if *publicResourceManagerURL == "" {
+		publicResourceManagerURLs = resourceManagerURLs
+	}
+	if *publicHistoryServerURL == "" {
+		publicHistoryServerURLs = resourceManagerURLs
+	}
 
 	if len(resourceManagerURLs) != len(historyServerURLs) {
 		log.Fatal("resource-manager-url and history-server-url are not 1:1")
@@ -236,6 +240,8 @@ func main() {
 		log.Printf("Creating new JT [%d]: %s %s %s\n", i, resourceManagerURLs[i], historyServerURLs[i], proxyServerURL)
 		jts[clusterNames[i]] = newJobTracker(
 			clusterNames[i],
+			publicResourceManagerURLs[i],
+			publicHistoryServerURLs[i],
 			newRecentJobClient(
 				resourceManagerURLs[i],
 				historyServerURLs[i],

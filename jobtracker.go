@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"runtime"
 	"sort"
@@ -48,6 +49,8 @@ func hadoopIDs(id string) (string, jobID) {
 type jobTracker struct {
 	jobClient       RecentJobClient
 	clusterName     string
+	publicResourceManagerURL string
+	publicHistoryServerURL string
 	jobs            map[jobID]*job
 	jobsLock        sync.Mutex
 	rm              string
@@ -60,9 +63,11 @@ type jobTracker struct {
 	updates         chan *job
 }
 
-func newJobTracker(clusterName string, jobClient RecentJobClient) *jobTracker {
+func newJobTracker(clusterName string, publicResourceManagerURL string, publicHistoryServerURL string, jobClient RecentJobClient) *jobTracker {
 	return &jobTracker{
 		clusterName: clusterName,
+		publicResourceManagerURL: publicResourceManagerURL,
+		publicHistoryServerURL: publicHistoryServerURL,
 		jobClient:   jobClient,
 		jobs:        make(map[jobID]*job),
 		running:     make(chan *job),
@@ -284,9 +289,7 @@ func (jt *jobTracker) getJob(id string) *job {
 	return jt.jobs[jobID]
 }
 
-func (jt *jobTracker) reifyJob(id string) *job {
-	job := jt.getJob(id)
-
+func (jt *jobTracker) reifyJob(job *job) {
 	if !job.running && job.partial {
 		err := jt.updateFromHistoryFile(job, true)
 		if err != nil {
@@ -294,7 +297,11 @@ func (jt *jobTracker) reifyJob(id string) *job {
 		}
 	}
 
-	return job
+	appID, _jobID := hadoopIDs(job.Details.ID)
+
+	job.Cluster = jt.clusterName
+	job.ResourceManagerURL = fmt.Sprintf("%s/cluster/app/%s", jt.publicResourceManagerURL, appID)
+	job.JobHistoryURL = fmt.Sprintf("%s/jobhistory/job/%s", jt.publicHistoryServerURL, _jobID)
 }
 
 func (jt *jobTracker) deleteJob(id string) {
@@ -358,8 +365,7 @@ func (jt *jobTracker) updateJob(job *job) error {
 
 func (jt *jobTracker) sendUpdates(sse *sse) {
 	for job := range jt.updates {
-		// FIXME: set the cluster in a more intuitive place, not JIT
-		job.Cluster = jt.clusterName
+		jt.reifyJob(job)
 		jsonBytes, err := json.Marshal(job)
 		if err != nil {
 			log.Println("json error: ", err)
