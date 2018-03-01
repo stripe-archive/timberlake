@@ -19,6 +19,8 @@ type job struct {
 	partial  bool
 	updated  time.Time
 	Cluster  string `json:"cluster"`
+	ResourceManagerURL string `json:"resourceManagerUrl"`
+	JobHistoryURL      string `json:"jobHistoryUrl"`
 
 	// http://docs.cascading.org/cascading/1.2/javadoc/cascading/flow/Flow.html
 	FlowID *string `json:"flowID"`

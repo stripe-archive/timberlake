@@ -171,7 +171,8 @@ export default class Job extends React.Component<Props, State> {
     const previous = prev ? <Link to={`job/${prev.id}`}>previous: {secondFormat(prev.duration())}</Link> : null;
 
     let state = jobState(job);
-    if (_.contains(ACTIVE_STATES, job.state)) {
+    const isActive = _.contains(ACTIVE_STATES, job.state);
+    if (isActive) {
       const {killing} = this.state;
       state = (
         <span>
@@ -256,8 +257,14 @@ export default class Job extends React.Component<Props, State> {
       <div>
         <div className="row">
           <div className="col-md-5">
-            <div>
+            <div className="job-header">
               <h4>Job Details</h4>
+              <div className="job-header-hadoop-link-container">
+                {isActive && job.resourceManagerUrl &&
+                  <a className="hadoop-link" href={job.resourceManagerUrl}>View in Resource Manager</a>}
+                {!isActive && job.jobHistoryUrl &&
+                  <a className="hadoop-link" href={job.jobHistoryUrl}>View in Job History</a>}
+              </div>
             </div>
             <table className="table job-details">
               <tbody>

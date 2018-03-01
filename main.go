@@ -6,6 +6,7 @@ import (
 	"github.com/zenazn/goji/bind"
 	"github.com/zenazn/goji/web"
 	"github.com/zenazn/goji/web/middleware"
+	"fmt"
 	"log"
 	"net/http"
 	"net/http/pprof"
@@ -120,6 +121,11 @@ func getJob(rawJobID string) *job {
 		if _, ok := jt.jobs[jobID(rawJobID)]; ok {
 			job := jt.reifyJob(rawJobID)
 			job.Cluster = clusterName
+
+			appID, _jobID := hadoopIDs(rawJobID)
+			job.ResourceManagerURL = fmt.Sprintf("%s/cluster/app/%s", jt.jobClient.getRMAddress(), appID)
+			job.JobHistoryURL = fmt.Sprintf("%s/jobhistory/job/%s", jt.jobClient.getJobHistoryAddress(), _jobID)
+
 			return job
 		}
 	}
