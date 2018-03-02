@@ -8,6 +8,8 @@ export class MRJob {
   constructor(data) {
     this.cluster = data.cluster;
     this.flowId = data.flowID;
+    this.resourceManagerUrl = data.resourceManagerUrl;
+    this.jobHistoryUrl = data.jobHistoryUrl;
     const d = data.details;
     this.id = d.id.replace('application_', 'job_');
     this.fullName = d.name;

@@ -32,7 +32,7 @@ func (m *mockPersistedJobClient) FetchJob(id string) (*job, error) {
  */
 func setJobTracker(client RecentJobClient) *jobTracker {
 	jts = make(map[string]*jobTracker)
-	var jt = newJobTracker("foo", client)
+	var jt = newJobTracker("foo", "", "", client)
 	jts["testCluster"] = jt
 	return jt
 }

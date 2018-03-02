@@ -122,6 +122,19 @@ a:hover,
 }
 /** progress bar **/
 
+.job-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.job-header-hadoop-link-container {
+  align-self: center;
+}
+
+.hadoop-link {
+  color: #428bca;
+}
+
 .job-details td {
   max-width: 500px;
   overflow: hidden;
