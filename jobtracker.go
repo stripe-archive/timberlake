@@ -46,18 +46,14 @@ func hadoopIDs(id string) (string, jobID) {
 }
 
 type jobTracker struct {
-	jobClient       RecentJobClient
-	clusterName     string
-	jobs            map[jobID]*job
-	jobsLock        sync.Mutex
-	rm              string
-	hs              string
-	ps              string
-	namenodeAddress string
-	running         chan *job
-	finished        chan *job
-	backfill        chan *job
-	updates         chan *job
+	jobClient   RecentJobClient
+	clusterName string
+	jobs        map[jobID]*job
+	jobsLock    sync.Mutex
+	running     chan *job
+	finished    chan *job
+	backfill    chan *job
+	updates     chan *job
 }
 
 func newJobTracker(clusterName string, jobClient RecentJobClient) *jobTracker {
@@ -102,7 +98,7 @@ func (jt *jobTracker) runningJobLoop() {
 	}
 
 	for range time.Tick(*pollInterval) {
-		log.Printf("Listing running jobs in cluster %s on resource manager %s\n", jt.clusterName, jt.rm)
+		log.Printf("Listing running jobs in cluster %s\n", jt.clusterName)
 		running, err := jt.jobClient.listJobs()
 		if err != nil {
 			log.Println("Error listing running jobs:", err)
