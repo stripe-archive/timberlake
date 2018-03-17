@@ -48,6 +48,7 @@ func hadoopIDs(id string) (string, jobID) {
 
 type jobTracker struct {
 	jobClient       RecentJobClient
+	jobHistoryClient HdfsJobHistoryClient
 	clusterName     string
 	publicResourceManagerURL string
 	publicHistoryServerURL string
@@ -63,11 +64,14 @@ type jobTracker struct {
 	updates         chan *job
 }
 
-func newJobTracker(clusterName string, publicResourceManagerURL string, publicHistoryServerURL string, jobClient RecentJobClient) *jobTracker {
+
+func newJobTracker(clusterName string, publicResourceManagerURL string, publicHistoryServerURL string, jobClient RecentJobClient, jobHistoryClient HdfsJobHistoryClient) *jobTracker {
 	return &jobTracker{
 		clusterName: clusterName,
+		jobHistoryClient: jobHistoryClient,
 		publicResourceManagerURL: publicResourceManagerURL,
 		publicHistoryServerURL: publicHistoryServerURL,
+
 		jobClient:   jobClient,
 		jobs:        make(map[jobID]*job),
 		running:     make(chan *job),
@@ -151,7 +155,7 @@ func (jt *jobTracker) finishedJobLoop() {
 				}
 
 				full := job.Details.FinishTime/1000 > time.Now().Add(-fullDataDuration).Unix()
-				err := jt.updateFromHistoryFile(job, full)
+				err := jt.jobHistoryClient.updateFromHistoryFile(jt, job, full)
 				if err != nil {
 					log.Println("An error occurred updating from history file", job.Details.ID, err)
 					continue
@@ -291,7 +295,7 @@ func (jt *jobTracker) getJob(id string) *job {
 
 func (jt *jobTracker) reifyJob(job *job) {
 	if !job.running && job.partial {
-		err := jt.updateFromHistoryFile(job, true)
+		err := jt.jobHistoryClient.updateFromHistoryFile(jt, job, true)
 		if err != nil {
 			log.Println("Error loading full details for job:", err)
 		}

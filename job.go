@@ -74,16 +74,20 @@ type counter struct {
 	Reduce int    `json:"reduce"`
 }
 
-type appsResp struct {
-	Apps struct {
+type appsDetailList struct {
 		App []jobDetail `json:"app"`
-	} `json:"apps"`
+}
+
+type appsResp struct {
+	Apps appsDetailList `json:"apps"`
+}
+
+type jobsDetailList struct {
+	Job []jobDetail `json:"job"`
 }
 
 type jobsResp struct {
-	Jobs struct {
-		Job []jobDetail `json:"job"`
-	} `json:"jobs"`
+	Jobs jobsDetailList `json:"jobs"`
 	Job jobDetail `json:"job"`
 }
 

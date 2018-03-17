@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -18,6 +19,11 @@ type mockPersistedJobClient struct {
 	mock.Mock
 }
 
+type mockHdfsJobHistoryClient struct {
+	hdfsJobHistoryClient
+	mock.Mock
+}
+
 func (m *mockPersistedJobClient) FetchJob(id string) (*job, error) {
 	args := m.Called(id)
 	detail := args.Get(0)
@@ -27,12 +33,38 @@ func (m *mockPersistedJobClient) FetchJob(id string) (*job, error) {
 	return nil, args.Error(1)
 }
 
+func (m *mockJobClient) listJobs() (*appsResp, error) {
+	args := m.Called()
+	returnVal := args.Get(0)
+	if returnVal != nil {
+		return args.Get(0).(*appsResp), args.Error(1)
+	}
+	return nil, args.Error(1)
+}
+
+func (m *mockJobClient) listFinishedJobs(since time.Time) (*jobsResp, error) {
+	args := m.Called(since)
+	returnVal := args.Get(0)
+	if returnVal != nil {
+		return args.Get(0).(*jobsResp), args.Error(1)
+	}
+	return nil, args.Error(1)
+}
+
+func (m *mockJobClient) updateJob(job *job) error {
+	return nil
+}
+
+func (m *mockHdfsJobHistoryClient) updateFromHistoryFile(jt *jobTracker, job *job, full bool) error {
+	return nil
+}
+
 /**
  * sets a jobTracker to main.jts
  */
 func setJobTracker(client RecentJobClient) *jobTracker {
 	jts = make(map[string]*jobTracker)
-	var jt = newJobTracker("foo", "", "", client)
+	var jt = newJobTracker("foo", "", "", client, &hdfsJobHistoryClient{})
 	jts["testCluster"] = jt
 	return jt
 }
