@@ -23,7 +23,7 @@ func TestJobTrackerJobsMapRace(t *testing.T) {
     },
   }
   mockClient.On("listJobs").Return(&appresp, nil)
-  jt := newJobTracker("foo", mockClient, mockHistoryClient)
+  jt := newJobTracker("foo", "", "",  mockClient, mockHistoryClient)
 
   jt.Loop()
   time.Sleep(time.Second * 5)

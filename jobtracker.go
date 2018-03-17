@@ -118,6 +118,7 @@ func (jt *jobTracker) runningJobLoop() {
 			continue
 		}
 
+		jt.jobsLock.Lock()
 		log.Printf("Running jobs in cluster %s: %d\n", jt.clusterName, len(running.Apps.App))
 		log.Println("Jobs in cache:", len(jt.jobs))
 		log.Println("Goroutines:", runtime.NumGoroutine())
@@ -131,9 +132,11 @@ func (jt *jobTracker) runningJobLoop() {
 				log.Printf("%s in cluster %s has not been updated in thirty ticks. Removing.\n", jobID, jt.clusterName)
 				job.Details.State = "GONE"
 				jt.updates <- job
-				jt.deleteJob(job.Details.ID)
+				_, jobID := hadoopIDs(job.Details.ID)
+				delete(jt.jobs, jobID)
 			}
 		}
+		jt.jobsLock.Unlock()
 
 		for i := range running.Apps.App {
 			job := &job{Details: running.Apps.App[i], running: true, updated: time.Now()}
@@ -306,15 +309,6 @@ func (jt *jobTracker) reifyJob(job *job) {
 	job.Cluster = jt.clusterName
 	job.ResourceManagerURL = fmt.Sprintf("%s/cluster/app/%s", jt.publicResourceManagerURL, appID)
 	job.JobHistoryURL = fmt.Sprintf("%s/jobhistory/job/%s", jt.publicHistoryServerURL, _jobID)
-}
-
-func (jt *jobTracker) deleteJob(id string) {
-	_, jobID := hadoopIDs(id)
-
-	jt.jobsLock.Lock()
-	defer jt.jobsLock.Unlock()
-
-	delete(jt.jobs, jobID)
 }
 
 func (jt *jobTracker) saveJob(job *job) {
