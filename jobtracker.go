@@ -47,37 +47,36 @@ func hadoopIDs(id string) (string, jobID) {
 }
 
 type jobTracker struct {
-	jobClient       RecentJobClient
-	jobHistoryClient HdfsJobHistoryClient
-	clusterName     string
+	jobClient                RecentJobClient
+	jobHistoryClient         HdfsJobHistoryClient
+	clusterName              string
 	publicResourceManagerURL string
-	publicHistoryServerURL string
-	jobs            map[jobID]*job
-	jobsLock        sync.Mutex
-	rm              string
-	hs              string
-	ps              string
-	namenodeAddress string
-	running         chan *job
-	finished        chan *job
-	backfill        chan *job
-	updates         chan *job
+	publicHistoryServerURL   string
+	jobs                     map[jobID]*job
+	jobsLock                 sync.Mutex
+	rm                       string
+	hs                       string
+	ps                       string
+	namenodeAddress          string
+	running                  chan *job
+	finished                 chan *job
+	backfill                 chan *job
+	updates                  chan *job
 }
-
 
 func newJobTracker(clusterName string, publicResourceManagerURL string, publicHistoryServerURL string, jobClient RecentJobClient, jobHistoryClient HdfsJobHistoryClient) *jobTracker {
 	return &jobTracker{
-		clusterName: clusterName,
-		jobHistoryClient: jobHistoryClient,
+		clusterName:              clusterName,
+		jobHistoryClient:         jobHistoryClient,
 		publicResourceManagerURL: publicResourceManagerURL,
-		publicHistoryServerURL: publicHistoryServerURL,
+		publicHistoryServerURL:   publicHistoryServerURL,
 
-		jobClient:   jobClient,
-		jobs:        make(map[jobID]*job),
-		running:     make(chan *job),
-		finished:    make(chan *job),
-		backfill:    make(chan *job),
-		updates:     make(chan *job),
+		jobClient: jobClient,
+		jobs:      make(map[jobID]*job),
+		running:   make(chan *job),
+		finished:  make(chan *job),
+		backfill:  make(chan *job),
+		updates:   make(chan *job),
 	}
 }
 

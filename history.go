@@ -95,7 +95,7 @@ type HdfsJobHistoryClient interface {
 	updateFromHistoryFile(jt *jobTracker, job *job, full bool) error
 }
 
-type hdfsJobHistoryClient struct {}
+type hdfsJobHistoryClient struct{}
 
 type jhistParser struct {
 	job  *job
