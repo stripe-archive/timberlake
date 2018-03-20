@@ -248,6 +248,7 @@ func main() {
 				proxyServerURL,
 				namenodeAddresses[i],
 			),
+			&hdfsJobHistoryClient{},
 		)
 	}
 

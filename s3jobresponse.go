@@ -13,7 +13,7 @@ type S3JobDetail struct {
 	State      string            `json:"outcome"`
 	Conf       map[string]string `json:"job_properties"`
 
-	MapTasks []task `json:"map_tasks"`
+	MapTasks    []task `json:"map_tasks"`
 	ReduceTasks []task `json:"reduce_tasks"`
 
 	MapCounters    map[string]int `json:"map_counters"`
@@ -24,8 +24,8 @@ type S3JobDetail struct {
 }
 
 type task struct {
-	StartTime int64 `json:"launch_date"`
-	EndTime   int64 `json:"finish_date"`
+	StartTime int64  `json:"launch_date"`
+	EndTime   int64  `json:"finish_date"`
 	Status    string `json:"task_status"`
 }
 
@@ -99,13 +99,13 @@ func s3responseToJobConf(s *S3JobDetail) conf {
 }
 
 func filter(vs []task, f func(task) bool) []task {
-    vsf := make([]task, 0)
-    for _, v := range vs {
-        if f(v) {
-            vsf = append(vsf, v)
-        }
-    }
-    return vsf
+	vsf := make([]task, 0)
+	for _, v := range vs {
+		if f(v) {
+			vsf = append(vsf, v)
+		}
+	}
+	return vsf
 }
 
 func s3jobdetailToJobDetail(s *S3JobDetail) jobDetail {
@@ -124,20 +124,20 @@ func s3jobdetailToJobDetail(s *S3JobDetail) jobDetail {
 
 		MapsTotal:     s.MapsTotal,
 		MapProgress:   100,
-		MapsPending: 0,
-		MapsRunning: 0,
-		MapsCompleted: len(filter(s.MapTasks, func (t task) bool { return t.Status == "SUCCESS" })),
-		MapsFailed: len(filter(s.MapTasks, func (t task) bool { return t.Status == "FAILED" })),
-		MapsKilled: len(filter(s.MapTasks, func (t task) bool { return t.Status == "KILLED" })),
+		MapsPending:   0,
+		MapsRunning:   0,
+		MapsCompleted: len(filter(s.MapTasks, func(t task) bool { return t.Status == "SUCCESS" })),
+		MapsFailed:    len(filter(s.MapTasks, func(t task) bool { return t.Status == "FAILED" })),
+		MapsKilled:    len(filter(s.MapTasks, func(t task) bool { return t.Status == "KILLED" })),
 		MapsTotalTime: int64(s.MapCounters["CPU_MILLISECONDS"]),
 
 		ReducesTotal:     s.ReducesTotal,
 		ReduceProgress:   100,
-		ReducesPending: 0,
-		ReducesRunning: 0,
-		ReducesCompleted: len(filter(s.ReduceTasks, func (t task) bool { return t.Status == "SUCCESS" })),
-		ReducesFailed: len(filter(s.ReduceTasks, func (t task) bool { return t.Status == "FAILED" })),
-		ReducesKilled: len(filter(s.ReduceTasks, func (t task) bool { return t.Status == "KILLED" })),
+		ReducesPending:   0,
+		ReducesRunning:   0,
+		ReducesCompleted: len(filter(s.ReduceTasks, func(t task) bool { return t.Status == "SUCCESS" })),
+		ReducesFailed:    len(filter(s.ReduceTasks, func(t task) bool { return t.Status == "FAILED" })),
+		ReducesKilled:    len(filter(s.ReduceTasks, func(t task) bool { return t.Status == "KILLED" })),
 		ReducesTotalTime: int64(s.ReduceCounters["CPU_MILLISECONDS"]),
 	}
 }

@@ -11,14 +11,14 @@ type jobConf struct {
 // Avoid adding additional exported fields
 // as event streaming can overwhelm clients
 type job struct {
-	Details  jobDetail `json:"details"`
-	Counters []counter `json:"counters"`
-	conf     conf
-	Tasks    tasks `json:"tasks"`
-	running  bool
-	partial  bool
-	updated  time.Time
-	Cluster  string `json:"cluster"`
+	Details            jobDetail `json:"details"`
+	Counters           []counter `json:"counters"`
+	conf               conf
+	Tasks              tasks `json:"tasks"`
+	running            bool
+	partial            bool
+	updated            time.Time
+	Cluster            string `json:"cluster"`
 	ResourceManagerURL string `json:"resourceManagerUrl"`
 	JobHistoryURL      string `json:"jobHistoryUrl"`
 
@@ -74,17 +74,21 @@ type counter struct {
 	Reduce int    `json:"reduce"`
 }
 
+type appsDetailList struct {
+	App []jobDetail `json:"app"`
+}
+
 type appsResp struct {
-	Apps struct {
-		App []jobDetail `json:"app"`
-	} `json:"apps"`
+	Apps appsDetailList `json:"apps"`
+}
+
+type jobsDetailList struct {
+	Job []jobDetail `json:"job"`
 }
 
 type jobsResp struct {
-	Jobs struct {
-		Job []jobDetail `json:"job"`
-	} `json:"jobs"`
-	Job jobDetail `json:"job"`
+	Jobs jobsDetailList `json:"jobs"`
+	Job  jobDetail      `json:"job"`
 }
 
 type confResp struct {

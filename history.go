@@ -90,6 +90,13 @@ type attemptEvent struct {
 	} `json:"counters"`
 }
 
+// HdfsJobHistoryClient fetches job history from HDFS
+type HdfsJobHistoryClient interface {
+	updateFromHistoryFile(jt *jobTracker, job *job, full bool) error
+}
+
+type hdfsJobHistoryClient struct{}
+
 type jhistParser struct {
 	job  *job
 	full bool
@@ -355,7 +362,7 @@ func findHistoryAndConfFiles(client *hdfs.Client, jobID jobID, finishTime int64)
 
 // updateFromHistoryFile updates a job's details by loading its saved 'jhist'
 // file stored in hdfs, along with the stored jobconf xml file.
-func (jt *jobTracker) updateFromHistoryFile(job *job, full bool) error {
+func (jc *hdfsJobHistoryClient) updateFromHistoryFile(jt *jobTracker, job *job, full bool) error {
 	now := time.Now()
 
 	client, err := hdfs.New(jt.jobClient.getNamenodeAddress())
