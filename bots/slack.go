@@ -169,9 +169,10 @@ func alert(job Job) {
 	resp, err := http.Post(*slackURL, "application/json", bytes.NewReader(jsonBytes))
 	if err != nil {
 		fmt.Println(err)
+	} else {
+		fmt.Println(resp)
+        	defer resp.Body.Close()
 	}
-	fmt.Println(resp)
-        defer resp.Body.Close()
 }
 
 func cleanName(name string) string {
