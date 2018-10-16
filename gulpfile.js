@@ -24,5 +24,5 @@ gulp.task('watch', function() {
   gulp.watch(paths.js, ['babel']);
 });
 
-gulp.task('build', ['babel', 'copy']);
-gulp.task('default', ['build', 'watch']);
+gulp.task('build', gulp.series('babel', 'copy'));
+gulp.task('default', gulp.series('build', 'watch'));
