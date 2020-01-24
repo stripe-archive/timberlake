@@ -1,4 +1,5 @@
 # Timberlake is a Job Tracker for Hadoop.
+## DEPRECATED: Stripe no longer supports Timberlake
 
 * [Intro](#intro)
 * [Screenshots](#screenshots)
